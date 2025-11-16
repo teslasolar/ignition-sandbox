@@ -5,16 +5,25 @@ Full Ignition SCADA running in your browser via WebAssembly
 ## Quick Start
 
 1. Visit: https://teslasolar.github.io/ignition-sandbox
-2. Wait 30-60s for VM boot
-3. Access at `localhost:8088` inside VM
-4. Login: admin/password
+2. Wait for custom WebVM to load (first time: 1-2 min, cached: instant)
+3. Ignition auto-starts on boot
+4. Access at `localhost:8088` inside VM
+5. Login: admin/password
+
+## Deployment
+
+See [DEPLOY.md](DEPLOY.md) for complete deployment instructions including:
+- Building custom WebVM images
+- GitHub Actions automation
+- Manual deployment steps
 
 ## How It Works
 
-- WebVM (Debian Linux in WASM)
-- Java 11 JRE
-- Ignition Gateway 8.1.43
-- All client-side, no server
+- **Custom Docker Image**: Pre-built with Ignition installed
+- **WebVM**: Runs Debian Linux in browser via WebAssembly
+- **GitHub Container Registry**: Hosts the custom image
+- **Auto-start**: Ignition launches automatically on boot
+- **All client-side**: No server required, runs entirely in browser
 
 ## Features
 

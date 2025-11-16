@@ -153,7 +153,8 @@
                 setTimeout(nextStep, currentStep === 5 ? 3000 : 2000);
             } else {
                 document.getElementById('container').classList.add('ready');
-                document.getElementById('vm').src = 'https://webvm.io/?sharedusr=ignition&sharedpwd=train123';
+                // Use custom Ignition WebVM image from GitHub Container Registry
+                document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox/webvm:latest';
             }
         }
 
@@ -161,7 +162,7 @@
 
         function forceBootVM() {
             document.getElementById('container').classList.add('ready');
-            document.getElementById('vm').src = 'https://webvm.io';
+            document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox/webvm:latest';
         }
     </script>
 </body>
