@@ -41,72 +41,106 @@
             color: #aaa;
         }
 
-        .splash {
+        .content {
             flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
         }
 
-        .splash h2 {
+        .sidebar {
+            width: 350px;
+            background: #2d2d2d;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #444;
+        }
+
+        .sidebar h2 {
             color: #0078d4;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 15px;
         }
 
-        .progress {
-            width: 400px;
-            height: 30px;
-            background: #333;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
+        .sidebar h3 {
+            color: #00bcf2;
+            font-size: 14px;
+            margin: 15px 0 10px;
         }
 
-        .bar {
-            height: 100%;
-            background: linear-gradient(90deg, #0078d4, #00bcf2);
-            width: 0;
-            transition: width 0.3s;
-        }
-
-        .text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            line-height: 30px;
-            color: #fff;
+        .sidebar code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #0f0;
+            font-family: monospace;
             font-size: 12px;
-        }
-
-        #vm {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: none;
-        }
-
-        .ready #splash {
-            display: none;
-        }
-
-        .ready #vm {
             display: block;
+            margin: 8px 0;
+            word-wrap: break-word;
+            cursor: pointer;
+            border: 1px solid #444;
         }
 
-        button {
+        .sidebar code:hover {
+            background: #333;
+            border-color: #0078d4;
+        }
+
+        .sidebar p {
+            font-size: 13px;
+            color: #ccc;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .sidebar ol {
+            margin-left: 20px;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+
+        .copy-btn {
             background: #0078d4;
             color: #fff;
             border: 0;
-            padding: 12px 24px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 12px;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 10px;
+            width: 100%;
         }
 
-        button:hover {
+        .copy-btn:hover {
             background: #005a9e;
+        }
+
+        .copy-btn.copied {
+            background: #00aa00;
+        }
+
+        #vm {
+            flex: 1;
+            border: 0;
+        }
+
+        .status {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            border-left: 3px solid #0078d4;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .status.success {
+            border-color: #00aa00;
+        }
+
+        .status.warning {
+            border-color: #ffaa00;
         }
     </style>
 </head>
@@ -117,53 +151,68 @@
             <p>Full Ignition 8.1 running in Debian Linux via WebAssembly | No server required</p>
         </div>
 
-        <div id="splash" class="splash">
-            <h2>Initializing Virtual Machine</h2>
-            <div class="progress">
-                <div class="bar" id="bar"></div>
-                <div class="text" id="text">Loading...</div>
-            </div>
-            <button onclick="forceBootVM()" style="display:none" id="forceBtn">Force Boot</button>
-        </div>
+        <div class="content">
+            <div class="sidebar">
+                <h2>Quick Start</h2>
 
-        <iframe id="vm"></iframe>
+                <div class="status warning">
+                    <p><strong>⚡ One-Time Setup Required</strong></p>
+                    <p>Run the command below in the WebVM terminal →</p>
+                </div>
+
+                <h3>1. Copy this command:</h3>
+                <code id="installCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/claude/ignition-browser-sandbox-01NvmpKvr4EosK7GoU2msPkK/ignition-install.sh | sudo bash</code>
+                <button class="copy-btn" onclick="copyCommand()">📋 Copy Command</button>
+
+                <h3>2. Paste in terminal →</h3>
+                <p>Right-click in the black terminal on the right and paste (Ctrl+Shift+V)</p>
+
+                <h3>3. Wait for installation</h3>
+                <p>Installation takes 3-5 minutes. You'll see:</p>
+                <ol>
+                    <li>Installing dependencies...</li>
+                    <li>Downloading Ignition...</li>
+                    <li>Running installer...</li>
+                    <li>Starting Gateway...</li>
+                    <li>✅ Ready!</li>
+                </ol>
+
+                <h3>4. Access Ignition</h3>
+                <p>Once installation completes:</p>
+                <ol>
+                    <li>Open browser inside WebVM</li>
+                    <li>Navigate to: <code>localhost:8088</code></li>
+                    <li>Login: <code>admin / password</code></li>
+                </ol>
+
+                <div class="status success" style="margin-top: 20px;">
+                    <p><strong>💡 Tip:</strong> Installation only needed once. Data persists in browser cache!</p>
+                </div>
+
+                <h3>Troubleshooting</h3>
+                <p>If download fails, you need to upload the Ignition installer to GitHub Releases first. See DEPLOY.md for details.</p>
+            </div>
+
+            <iframe id="vm" src="https://webvm.io/"></iframe>
+        </div>
     </div>
 
     <script>
-        const steps = [
-            'Load WASM',
-            'Boot Linux',
-            'Mount FS',
-            'Start Java',
-            'Launch Ignition',
-            'Ready'
-        ];
-
-        let currentStep = 0;
-
-        function updateProgress(percent, message) {
-            document.getElementById('bar').style.width = percent + '%';
-            document.getElementById('text').textContent = message || steps[currentStep] || 'Loading...';
+        function copyCommand() {
+            const cmd = document.getElementById('installCmd').textContent;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Command';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         }
 
-        function nextStep() {
-            if (currentStep < steps.length) {
-                updateProgress((currentStep + 1) * 16.66, steps[currentStep]);
-                currentStep++;
-                setTimeout(nextStep, currentStep === 5 ? 3000 : 2000);
-            } else {
-                document.getElementById('container').classList.add('ready');
-                // Use custom Ignition WebVM image from GitHub Container Registry
-                document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox/webvm:latest';
-            }
-        }
-
-        setTimeout(nextStep, 1000);
-
-        function forceBootVM() {
-            document.getElementById('container').classList.add('ready');
-            document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox/webvm:latest';
-        }
+        // Allow clicking code to copy
+        document.getElementById('installCmd').addEventListener('click', copyCommand);
     </script>
 </body>
 </html>
