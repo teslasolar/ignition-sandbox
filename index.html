@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ignition Sandbox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 14px/1.6 sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: #2d2d2d;
+            padding: 15px;
+            border-bottom: 2px solid #0078d4;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #0078d4;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .splash {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .splash h2 {
+            color: #0078d4;
+            margin-bottom: 20px;
+        }
+
+        .progress {
+            width: 400px;
+            height: 30px;
+            background: #333;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0078d4, #00bcf2);
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 30px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        #vm {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: none;
+        }
+
+        .ready #splash {
+            display: none;
+        }
+
+        .ready #vm {
+            display: block;
+        }
+
+        button {
+            background: #0078d4;
+            color: #fff;
+            border: 0;
+            padding: 12px 24px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div class="header">
+            <h1>🏭 Ignition Gateway - Browser Sandbox</h1>
+            <p>Full Ignition 8.1 running in Debian Linux via WebAssembly | No server required</p>
+        </div>
+
+        <div id="splash" class="splash">
+            <h2>Initializing Virtual Machine</h2>
+            <div class="progress">
+                <div class="bar" id="bar"></div>
+                <div class="text" id="text">Loading...</div>
+            </div>
+            <button onclick="forceBootVM()" style="display:none" id="forceBtn">Force Boot</button>
+        </div>
+
+        <iframe id="vm"></iframe>
+    </div>
+
+    <script>
+        const steps = [
+            'Load WASM',
+            'Boot Linux',
+            'Mount FS',
+            'Start Java',
+            'Launch Ignition',
+            'Ready'
+        ];
+
+        let currentStep = 0;
+
+        function updateProgress(percent, message) {
+            document.getElementById('bar').style.width = percent + '%';
+            document.getElementById('text').textContent = message || steps[currentStep] || 'Loading...';
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length) {
+                updateProgress((currentStep + 1) * 16.66, steps[currentStep]);
+                currentStep++;
+                setTimeout(nextStep, currentStep === 5 ? 3000 : 2000);
+            } else {
+                document.getElementById('container').classList.add('ready');
+                document.getElementById('vm').src = 'https://webvm.io/?sharedusr=ignition&sharedpwd=train123';
+            }
+        }
+
+        setTimeout(nextStep, 1000);
+
+        function forceBootVM() {
+            document.getElementById('container').classList.add('ready');
+            document.getElementById('vm').src = 'https://webvm.io';
+        }
+    </script>
+</body>
+</html>
