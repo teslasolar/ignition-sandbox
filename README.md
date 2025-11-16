@@ -4,7 +4,7 @@ Full Ignition SCADA running in your browser via WebAssembly
 
 ## Quick Start
 
-1. Visit: https://YOUR_USERNAME.github.io/ignition-sandbox
+1. Visit: https://teslasolar.github.io/ignition-sandbox
 2. Wait 30-60s for VM boot
 3. Access at `localhost:8088` inside VM
 4. Login: admin/password
