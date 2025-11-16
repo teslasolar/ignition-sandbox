@@ -153,9 +153,8 @@
                 setTimeout(nextStep, currentStep === 5 ? 3000 : 2000);
             } else {
                 document.getElementById('container').classList.add('ready');
-                // WebVM with auto-run startup script
-                const startupScript = 'curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | bash';
-                document.getElementById('vm').src = 'https://webvm.io/?cmd=' + encodeURIComponent(startupScript);
+                // Use custom Ignition WebVM image from GitHub Container Registry
+                document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox:latest';
             }
         }
 
@@ -163,7 +162,7 @@
 
         function forceBootVM() {
             document.getElementById('container').classList.add('ready');
-            document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox/webvm:latest';
+            document.getElementById('vm').src = 'https://webvm.io/?image=ghcr.io/teslasolar/ignition-sandbox:latest';
         }
     </script>
 </body>

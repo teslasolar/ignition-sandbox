@@ -1,75 +1,100 @@
 FROM debian:bullseye
 
-# Install dependencies
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y \
+    openjdk-11-jre-headless \
     wget \
     curl \
-    openjdk-11-jre-headless \
     unzip \
     procps \
     net-tools \
     vim \
     nano \
+    sudo \
+    systemctl \
     && rm -rf /var/lib/apt/lists/*
 
-# Download Ignition installer
-# NOTE: You'll need to manually download this and add it to the build context
-# Or modify to download from your GitHub release
-WORKDIR /tmp
+# Create ignition user
+RUN useradd -m -s /bin/bash ignition && \
+    echo "ignition:ignition" | chpasswd && \
+    usermod -aG sudo ignition
 
-# Option 1: Copy from local build context (after you download it)
-# COPY Ignition-linux-x64-installer.run /tmp/ignition-installer.run
+# Copy Ignition installer (you'll add this file to the repo)
+# Download from: https://inductiveautomation.com/downloads/ignition/
+COPY Ignition-linux-x64-installer.run /tmp/ignition-installer.run
 
-# Option 2: Download from GitHub release (once uploaded)
-# RUN wget -O ignition-installer.run https://github.com/teslasolar/ignition-sandbox/releases/download/v1.0-ignition/Ignition-linux-x64-installer.run
+# Install Ignition
+RUN chmod +x /tmp/ignition-installer.run && \
+    /tmp/ignition-installer.run --unattendedmodeui none --mode unattended --prefix /opt/ignition && \
+    rm /tmp/ignition-installer.run
 
-# For now, use a placeholder that downloads from IA (may not work in build)
-# You'll need to replace this with Option 1 or 2 above
-RUN echo "#!/bin/bash\necho 'Ignition will be installed on first boot'\n" > /tmp/install-ignition.sh && \
-    chmod +x /tmp/install-ignition.sh
+# Configure Ignition
+RUN mkdir -p /opt/ignition/data && \
+    cat > /opt/ignition/data/ignition.conf << 'EOF'
+gateway.publicAddress.autoDetect=true
+gateway.useSSL=false
+gateway.http.port=8088
+gateway.https.port=8043
+EOF
 
-# Create installation directory
-RUN mkdir -p /opt/ignition
+# Set permissions
+RUN chown -R ignition:ignition /opt/ignition
 
-# Copy installation script
-COPY ignition-install.sh /usr/local/bin/install-ignition.sh
-RUN chmod +x /usr/local/bin/install-ignition.sh
+# Create auto-start script
+RUN cat > /usr/local/bin/start-ignition.sh << 'EOF'
+#!/bin/bash
+echo ""
+echo "================================================"
+echo "  🏭 Ignition Gateway WebVM"
+echo "================================================"
+echo ""
+echo "🚀 Starting Ignition Gateway..."
+/opt/ignition/ignition.sh start
+sleep 5
+echo ""
+echo "✅ Ignition Gateway is running!"
+echo ""
+echo "🌐 Access at: http://localhost:8088"
+echo "🔑 Login: admin / password"
+echo ""
+echo "================================================"
+echo ""
+EOF
 
-# Create startup script that runs on boot
-RUN echo '#!/bin/bash\n\
-echo "================================================"\n\
-echo "  🏭 Ignition Gateway WebVM Sandbox"\n\
-echo "================================================"\n\
-echo ""\n\
-echo "Starting Ignition installation..."\n\
-/usr/local/bin/install-ignition.sh\n\
-echo ""\n\
-echo "================================================"\n\
-echo "  ✅ Ignition Gateway Ready!"\n\
-echo "================================================"\n\
-echo ""\n\
-echo "Access Ignition at: http://localhost:8088"\n\
-echo "Default credentials: admin/password"\n\
-echo ""\n\
-' > /startup.sh && chmod +x /startup.sh
+RUN chmod +x /usr/local/bin/start-ignition.sh
+
+# Add to bashrc for auto-start on login
+RUN cat >> /root/.bashrc << 'EOF'
+
+# Auto-start Ignition if not already running
+if ! pgrep -f "ignition" > /dev/null; then
+    /usr/local/bin/start-ignition.sh
+else
+    echo ""
+    echo "🏭 Ignition Gateway is running"
+    echo "🌐 Access at: http://localhost:8088"
+    echo ""
+fi
+EOF
+
+# Add helpful aliases
+RUN cat >> /root/.bashrc << 'EOF'
+alias ignition-start='/opt/ignition/ignition.sh start'
+alias ignition-stop='/opt/ignition/ignition.sh stop'
+alias ignition-restart='/opt/ignition/ignition.sh restart'
+alias ignition-status='/opt/ignition/ignition.sh status'
+EOF
+
+# Expose ports
+EXPOSE 8088 8043
 
 # Set working directory
 WORKDIR /root
 
-# Add helpful message to bashrc
-RUN echo 'echo ""' >> /root/.bashrc && \
-    echo 'echo "🏭 Ignition Gateway Sandbox"' >> /root/.bashrc && \
-    echo 'echo "Access gateway: http://localhost:8088"' >> /root/.bashrc && \
-    echo 'echo "Credentials: admin/password"' >> /root/.bashrc && \
-    echo 'echo ""' >> /root/.bashrc && \
-    echo 'echo "Commands:"' >> /root/.bashrc && \
-    echo 'echo "  /opt/ignition/ignition.sh start    - Start Ignition"' >> /root/.bashrc && \
-    echo 'echo "  /opt/ignition/ignition.sh stop     - Stop Ignition"' >> /root/.bashrc && \
-    echo 'echo "  /opt/ignition/ignition.sh restart  - Restart Ignition"' >> /root/.bashrc && \
-    echo 'echo ""' >> /root/.bashrc
-
-# Expose Ignition ports
-EXPOSE 8088 8043
-
-CMD ["/bin/bash"]
+# Default command
+CMD ["/bin/bash", "-l"]
