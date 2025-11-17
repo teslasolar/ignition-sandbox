@@ -8,6 +8,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 RUN apt-get update && \
     apt-get install -y \
     openjdk-11-jre-headless \
+    python3 \
+    python3-pip \
     wget \
     curl \
     unzip \
@@ -45,12 +47,20 @@ EOF
 # Set permissions
 RUN chown -R ignition:ignition /opt/ignition
 
+# Copy UUID Markdown Sandbox
+COPY uuid-resolve /usr/local/bin/uuid-resolve
+COPY md-sandbox /root/md-sandbox
+RUN chmod +x /usr/local/bin/uuid-resolve
+
+# Install Python dependencies for markdown executor
+RUN pip3 install --no-cache-dir pyyaml requests
+
 # Create auto-start script
 RUN cat > /usr/local/bin/start-ignition.sh << 'EOF'
 #!/bin/bash
 echo ""
 echo "================================================"
-echo "  🏭 Ignition Gateway WebVM"
+echo "  🏭 Ignition Gateway WebVM + UUID Markdown"
 echo "================================================"
 echo ""
 echo "🚀 Starting Ignition Gateway..."
@@ -61,6 +71,10 @@ echo "✅ Ignition Gateway is running!"
 echo ""
 echo "🌐 Access at: http://localhost:8088"
 echo "🔑 Login: admin / password"
+echo ""
+echo "📝 Markdown Sandbox: cd ~/md-sandbox"
+echo "🔍 List files: uul"
+echo "⚡ Run workflow: uup workflow.md | bash"
 echo ""
 echo "================================================"
 echo ""
@@ -88,6 +102,11 @@ alias ignition-start='/opt/ignition/ignition.sh start'
 alias ignition-stop='/opt/ignition/ignition.sh stop'
 alias ignition-restart='/opt/ignition/ignition.sh restart'
 alias ignition-status='/opt/ignition/ignition.sh status'
+alias uu='uuid-resolve'
+alias uul='uuid-resolve list'
+alias uur='uuid-resolve read'
+alias uup='uuid-resolve proc'
+alias uux='uuid-resolve exec'
 EOF
 
 # Expose ports
