@@ -1,0 +1,32 @@
+{
+  "name": "tailscale-test",
+  "description": "Test GitHub Pages sandbox connectivity through Tailscale",
+  "type": "tailscale",
+  "tests": [
+    {
+      "name": "check-tailscale-status",
+      "action": "status",
+      "description": "Verify Tailscale is running and connected"
+    },
+    {
+      "name": "list-peers",
+      "action": "peers",
+      "description": "List all connected Tailscale peers"
+    },
+    {
+      "name": "test-pages-through-tailscale",
+      "action": "test",
+      "description": "Fetch GitHub Pages through Tailscale network"
+    }
+  ],
+  "funnel_config": {
+    "port": 8088,
+    "description": "Expose local Ignition Gateway via public HTTPS URL",
+    "url_pattern": "https://<machine>.<tailnet>.ts.net"
+  },
+  "serve_config": {
+    "port": 8088,
+    "description": "Expose local Ignition Gateway to Tailnet only (more secure)",
+    "url_pattern": "https://<machine>.<tailnet>.ts.net"
+  }
+}

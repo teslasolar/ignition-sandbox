@@ -294,6 +294,10 @@ Examples:
   sandbox-cli run <name>              # Run a command
   sandbox-cli mcp list                # List MCP tools
   sandbox-cli mcp call <tool> [json]  # Call MCP tool
+  sandbox-cli ts status               # Check Tailscale status
+  sandbox-cli ts peers                # List Tailscale peers
+  sandbox-cli ts test                 # Test connectivity via Tailscale
+  sandbox-cli ts funnel 8088          # Expose Ignition via Tailscale Funnel
 '''
     )
 
@@ -393,6 +397,84 @@ Examples:
         print(f"\nLoaded Commands: {len(loader.list())}")
         for cmd in loader.list():
             print(f"  - {cmd}")
+
+        # Check Tailscale
+        try:
+            from wrappers.tailscale_wrapper import TailscaleWrapper
+            ts = TailscaleWrapper()
+            print(f"\nTailscale: {'Available' if ts.available else 'Not installed'}")
+            if ts.available and ts.is_connected():
+                print(f"Tailscale IP: {ts.ip()}")
+                print(f"Peers: {len(ts.peers())}")
+        except:
+            print("\nTailscale: Not configured")
+
+    elif args.action == 'tailscale' or args.action == 'ts':
+        # Tailscale commands
+        try:
+            sys.path.insert(0, str(CLI_ROOT / 'wrappers'))
+            from tailscale_wrapper import TailscaleWrapper, SandboxTailscaleTest
+
+            ts = TailscaleWrapper()
+            tester = SandboxTailscaleTest()
+
+            subcmd = args.args[0] if args.args else 'status'
+
+            if subcmd == 'status':
+                if not ts.available:
+                    print("Tailscale not installed")
+                    print("Install: curl -fsSL https://tailscale.com/install.sh | sh")
+                else:
+                    status = ts.status()
+                    if args.json:
+                        output(status)
+                    else:
+                        print(f"State: {status.get('BackendState', 'Unknown')}")
+                        print(f"IP: {ts.ip() or 'N/A'}")
+                        print(f"Connected: {ts.is_connected()}")
+
+            elif subcmd == 'peers':
+                peers = ts.peers()
+                if args.json:
+                    output(peers)
+                elif peers:
+                    for p in peers:
+                        status = '●' if p['online'] else '○'
+                        print(f"{status} {p['name']:20} {p['ip']:15} ({p['os']})")
+                else:
+                    print("No peers or not connected")
+
+            elif subcmd == 'test':
+                result = tester.test_connectivity()
+                output(result)
+
+            elif subcmd == 'funnel':
+                port = int(args.args[1]) if len(args.args) > 1 else 8088
+                result = tester.setup_funnel(port)
+                output(result)
+
+            elif subcmd == 'serve':
+                port = int(args.args[1]) if len(args.args) > 1 else 8088
+                result = tester.setup_serve(port)
+                output(result)
+
+            elif subcmd == 'proxy' and len(args.args) > 1:
+                result = tester.proxy_test(args.args[1])
+                output(result)
+
+            else:
+                print("Tailscale commands:")
+                print("  sandbox-cli ts status       # Check Tailscale status")
+                print("  sandbox-cli ts peers        # List connected peers")
+                print("  sandbox-cli ts test         # Full connectivity test")
+                print("  sandbox-cli ts funnel [port] # Setup public HTTPS")
+                print("  sandbox-cli ts serve [port]  # Setup Tailnet-only")
+                print("  sandbox-cli ts proxy <ip>   # Test peer connection")
+
+        except ImportError as e:
+            print(f"Tailscale wrapper not found: {e}")
+        except Exception as e:
+            print(f"Tailscale error: {e}")
 
     else:
         print(f"Unknown action: {args.action}")
