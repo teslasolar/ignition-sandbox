@@ -1,0 +1,23 @@
+[
+  {
+    "name": "check-index",
+    "description": "Verify index.html is deployed",
+    "type": "fetch",
+    "path": "index.html",
+    "expect": {"status": 200}
+  },
+  {
+    "name": "check-install-script",
+    "description": "Verify install script is accessible",
+    "type": "fetch",
+    "path": "ignition-install.sh",
+    "expect": {"status": 200}
+  },
+  {
+    "name": "check-uuid-resolver",
+    "description": "Verify uuid-resolve is accessible",
+    "type": "fetch",
+    "path": "uuid-resolve",
+    "expect": {"status": 200}
+  }
+]

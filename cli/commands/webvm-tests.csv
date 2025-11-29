@@ -1,0 +1,4 @@
+name,description,type,url,expect_status
+test-webvm-iframe,Check WebVM iframe loads,fetch,https://webvm.io/,200
+test-pages-root,Check Pages root,fetch,https://teslasolar.github.io/ignition-sandbox/,200
+test-raw-script,Check raw install script,fetch,https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh,200

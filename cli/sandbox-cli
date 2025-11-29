@@ -1,0 +1,404 @@
+#!/usr/bin/env python3
+"""
+Ignition Sandbox CLI - Test & monitor GitHub Pages sandbox
+Auto-loads commands from cli/commands/ (JSON, MD, CSV)
+"""
+import os
+import sys
+import json
+import csv
+import re
+import time
+import hashlib
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Optional, Any
+
+# Add parent for imports
+CLI_ROOT = Path(__file__).parent.absolute()
+REPO_ROOT = CLI_ROOT.parent
+COMMANDS_DIR = CLI_ROOT / "commands"
+
+# GitHub Pages config
+PAGES_URL = "https://teslasolar.github.io/ignition-sandbox"
+REPO_URL = "https://github.com/teslasolar/ignition-sandbox"
+RAW_URL = "https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main"
+
+
+class CommandLoader:
+    """Auto-load commands from JSON, Markdown, or CSV files"""
+
+    def __init__(self, commands_dir: Path):
+        self.dir = commands_dir
+        self.commands: Dict[str, dict] = {}
+        self.load_all()
+
+    def load_all(self):
+        """Scan and load all command files"""
+        if not self.dir.exists():
+            self.dir.mkdir(parents=True, exist_ok=True)
+            return
+
+        for f in self.dir.iterdir():
+            if f.suffix == '.json':
+                self._load_json(f)
+            elif f.suffix == '.md':
+                self._load_markdown(f)
+            elif f.suffix == '.csv':
+                self._load_csv(f)
+
+    def _load_json(self, path: Path):
+        """Load command from JSON file"""
+        try:
+            with open(path) as f:
+                data = json.load(f)
+
+            # Single command or list
+            if isinstance(data, list):
+                for cmd in data:
+                    if 'name' in cmd:
+                        self.commands[cmd['name']] = cmd
+            elif 'name' in data:
+                self.commands[data['name']] = data
+        except Exception as e:
+            print(f"Error loading {path}: {e}", file=sys.stderr)
+
+    def _load_markdown(self, path: Path):
+        """Load command from Markdown with YAML front matter"""
+        try:
+            with open(path) as f:
+                content = f.read()
+
+            # Extract YAML front matter
+            match = re.match(r'^---\n(.+?)\n---', content, re.DOTALL)
+            if not match:
+                return
+
+            # Parse YAML-like front matter
+            meta = {}
+            for line in match.group(1).split('\n'):
+                if ':' in line:
+                    key, val = line.split(':', 1)
+                    meta[key.strip()] = val.strip()
+
+            if 'name' not in meta:
+                meta['name'] = path.stem
+
+            # Extract code blocks
+            code_blocks = re.findall(r'```(\w+)\n(.+?)```', content, re.DOTALL)
+            if code_blocks:
+                meta['code'] = [{'lang': lang, 'code': code} for lang, code in code_blocks]
+
+            meta['_source'] = str(path)
+            meta['_content'] = content
+            self.commands[meta['name']] = meta
+
+        except Exception as e:
+            print(f"Error loading {path}: {e}", file=sys.stderr)
+
+    def _load_csv(self, path: Path):
+        """Load commands from CSV file"""
+        try:
+            with open(path) as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if 'name' in row:
+                        self.commands[row['name']] = dict(row)
+        except Exception as e:
+            print(f"Error loading {path}: {e}", file=sys.stderr)
+
+    def get(self, name: str) -> Optional[dict]:
+        return self.commands.get(name)
+
+    def list(self) -> List[str]:
+        return list(self.commands.keys())
+
+
+class APIWrapper:
+    """HTTP wrapper for testing GitHub Pages endpoints"""
+
+    def __init__(self, base_url: str = PAGES_URL):
+        self.base_url = base_url.rstrip('/')
+        self.session_cache: Dict[str, Any] = {}
+
+    def fetch(self, path: str = "", timeout: int = 10) -> dict:
+        """Fetch URL and return response info"""
+        import urllib.request
+        import urllib.error
+
+        url = f"{self.base_url}/{path}".rstrip('/')
+        start = time.time()
+
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'SandboxCLI/1.0'})
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = resp.read()
+                elapsed = time.time() - start
+
+                return {
+                    'url': url,
+                    'status': resp.status,
+                    'headers': dict(resp.headers),
+                    'size': len(body),
+                    'elapsed_ms': int(elapsed * 1000),
+                    'content_hash': hashlib.md5(body).hexdigest()[:8],
+                    'success': True
+                }
+        except urllib.error.HTTPError as e:
+            return {'url': url, 'status': e.code, 'error': str(e), 'success': False}
+        except Exception as e:
+            return {'url': url, 'error': str(e), 'success': False}
+
+    def ping(self) -> dict:
+        """Quick health check"""
+        return self.fetch()
+
+    def check_files(self, files: List[str]) -> List[dict]:
+        """Check multiple files exist"""
+        return [self.fetch(f) for f in files]
+
+
+class SyncMonitor:
+    """Monitor repo→pages sync timing"""
+
+    def __init__(self, repo_root: Path = REPO_ROOT):
+        self.repo_root = repo_root
+        self.api = APIWrapper()
+        self.raw_api = APIWrapper(RAW_URL)
+
+    def get_local_hash(self, file: str) -> Optional[str]:
+        """Get MD5 hash of local file"""
+        path = self.repo_root / file
+        if path.exists():
+            return hashlib.md5(path.read_bytes()).hexdigest()[:8]
+        return None
+
+    def get_remote_hash(self, file: str) -> Optional[str]:
+        """Get MD5 hash from GitHub Pages"""
+        result = self.api.fetch(file)
+        return result.get('content_hash') if result.get('success') else None
+
+    def check_sync(self, file: str = "index.html") -> dict:
+        """Compare local vs deployed version"""
+        local = self.get_local_hash(file)
+        remote = self.get_remote_hash(file)
+
+        return {
+            'file': file,
+            'local_hash': local,
+            'remote_hash': remote,
+            'synced': local == remote if (local and remote) else None,
+            'timestamp': datetime.now().isoformat()
+        }
+
+    def watch(self, file: str = "index.html", interval: int = 5, max_wait: int = 300) -> dict:
+        """Watch for sync completion after push"""
+        local = self.get_local_hash(file)
+        if not local:
+            return {'error': f'Local file not found: {file}'}
+
+        start = time.time()
+        checks = 0
+
+        print(f"Watching {file} for sync (local: {local})...")
+
+        while time.time() - start < max_wait:
+            checks += 1
+            remote = self.get_remote_hash(file)
+
+            if remote == local:
+                elapsed = time.time() - start
+                return {
+                    'synced': True,
+                    'elapsed_sec': int(elapsed),
+                    'checks': checks,
+                    'hash': local
+                }
+
+            print(f"  Check {checks}: remote={remote or 'pending'}...")
+            time.sleep(interval)
+
+        return {'synced': False, 'timeout': max_wait, 'checks': checks}
+
+
+class MCPWrapper:
+    """MCP-style tool definitions for external integration"""
+
+    TOOLS = {
+        'sandbox_ping': {
+            'description': 'Check if GitHub Pages sandbox is accessible',
+            'parameters': {}
+        },
+        'sandbox_fetch': {
+            'description': 'Fetch a file from the sandbox',
+            'parameters': {'path': {'type': 'string', 'description': 'File path to fetch'}}
+        },
+        'sandbox_sync_check': {
+            'description': 'Check if local repo is synced with GitHub Pages',
+            'parameters': {'file': {'type': 'string', 'default': 'index.html'}}
+        },
+        'sandbox_run_command': {
+            'description': 'Execute a loaded command by name',
+            'parameters': {'name': {'type': 'string', 'description': 'Command name'}}
+        }
+    }
+
+    def __init__(self):
+        self.api = APIWrapper()
+        self.sync = SyncMonitor()
+        self.loader = CommandLoader(COMMANDS_DIR)
+
+    def call(self, tool: str, params: dict = None) -> dict:
+        """Execute MCP-style tool call"""
+        params = params or {}
+
+        if tool == 'sandbox_ping':
+            return self.api.ping()
+
+        elif tool == 'sandbox_fetch':
+            return self.api.fetch(params.get('path', ''))
+
+        elif tool == 'sandbox_sync_check':
+            return self.sync.check_sync(params.get('file', 'index.html'))
+
+        elif tool == 'sandbox_run_command':
+            cmd = self.loader.get(params.get('name', ''))
+            if cmd:
+                return {'command': cmd, 'status': 'loaded'}
+            return {'error': 'Command not found'}
+
+        return {'error': f'Unknown tool: {tool}'}
+
+    def list_tools(self) -> dict:
+        return self.TOOLS
+
+    def export_schema(self) -> str:
+        """Export MCP tool schema as JSON"""
+        return json.dumps({'tools': self.TOOLS}, indent=2)
+
+
+def main():
+    """CLI entry point"""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Ignition Sandbox CLI - Test GitHub Pages sandbox',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  sandbox-cli ping                    # Check Pages is up
+  sandbox-cli fetch index.html        # Fetch specific file
+  sandbox-cli sync                    # Check repo→pages sync
+  sandbox-cli watch                   # Watch for sync after push
+  sandbox-cli commands                # List loaded commands
+  sandbox-cli run <name>              # Run a command
+  sandbox-cli mcp list                # List MCP tools
+  sandbox-cli mcp call <tool> [json]  # Call MCP tool
+'''
+    )
+
+    parser.add_argument('action', nargs='?', default='help',
+                       help='Action to perform')
+    parser.add_argument('args', nargs='*', help='Additional arguments')
+    parser.add_argument('-j', '--json', action='store_true',
+                       help='Output as JSON')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                       help='Verbose output')
+
+    args = parser.parse_args()
+
+    api = APIWrapper()
+    sync = SyncMonitor()
+    loader = CommandLoader(COMMANDS_DIR)
+    mcp = MCPWrapper()
+
+    def output(data):
+        if args.json:
+            print(json.dumps(data, indent=2, default=str))
+        else:
+            if isinstance(data, dict):
+                for k, v in data.items():
+                    print(f"{k}: {v}")
+            elif isinstance(data, list):
+                for item in data:
+                    print(item)
+            else:
+                print(data)
+
+    # Route actions
+    if args.action == 'help' or args.action == '-h':
+        parser.print_help()
+
+    elif args.action == 'ping':
+        output(api.ping())
+
+    elif args.action == 'fetch':
+        path = args.args[0] if args.args else ''
+        output(api.fetch(path))
+
+    elif args.action == 'sync':
+        file = args.args[0] if args.args else 'index.html'
+        output(sync.check_sync(file))
+
+    elif args.action == 'watch':
+        file = args.args[0] if args.args else 'index.html'
+        output(sync.watch(file))
+
+    elif args.action == 'commands' or args.action == 'list':
+        cmds = loader.list()
+        if cmds:
+            output(cmds)
+        else:
+            print("No commands loaded. Add files to cli/commands/")
+
+    elif args.action == 'run':
+        if not args.args:
+            print("Usage: sandbox-cli run <command-name>")
+            sys.exit(1)
+        cmd = loader.get(args.args[0])
+        if cmd:
+            output(cmd)
+        else:
+            print(f"Command not found: {args.args[0]}")
+            sys.exit(1)
+
+    elif args.action == 'mcp':
+        if not args.args or args.args[0] == 'list':
+            output(mcp.list_tools())
+        elif args.args[0] == 'schema':
+            print(mcp.export_schema())
+        elif args.args[0] == 'call' and len(args.args) > 1:
+            tool = args.args[1]
+            params = json.loads(args.args[2]) if len(args.args) > 2 else {}
+            output(mcp.call(tool, params))
+        else:
+            print("Usage: sandbox-cli mcp [list|schema|call <tool> <json>]")
+
+    elif args.action == 'status':
+        # Full status report
+        print("=== Ignition Sandbox Status ===\n")
+        print(f"Pages URL: {PAGES_URL}")
+        print(f"Repo URL:  {REPO_URL}\n")
+
+        ping = api.ping()
+        print(f"Pages Status: {'UP' if ping.get('success') else 'DOWN'}")
+        if ping.get('elapsed_ms'):
+            print(f"Response Time: {ping['elapsed_ms']}ms")
+
+        sync_status = sync.check_sync('index.html')
+        print(f"\nSync Status: {'SYNCED' if sync_status.get('synced') else 'OUT OF SYNC'}")
+        print(f"Local Hash:  {sync_status.get('local_hash', 'N/A')}")
+        print(f"Remote Hash: {sync_status.get('remote_hash', 'N/A')}")
+
+        print(f"\nLoaded Commands: {len(loader.list())}")
+        for cmd in loader.list():
+            print(f"  - {cmd}")
+
+    else:
+        print(f"Unknown action: {args.action}")
+        print("Run 'sandbox-cli help' for usage")
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
