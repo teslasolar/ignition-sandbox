@@ -1,0 +1,8 @@
+{"name":"UDT Library","type":"udt-registry","items":[
+{"id":"pump","file":"pump.udt","cat":"equipment"},
+{"id":"tank","file":"tank.udt","cat":"equipment"},
+{"id":"valve","file":"valve.udt","cat":"equipment"},
+{"id":"sensor","file":"sensor.udt","cat":"instrumentation"},
+{"id":"belt","file":"belt.udt","cat":"conveyor"},
+{"id":"hopper","file":"hopper.udt","cat":"feeder"}
+]}

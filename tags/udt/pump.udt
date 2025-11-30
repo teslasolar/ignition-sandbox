@@ -1,0 +1,13 @@
+# Pump UDT - Centrifugal pump with motor monitoring
+@pump|Pump|1.0|equipment
+>name|str||1
+>location|str||0
+>serialNo|str||0
+~running|bool|Running status|||
+~fault|bool|Fault indicator|||
+~amps|float|Motor current|A|0|100
+~speed|float|Speed|RPM|0|3600
+~hours|float|Run hours|hr|0|999999
+=running|#10b981|#10b981|0
+=stopped|#6b7280|#6b7280|0
+=fault|#ef4444|#ef4444|1

@@ -1,0 +1,4 @@
+{"name":"Perspective Designer","type":"module","files":[
+{"id":"app","file":"index.html","type":"html","desc":"Designer interface"},
+{"id":"core","file":"designer.js","type":"script","desc":"Drag-drop builder"}
+],"features":["drag-drop","component-palette","json-export","live-preview"]}

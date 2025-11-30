@@ -1,0 +1,5 @@
+{"name":"Symbols","type":"symbols","items":[
+{"id":"hopper","file":"hopper.json","icon":"⏏️"},
+{"id":"belt","file":"belt.json","icon":"↔️"},
+{"id":"screw","file":"screw.json","icon":"🔩"}
+]}

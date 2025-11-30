@@ -1,0 +1,15 @@
+# Sensor UDT - Process transmitter
+@sensor|Sensor|1.0|instrumentation
+>name|str||1
+>sensorType|str|PT|0
+>units|str|psi|0
+>rangeMin|float|0|0
+>rangeMax|float|100|0
+~value|float|Process value|||
+~rawValue|float|Raw 4-20mA|mA|4|20
+~quality|int|Signal quality|%|0|100
+~hiAlarm|bool|High alarm|||
+~loAlarm|bool|Low alarm|||
+=normal|#10b981|#10b981|0
+=warning|#f59e0b|#f59e0b|0
+=alarm|#ef4444|#ef4444|1

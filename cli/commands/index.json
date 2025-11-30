@@ -1,0 +1,7 @@
+{"name":"CLI Commands","type":"commands","files":[
+{"id":"ping-pages","file":"ping-pages.json","type":"test"},
+{"id":"check-assets","file":"check-assets.json","type":"test"},
+{"id":"tailscale-test","file":"tailscale-test.json","type":"test"},
+{"id":"webvm-tests","file":"webvm-tests.csv","type":"tests"},
+{"id":"test-sync","file":"test-sync.md","type":"docs"}
+]}

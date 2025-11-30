@@ -1,0 +1,3 @@
+{"running":"#10b981","stopped":"#6b7280","fault":"#ef4444",
+"normal":"#3b82f6","warning":"#f59e0b","alarm":"#ef4444",
+"open":"#10b981","closed":"#6b7280","transit":"#f59e0b"}

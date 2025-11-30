@@ -1,0 +1,14 @@
+# Belt Conveyor UDT - Material transport
+@belt|Belt Conveyor|1.0|conveyor
+>name|str||1
+>length|float|10|0
+>width|float|0.6|0
+~speed|float|Belt speed|m/s|0|5
+~running|bool|Motor running|||
+~fault|bool|Motor fault|||
+~load|float|Belt load|%|0|100
+~slip|bool|Slip detected|||
+~jam|bool|Jam detected|||
+=running|#10b981|#10b981|0
+=stopped|#6b7280|#6b7280|0
+=fault|#ef4444|#ef4444|1

@@ -1,0 +1,4 @@
+{"name":"Tab Templates","type":"tabs","files":[
+{"id":"designer","file":"designer.json","desc":"Designer tab config"},
+{"id":"vm","file":"vm.json","desc":"VM tab config"}
+]}
