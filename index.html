@@ -12,9 +12,10 @@
             color: #c9d1d9;
             padding: 40px 20px;
         }
-        .container { max-width: 800px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; }
         h1 { color: #58a6ff; margin-bottom: 10px; }
-        h2 { color: #7ee787; margin: 30px 0 15px; font-size: 18px; }
+        h2 { color: #7ee787; margin: 30px 0 15px; font-size: 18px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        h3 { color: #f0f6fc; font-size: 14px; margin: 15px 0 10px; }
         p { color: #8b949e; margin-bottom: 15px; }
         a { color: #58a6ff; }
 
@@ -22,120 +23,253 @@
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 6px;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 12px 15px;
+            margin: 8px 0;
             position: relative;
+            cursor: pointer;
+            transition: border-color 0.2s;
         }
+        .cmd:hover { border-color: #58a6ff; }
         .cmd code {
             display: block;
             color: #7ee787;
             font-family: 'SF Mono', Consolas, monospace;
-            font-size: 14px;
+            font-size: 13px;
             word-break: break-all;
         }
         .cmd .label {
-            color: #8b949e;
+            color: #c9d1d9;
             font-size: 13px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .cmd .desc {
+            color: #8b949e;
+            font-size: 12px;
+            margin-top: 4px;
         }
         .cmd button {
             position: absolute;
-            top: 10px;
+            top: 50%;
             right: 10px;
+            transform: translateY(-50%);
             background: #21262d;
             border: 1px solid #30363d;
             color: #c9d1d9;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
         .cmd button:hover { background: #30363d; }
         .cmd button.copied { background: #238636; border-color: #238636; }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
         }
         .card {
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 6px;
-            padding: 20px;
+            padding: 15px;
         }
-        .card h3 { color: #f0f6fc; font-size: 16px; margin-bottom: 8px; }
-        .card p { font-size: 14px; margin: 0; }
+        .card h4 { color: #f0f6fc; font-size: 14px; margin-bottom: 6px; }
+        .card p { font-size: 13px; margin: 0; }
+        .card code { color: #7ee787; font-size: 12px; }
 
-        .footer { margin-top: 40px; color: #8b949e; font-size: 14px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .tab:hover, .tab.active { background: #30363d; border-color: #58a6ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .footer { margin-top: 40px; color: #8b949e; font-size: 13px; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Ignition Sandbox</h1>
-        <p>Commands to install Ignition SCADA on any Linux system. Copy and run in your terminal.</p>
+        <p>Command reference for Linux environments. Click any command to copy.</p>
 
-        <h2>Quick Install</h2>
-
-        <div class="cmd">
-            <div class="label">Install Ignition Gateway (Debian/Ubuntu)</div>
-            <code id="cmd1">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
-            <button onclick="copy('cmd1', this)">Copy</button>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('ignition')">Ignition</button>
+            <button class="tab" onclick="showTab('tailscale')">Tailscale</button>
+            <button class="tab" onclick="showTab('system')">System</button>
+            <button class="tab" onclick="showTab('setup')">Setup</button>
         </div>
 
-        <div class="cmd">
-            <div class="label">Install Tailscale (remote access)</div>
-            <code id="cmd2">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
-            <button onclick="copy('cmd2', this)">Copy</button>
+        <div id="ignition" class="tab-content active">
+            <h2>Ignition Gateway</h2>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Install Ignition</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
+                <button>Copy</button>
+            </div>
+
+            <h3>Control</h3>
+            <div class="grid">
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Start</div>
+                    <code>/opt/ignition/ignition.sh start</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Stop</div>
+                    <code>/opt/ignition/ignition.sh stop</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Restart</div>
+                    <code>/opt/ignition/ignition.sh restart</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Status</div>
+                    <code>/opt/ignition/ignition.sh status</code>
+                    <button>Copy</button>
+                </div>
+            </div>
+
+            <h3>Access</h3>
+            <div class="card">
+                <h4>Web Interface</h4>
+                <p><code>http://localhost:8088</code></p>
+                <p>Login: <strong>admin</strong> / <strong>password</strong></p>
+            </div>
         </div>
 
-        <div class="cmd">
-            <div class="label">Full setup (Ignition + Tailscale)</div>
-            <code id="cmd3">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash</code>
-            <button onclick="copy('cmd3', this)">Copy</button>
+        <div id="tailscale" class="tab-content">
+            <h2>Tailscale VPN</h2>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Install Tailscale</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
+                <button>Copy</button>
+            </div>
+
+            <h3>Commands</h3>
+            <div class="grid">
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Connect</div>
+                    <code>tailscale up</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Status</div>
+                    <code>tailscale status</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Get IP</div>
+                    <code>tailscale ip -4</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Disconnect</div>
+                    <code>tailscale down</code>
+                    <button>Copy</button>
+                </div>
+            </div>
+
+            <h3>With Auth Key</h3>
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Connect with auth key</div>
+                <code>tailscale up --authkey=tskey-YOUR-KEY</code>
+                <button>Copy</button>
+            </div>
         </div>
 
-        <h2>After Installation</h2>
+        <div id="system" class="tab-content">
+            <h2>System Tools</h2>
 
-        <div class="grid">
-            <div class="card">
-                <h3>Access Gateway</h3>
-                <p>Open <code style="color:#7ee787">http://localhost:8088</code><br>Login: admin / password</p>
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">System Info</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sysinfo | bash</code>
+                <div class="desc">OS, hardware, services, installed tools</div>
+                <button>Copy</button>
             </div>
-            <div class="card">
-                <h3>Start/Stop</h3>
-                <p><code style="color:#7ee787">/opt/ignition/ignition.sh start</code><br>
-                <code style="color:#7ee787">/opt/ignition/ignition.sh stop</code></p>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Network Diagnostics</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/netinfo | bash</code>
+                <div class="desc">Interfaces, DNS, connectivity, open ports</div>
+                <button>Copy</button>
             </div>
-            <div class="card">
-                <h3>Connect Tailscale</h3>
-                <p><code style="color:#7ee787">tailscale up</code><br>
-                <code style="color:#7ee787">tailscale ip</code></p>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Command Loader</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/loader | bash -s -- list</code>
+                <div class="desc">List and run commands from manifest</div>
+                <button>Copy</button>
             </div>
-            <div class="card">
-                <h3>Check Status</h3>
-                <p><code style="color:#7ee787">/opt/ignition/ignition.sh status</code><br>
-                <code style="color:#7ee787">tailscale status</code></p>
+        </div>
+
+        <div id="setup" class="tab-content">
+            <h2>Environment Setup</h2>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Full Setup (Ignition + Tailscale)</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash</code>
+                <button>Copy</button>
+            </div>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Install Docker</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | sudo bash</code>
+                <button>Copy</button>
+            </div>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Install Java (OpenJDK 17)</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | sudo bash</code>
+                <button>Copy</button>
+            </div>
+
+            <div class="cmd" onclick="copyCode(this)">
+                <div class="label">Setup Python Environment</div>
+                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash</code>
+                <button>Copy</button>
             </div>
         </div>
 
         <h2>Resources</h2>
-        <p>
-            <a href="commands/manifest.json">Command Manifest (JSON)</a> ·
-            <a href="cli/">CLI Tools</a> ·
-            <a href="https://github.com/teslasolar/ignition-sandbox">GitHub Repo</a>
-        </p>
+        <div class="grid">
+            <div class="card">
+                <h4><a href="commands/manifest.json">Command Manifest</a></h4>
+                <p>JSON file with all commands</p>
+            </div>
+            <div class="card">
+                <h4><a href="cli/">CLI Tools</a></h4>
+                <p>Python CLI and wrappers</p>
+            </div>
+            <div class="card">
+                <h4><a href="https://github.com/teslasolar/ignition-sandbox">GitHub</a></h4>
+                <p>Source code</p>
+            </div>
+        </div>
 
         <div class="footer">
-            <p>Scripts fetch from this repo. Run on any Debian/Ubuntu Linux.</p>
+            <p>All scripts fetch from this repo and run on Debian/Ubuntu Linux.</p>
         </div>
     </div>
 
     <script>
-        function copy(id, btn) {
-            const text = document.getElementById(id).textContent;
-            navigator.clipboard.writeText(text).then(() => {
+        function copyCode(el) {
+            const code = el.querySelector('code').textContent;
+            const btn = el.querySelector('button');
+            navigator.clipboard.writeText(code).then(() => {
                 btn.textContent = 'Copied!';
                 btn.classList.add('copied');
                 setTimeout(() => {
@@ -143,6 +277,13 @@
                     btn.classList.remove('copied');
                 }, 2000);
             });
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
         }
     </script>
 </body>

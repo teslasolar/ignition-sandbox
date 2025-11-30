@@ -1,0 +1,40 @@
+#!/bin/bash
+# Network diagnostics
+# curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/netinfo | bash
+
+echo "╔════════════════════════════════════════╗"
+echo "║       Network Diagnostics              ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+
+echo "=== Interfaces ==="
+ip -4 addr show 2>/dev/null | grep -E "^[0-9]+:|inet " | sed 's/^/  /' || ifconfig 2>/dev/null | head -20
+
+echo ""
+echo "=== DNS ==="
+cat /etc/resolv.conf 2>/dev/null | grep nameserver | head -3
+
+echo ""
+echo "=== Connectivity Tests ==="
+for host in "google.com" "github.com" "1.1.1.1"; do
+    echo -n "  $host: "
+    if ping -c1 -W2 "$host" &>/dev/null; then
+        echo "✓ reachable"
+    else
+        echo "✗ unreachable"
+    fi
+done
+
+echo ""
+echo "=== Open Ports (listening) ==="
+ss -tlnp 2>/dev/null | grep LISTEN | head -10 || netstat -tlnp 2>/dev/null | grep LISTEN | head -10
+
+echo ""
+echo "=== Routes ==="
+ip route 2>/dev/null | head -5 || route -n 2>/dev/null | head -5
+
+if command -v tailscale &>/dev/null; then
+    echo ""
+    echo "=== Tailscale ==="
+    tailscale status 2>/dev/null || echo "  Not connected"
+fi

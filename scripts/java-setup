@@ -1,0 +1,32 @@
+#!/bin/bash
+# Install Java (OpenJDK) on Debian/Ubuntu
+# curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | sudo bash
+
+set -e
+
+VERSION="${1:-17}"
+
+echo "╔════════════════════════════════════════╗"
+echo "║       Installing Java $VERSION              ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+
+if command -v java &>/dev/null; then
+    echo "Java already installed:"
+    java -version 2>&1 | head -3
+    echo ""
+    read -p "Install anyway? [y/N] " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0
+fi
+
+echo "Installing OpenJDK $VERSION..."
+apt-get update -qq
+apt-get install -y openjdk-${VERSION}-jdk
+
+echo ""
+echo "✅ Java installed!"
+java -version 2>&1 | head -3
+
+echo ""
+echo "JAVA_HOME=/usr/lib/jvm/java-${VERSION}-openjdk-amd64"

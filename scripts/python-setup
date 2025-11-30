@@ -1,0 +1,37 @@
+#!/bin/bash
+# Setup Python environment with common tools
+# curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash
+
+set -e
+
+echo "╔════════════════════════════════════════╗"
+echo "║       Python Environment Setup         ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+
+# Check Python
+if ! command -v python3 &>/dev/null; then
+    echo "Installing Python3..."
+    sudo apt-get update -qq
+    sudo apt-get install -y python3 python3-pip python3-venv
+fi
+
+echo "Python: $(python3 --version)"
+
+# Install common packages
+echo ""
+echo "Installing common packages..."
+pip3 install --quiet --upgrade pip
+pip3 install --quiet \
+    requests \
+    pyyaml \
+    python-dotenv \
+    click \
+    rich \
+    httpx
+
+echo ""
+echo "✅ Python environment ready!"
+echo ""
+echo "Installed packages:"
+pip3 list 2>/dev/null | grep -E "^(requests|pyyaml|python-dotenv|click|rich|httpx)" || true
