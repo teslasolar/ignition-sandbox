@@ -411,9 +411,13 @@ const K = {
     // Load tab content
     this.load(tab.src).then(data => {
       if (data.commands && data.commands.length) {
+        const primary = data.primaryAction;
+        const primaryBtn = primary ?
+          `<a href="${primary.href}" class="btn" style="display:inline-block;text-decoration:none;margin-top:10px">▸ ${primary.label}</a>` : '';
+
         const cmds = data.commands.map(c => `
-          <div class="cv-card" onclick="K.runCmd(\`${(c.code || c.run || '').replace(/`/g, '\\`')}\`)">
-            <div class="icon">⚡</div>
+          <div class="cv-card${c.primary ? ' hl' : ''}" onclick="K.runCmd(\`${(c.code || c.run || '').replace(/`/g, '\\`')}\`)">
+            <div class="icon">${c.primary ? '▸' : '⚡'}</div>
             <h4>${c.label || c.name}</h4>
             <p>${c.desc || c.description || ''}</p>
           </div>
@@ -422,6 +426,7 @@ const K = {
           <div class="cv-inner" style="padding:15px 0">
             <h2 style="font-size:16px">${data.title || tab.label}</h2>
             <p>${data.description || ''}</p>
+            ${primaryBtn}
           </div>
           <div class="cv-grid">${cmds}</div>`;
       } else {

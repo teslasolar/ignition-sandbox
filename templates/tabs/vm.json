@@ -1,12 +1,10 @@
 {"id":"vm","title":"VM Sandbox","type":"tab",
 "description":"Browser-based x86 emulation with bootable images",
+"primaryAction":{"label":"Open VM","href":"vm/"},
 "commands":[
-  {"label":"Boot Minimal","code":"ImageLoader.buildConfig('minimal')","desc":"Quick banner display (<50ms)"},
-  {"label":"Boot Shell","code":"ImageLoader.buildConfig('shell')","desc":"Interactive keyboard shell"},
-  {"label":"Boot Gateway","code":"ImageLoader.buildConfig('gateway')","desc":"PLC/Gateway status display"},
-  {"label":"Boot Floppy","code":"ImageLoader.buildConfig('floppy')","desc":"Full 1.44MB FAT12 OS"},
-  {"label":"Open VM Page","code":"location.href='vm/'","desc":"Full VM interface"},
-  {"label":"List Images","code":"ImageLoader.listImages()","desc":"Show all available images"},
-  {"label":"Cache Stats","code":"ImageLoader.getStats()","desc":"IndexedDB cache info"},
-  {"label":"Clear Cache","code":"ImageLoader.clearCache()","desc":"Remove cached images"}
+  {"label":"Open VM Page","code":"location.href='vm/'","desc":"Full VM interface","primary":true},
+  {"label":"Boot Minimal","code":"location.href='vm/#minimal'","desc":"Quick banner display (<50ms)"},
+  {"label":"Boot Shell","code":"location.href='vm/#shell'","desc":"Interactive keyboard shell"},
+  {"label":"Boot Gateway","code":"location.href='vm/#gateway'","desc":"PLC/Gateway status display"},
+  {"label":"Boot Floppy","code":"location.href='vm/#floppy'","desc":"Full 1.44MB FAT12 OS"}
 ]}
