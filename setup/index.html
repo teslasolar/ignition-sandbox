@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ignition Setup - Sandbox</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        body { overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div class="vm-layout">
+        <div class="vm-sidebar">
+            <h2>Ignition Gateway Setup</h2>
+
+            <div class="status warning">
+                <strong>One-Time Setup</strong>
+                <p style="margin-top: 5px; font-size: 13px;">Run the command below in the terminal →</p>
+            </div>
+
+            <h3>1. Copy & paste this command:</h3>
+            <code id="installCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
+            <button class="btn btn-primary copy-btn" data-copy="installCmd">Copy Command</button>
+
+            <h3>2. Wait for installation</h3>
+            <ol>
+                <li>Installing dependencies...</li>
+                <li>Downloading Ignition (~200MB)</li>
+                <li>Running installer...</li>
+                <li>Starting Gateway...</li>
+            </ol>
+
+            <h3>3. Access Ignition</h3>
+            <p>Once ready, open in WebVM browser:</p>
+            <code style="display: inline-block; padding: 8px 12px;">localhost:8088</code>
+            <p style="margin-top: 10px; font-size: 13px;">
+                Login: <strong>admin</strong> / <strong>password</strong>
+            </p>
+
+            <div class="status success" style="margin-top: 20px;">
+                <strong>Persists in browser!</strong>
+                <p style="font-size: 12px; margin-top: 5px;">Data saved to IndexedDB. No re-install needed.</p>
+            </div>
+
+            <h3 style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #30363d;">
+                Want remote access?
+            </h3>
+            <p><a href="../tailscale/">Setup Tailscale</a> to connect from any device.</p>
+
+            <p style="margin-top: 20px; font-size: 12px; color: #8b949e;">
+                <a href="../">← Back to home</a>
+            </p>
+        </div>
+
+        <iframe class="vm-frame" src="https://webvm.io/"></iframe>
+    </div>
+
+    <script src="../assets/main.js"></script>
+</body>
+</html>

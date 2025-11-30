@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CLI Tools - Ignition Sandbox</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>CLI Tools</h1>
+            <p>Command-line testing framework for the Ignition Sandbox</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card-grid">
+            <div class="card">
+                <h2>sandbox-cli</h2>
+                <p>Main CLI entry point with auto-loading commands from JSON, Markdown, or CSV.</p>
+                <span class="tag">Python</span>
+                <span class="tag">API</span>
+                <code style="margin-top: 15px;">./cli/sandbox-cli status</code>
+            </div>
+
+            <div class="card">
+                <h2>API Wrapper</h2>
+                <p>HTTP client for testing GitHub Pages endpoints with hash verification.</p>
+                <span class="tag">Python</span>
+                <code style="margin-top: 15px;">./cli/wrappers/api-wrapper.py</code>
+            </div>
+
+            <div class="card">
+                <h2>MCP Tools</h2>
+                <p>MCP-compatible tool definitions for external integration.</p>
+                <span class="tag">JSON</span>
+                <span class="tag">MCP</span>
+                <code style="margin-top: 15px;">./cli/sandbox-cli mcp list</code>
+            </div>
+
+            <div class="card">
+                <h2>Tailscale Wrapper</h2>
+                <p>Tailscale CLI wrapper for status, peers, funnel, and serve.</p>
+                <span class="tag">Python</span>
+                <span class="tag">Tailscale</span>
+                <code style="margin-top: 15px;">./cli/sandbox-cli ts status</code>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px;">Quick Commands</h2>
+
+        <div style="display: grid; gap: 15px; margin-top: 20px;">
+            <div>
+                <p style="color: #8b949e; margin-bottom: 5px;">Check sandbox status:</p>
+                <code>./cli/sandbox-cli ping</code>
+            </div>
+            <div>
+                <p style="color: #8b949e; margin-bottom: 5px;">Check repo→pages sync:</p>
+                <code>./cli/sandbox-cli sync</code>
+            </div>
+            <div>
+                <p style="color: #8b949e; margin-bottom: 5px;">List loaded commands:</p>
+                <code>./cli/sandbox-cli commands</code>
+            </div>
+            <div>
+                <p style="color: #8b949e; margin-bottom: 5px;">Watch for sync after push:</p>
+                <code>./cli/sandbox-cli watch</code>
+            </div>
+            <div>
+                <p style="color: #8b949e; margin-bottom: 5px;">Tailscale status:</p>
+                <code>./cli/sandbox-cli ts status</code>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px;">Command Files</h2>
+        <p style="color: #8b949e;">Drop files in <code style="display: inline; padding: 4px 8px;">cli/commands/</code> - auto-loaded by format:</p>
+
+        <div class="card-grid" style="margin-top: 20px;">
+            <div class="card">
+                <h2>JSON</h2>
+                <pre style="background: #0d1117; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto;">{
+  "name": "my-check",
+  "type": "fetch",
+  "path": "index.html"
+}</pre>
+            </div>
+            <div class="card">
+                <h2>Markdown</h2>
+                <pre style="background: #0d1117; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto;">---
+name: my-test
+type: sync
+---
+# Description here</pre>
+            </div>
+            <div class="card">
+                <h2>CSV</h2>
+                <pre style="background: #0d1117; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto;">name,type,path
+check-1,fetch,/index.html
+check-2,fetch,/setup/</pre>
+            </div>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #8b949e;">
+            <a href="../">← Back to home</a> ·
+            <a href="README.md">Full Documentation</a>
+        </p>
+    </div>
+
+    <script src="../assets/main.js"></script>
+</body>
+</html>

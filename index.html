@@ -1,255 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ignition Sandbox</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font: 14px/1.6 sans-serif;
-            background: #1a1a1a;
-            color: #fff;
-            overflow: hidden;
-        }
-
-        #container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .header {
-            background: #2d2d2d;
-            padding: 15px;
-            border-bottom: 2px solid #0078d4;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-            color: #0078d4;
-        }
-
-        .header p {
-            margin: 5px 0 0;
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        .content {
-            flex: 1;
-            display: flex;
-        }
-
-        .sidebar {
-            width: 350px;
-            background: #2d2d2d;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid #444;
-        }
-
-        .sidebar h2 {
-            color: #0078d4;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .sidebar h3 {
-            color: #00bcf2;
-            font-size: 14px;
-            margin: 15px 0 10px;
-        }
-
-        .sidebar code {
-            background: #1a1a1a;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: #0f0;
-            font-family: monospace;
-            font-size: 12px;
-            display: block;
-            margin: 8px 0;
-            word-wrap: break-word;
-            cursor: pointer;
-            border: 1px solid #444;
-        }
-
-        .sidebar code:hover {
-            background: #333;
-            border-color: #0078d4;
-        }
-
-        .sidebar p {
-            font-size: 13px;
-            color: #ccc;
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-
-        .sidebar ol {
-            margin-left: 20px;
-            font-size: 13px;
-            color: #ccc;
-        }
-
-        .sidebar li {
-            margin-bottom: 8px;
-        }
-
-        .copy-btn {
-            background: #0078d4;
-            color: #fff;
-            border: 0;
-            padding: 8px 16px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-        }
-
-        .copy-btn:hover {
-            background: #005a9e;
-        }
-
-        .copy-btn.copied {
-            background: #00aa00;
-        }
-
-        #vm {
-            flex: 1;
-            border: 0;
-        }
-
-        .status {
-            background: #1a1a1a;
-            padding: 10px 20px;
-            border-left: 3px solid #0078d4;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .status.success {
-            border-color: #00aa00;
-        }
-
-        .status.warning {
-            border-color: #ffaa00;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-    <div id="container">
-        <div class="header">
-            <h1>🏭 Ignition Gateway - Browser Sandbox</h1>
-            <p>Full Ignition 8.1 running in Debian Linux via WebAssembly | No server required</p>
-        </div>
-
-        <div class="content">
-            <div class="sidebar">
-                <h2>Quick Start</h2>
-
-                <div class="status warning">
-                    <p><strong>⚡ One-Time Setup Required</strong></p>
-                    <p>Run the command below in the WebVM terminal →</p>
-                </div>
-
-                <h3>1. Copy this command:</h3>
-                <code id="installCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
-                <button class="copy-btn" onclick="copyCommand()">📋 Copy Command</button>
-
-                <h3>2. Paste in terminal →</h3>
-                <p>Right-click in the black terminal on the right and paste (Ctrl+Shift+V)</p>
-
-                <h3>3. Wait for installation</h3>
-                <p>Installation takes 3-5 minutes. You'll see:</p>
-                <ol>
-                    <li>Installing dependencies...</li>
-                    <li>Downloading Ignition...</li>
-                    <li>Running installer...</li>
-                    <li>Starting Gateway...</li>
-                    <li>✅ Ready!</li>
-                </ol>
-
-                <h3>4. Access Ignition</h3>
-                <p>Once installation completes:</p>
-                <ol>
-                    <li>Open browser inside WebVM</li>
-                    <li>Navigate to: <code>localhost:8088</code></li>
-                    <li>Login: <code>admin / password</code></li>
-                </ol>
-
-                <div class="status success" style="margin-top: 20px;">
-                    <p><strong>💡 Tip:</strong> Installation only needed once. Data persists in browser cache!</p>
-                </div>
-
-                <h2 style="margin-top: 25px; border-top: 1px solid #444; padding-top: 15px;">Remote Access (Tailscale)</h2>
-
-                <p>Connect to this sandbox from any device on your Tailnet:</p>
-
-                <h3>Full Setup (Ignition + Tailscale):</h3>
-                <code id="fullSetupCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash -s -- tskey-YOUR-KEY</code>
-                <button class="copy-btn" onclick="copyFullSetup()" style="background: #6b5b95;">📋 Copy Full Setup</button>
-
-                <h3>Or add Tailscale to existing:</h3>
-                <code id="tailscaleCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
-                <button class="copy-btn" onclick="copyTailscale()" style="background: #5b8c6b;">📋 Copy Tailscale Only</button>
-
-                <div class="status" style="margin-top: 15px; border-color: #6b5b95;">
-                    <p><strong>🔗 How it works:</strong></p>
-                    <p style="font-size: 12px;">1. Tailscale runs inside WebVM<br>
-                    2. Connects to your Tailnet<br>
-                    3. Access Ignition from any peer:<br>
-                    <code style="display: inline; padding: 2px 4px;">http://&lt;tailscale-ip&gt;:8088</code></p>
-                </div>
-
-                <p style="font-size: 11px; color: #888; margin-top: 10px;">
-                    Get auth key: <a href="https://login.tailscale.com/admin/settings/keys" target="_blank" style="color: #00bcf2;">Tailscale Admin</a>
-                </p>
-
-                <h3>Troubleshooting</h3>
-                <p>If download fails, you need to upload the Ignition installer to GitHub Releases first. See DEPLOY.md for details.</p>
-            </div>
-
-            <iframe id="vm" src="https://webvm.io/"></iframe>
+    <div class="header">
+        <div class="container">
+            <h1>Ignition Sandbox</h1>
+            <p>Full Ignition SCADA running in your browser via WebAssembly</p>
         </div>
     </div>
 
-    <script>
-        function copyToClipboard(elementId, btn, originalText) {
-            const cmd = document.getElementById(elementId).textContent;
-            navigator.clipboard.writeText(cmd).then(() => {
-                btn.textContent = '✅ Copied!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        }
+    <div class="container">
+        <div class="card-grid">
+            <a href="setup/" class="card">
+                <h2>Quick Setup</h2>
+                <p>Launch WebVM and install Ignition Gateway in your browser. No server required.</p>
+                <span class="tag">3-5 min</span>
+                <span class="tag">WebVM</span>
+                <span class="tag">Ignition 8.1</span>
+            </a>
 
-        function copyCommand() {
-            copyToClipboard('installCmd', document.querySelectorAll('.copy-btn')[0], '📋 Copy Command');
-        }
+            <a href="tailscale/" class="card">
+                <h2>Remote Access</h2>
+                <p>Connect to your browser sandbox from anywhere via Tailscale mesh VPN.</p>
+                <span class="tag">Tailscale</span>
+                <span class="tag">Remote</span>
+            </a>
 
-        function copyFullSetup() {
-            copyToClipboard('fullSetupCmd', document.querySelectorAll('.copy-btn')[1], '📋 Copy Full Setup');
-        }
+            <a href="cli/" class="card">
+                <h2>CLI Tools</h2>
+                <p>Command-line testing framework with API/MCP wrappers for automation.</p>
+                <span class="tag">Python</span>
+                <span class="tag">API</span>
+                <span class="tag">MCP</span>
+            </a>
 
-        function copyTailscale() {
-            copyToClipboard('tailscaleCmd', document.querySelectorAll('.copy-btn')[2], '📋 Copy Tailscale Only');
-        }
+            <a href="https://github.com/teslasolar/ignition-sandbox" class="card" target="_blank">
+                <h2>Source Code</h2>
+                <p>View the repository, contribute, or fork for your own setup.</p>
+                <span class="tag">GitHub</span>
+            </a>
+        </div>
 
-        // Allow clicking code to copy
-        document.getElementById('installCmd').addEventListener('click', copyCommand);
-        document.getElementById('fullSetupCmd').addEventListener('click', copyFullSetup);
-        document.getElementById('tailscaleCmd').addEventListener('click', copyTailscale);
-    </script>
+        <div class="status info" style="margin-top: 40px;">
+            <strong>How it works:</strong>
+            <p style="margin-top: 8px;">
+                WebVM runs a full Debian Linux in your browser using WebAssembly.
+                Ignition Gateway installs inside this VM and persists in your browser's IndexedDB.
+                Add Tailscale for remote access from any device on your network.
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center; color: #8b949e; font-size: 13px;">
+            <p>
+                <a href="setup/">Launch Sandbox</a> ·
+                <a href="https://github.com/teslasolar/ignition-sandbox/releases">Downloads</a> ·
+                <a href="cli/README.md">Documentation</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="assets/main.js"></script>
 </body>
 </html>
