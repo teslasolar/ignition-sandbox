@@ -1,0 +1,5 @@
+id,name,size,mem,boot,priority,compressed
+ignition-kernel,Ignition Kernel,512,64,<50ms,critical,false
+minimal-kernel,Minimal Kernel,512,64,<50ms,critical,false
+alpine,Alpine Linux,50MB,512,~10s,high,true
+buildroot,Buildroot,20MB,256,~5s,medium,true

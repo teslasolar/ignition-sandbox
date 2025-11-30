@@ -1,0 +1,6 @@
+id,name,layout,components
+overview,System Overview,grid-2x2,pump:P101|tank:T101|valve:XV101|sensor:LT101
+tank-farm,Tank Farm,grid-3x2,tank:T101|tank:T102|tank:T201|pump:P101|pump:P102|valve:XV101
+process,Process Area,flow-h,pump:P103|valve:FV201|tank:T102|sensor:FT201
+loading,Loading Station,flow-v,tank:T201|pump:P201|valve:XV301|sensor:PT301
+plc-io,PLC I/O Monitor,io-grid,di:0-7|do:0-7|ai:0-3|ao:0-1
