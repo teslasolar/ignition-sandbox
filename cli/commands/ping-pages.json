@@ -1,11 +1,1 @@
-{
-  "name": "ping-pages",
-  "description": "Check GitHub Pages is responding",
-  "type": "api",
-  "action": "ping",
-  "url": "https://teslasolar.github.io/ignition-sandbox/",
-  "expect": {
-    "status": 200
-  },
-  "timeout": 10
-}
+{"name":"ping-pages","type":"api","action":"ping","url":"https://teslasolar.github.io/ignition-sandbox/","expect":200,"timeout":10}

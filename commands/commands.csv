@@ -1,0 +1,17 @@
+name,category,description,run
+install-ignition,ignition,Install Ignition Gateway,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash
+start,ignition,Start Ignition Gateway,/opt/ignition/ignition.sh start
+stop,ignition,Stop Ignition Gateway,/opt/ignition/ignition.sh stop
+restart,ignition,Restart Ignition Gateway,/opt/ignition/ignition.sh restart
+status,ignition,Check status,/opt/ignition/ignition.sh status
+logs,ignition,Tail logs,tail -f /opt/ignition/logs/wrapper.log
+install-tailscale,tailscale,Install Tailscale,curl -fsSL https://tailscale.com/install.sh | sh
+tailscale-up,tailscale,Connect,tailscale up
+tailscale-status,tailscale,Show status,tailscale status
+tailscale-ip,tailscale,Show IP,tailscale ip -4
+full-setup,setup,Install all,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash
+sysinfo,system,System info,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sysinfo | bash
+netinfo,system,Network info,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/netinfo | bash
+docker-setup,setup,Install Docker,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | sudo bash
+java-setup,setup,Install Java,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | sudo bash
+python-setup,setup,Setup Python,curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash
