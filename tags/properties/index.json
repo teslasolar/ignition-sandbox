@@ -1,0 +1,5 @@
+{"name":"Shared Properties","type":"properties","files":[
+{"id":"states","file":"states.json","desc":"State color definitions"},
+{"id":"units","file":"units.json","desc":"Engineering units"},
+{"id":"alarms","file":"alarms.json","desc":"Alarm thresholds"}
+]}

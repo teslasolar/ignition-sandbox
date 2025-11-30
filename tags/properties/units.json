@@ -1,0 +1,3 @@
+{"temperature":["°C","°F","K"],"pressure":["psi","bar","kPa"],
+"flow":["gpm","lpm","m³/h"],"level":["%","ft","m","in"],
+"speed":["RPM","m/s","ft/min"],"current":["A","mA"]}

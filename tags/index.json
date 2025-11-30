@@ -1,0 +1,5 @@
+{"name":"Tag Provider","version":"1.0.0","type":"tags",
+"description":"UDT definitions and tag instances for Konomi IgnAIte",
+"format":".udt","spec":"Line-based: @udt|>prop|~tag|=state|#comment",
+"children":["udt","instances","properties"],
+"stats":{"udts":6,"instances":0}}

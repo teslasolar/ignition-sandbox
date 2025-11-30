@@ -10,8 +10,9 @@
 ],
 "resources":[
   {"id":"vm","title":"VM Sandbox","href":"vm/","icon":"terminal","highlight":true},
+  {"id":"tags","title":"Tag Provider","href":"tags/","icon":"tag"},
   {"id":"screens","title":"Screens","href":"screens/","icon":"grid"},
   {"id":"cli","title":"CLI Tools","href":"cli/","icon":"code"},
   {"id":"templates","title":"Templates","href":"templates/","icon":"file"}
 ],
-"children":["cli","screens","vm","templates"]}
+"children":["cli","screens","vm","templates","tags"]}
