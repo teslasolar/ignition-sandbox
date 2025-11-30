@@ -4,330 +4,145 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ignition Sandbox</title>
-    <link rel="stylesheet" href="assets/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
     <style>
-        .sandbox-layout {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sandbox-sidebar {
-            width: 320px;
-            background: #161b22;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid #30363d;
-        }
-        .sandbox-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #0d1117;
+            color: #c9d1d9;
+            padding: 40px 20px;
         }
-        .sandbox-header {
-            padding: 10px 20px;
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #58a6ff; margin-bottom: 10px; }
+        h2 { color: #7ee787; margin: 30px 0 15px; font-size: 18px; }
+        p { color: #8b949e; margin-bottom: 15px; }
+        a { color: #58a6ff; }
+
+        .cmd {
             background: #161b22;
-            border-bottom: 1px solid #30363d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .sandbox-terminal {
-            flex: 1;
-            padding: 10px;
-        }
-        #terminal {
-            height: 100%;
-        }
-        .cmd-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 10px 12px;
-            margin: 5px 0;
-            background: #21262d;
             border: 1px solid #30363d;
             border-radius: 6px;
-            color: #c9d1d9;
-            cursor: pointer;
-            font-size: 13px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
         }
-        .cmd-btn:hover {
-            border-color: #58a6ff;
-            background: #30363d;
-        }
-        .cmd-btn code {
+        .cmd code {
             display: block;
-            background: none;
-            border: none;
-            padding: 4px 0 0;
             color: #7ee787;
-            font-size: 11px;
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 14px;
+            word-break: break-all;
         }
-        .status-bar {
-            padding: 8px 20px;
-            background: #161b22;
-            border-top: 1px solid #30363d;
-            font-size: 12px;
+        .cmd .label {
             color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 8px;
         }
+        .cmd button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .cmd button:hover { background: #30363d; }
+        .cmd button.copied { background: #238636; border-color: #238636; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+        }
+        .card h3 { color: #f0f6fc; font-size: 16px; margin-bottom: 8px; }
+        .card p { font-size: 14px; margin: 0; }
+
+        .footer { margin-top: 40px; color: #8b949e; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="sandbox-layout">
-        <div class="sandbox-sidebar">
-            <h2 style="color: #58a6ff; margin-bottom: 15px;">Ignition Sandbox</h2>
+    <div class="container">
+        <h1>Ignition Sandbox</h1>
+        <p>Commands to install Ignition SCADA on any Linux system. Copy and run in your terminal.</p>
 
-            <p style="color: #8b949e; font-size: 13px; margin-bottom: 20px;">
-                Custom Linux sandbox for Ignition SCADA testing
-            </p>
+        <h2>Quick Install</h2>
 
-            <h3 style="color: #7ee787; font-size: 14px; margin-bottom: 10px;">Quick Commands</h3>
-
-            <button class="cmd-btn" onclick="runCommand('install')">
-                Install Ignition
-                <code>sandbox install</code>
-            </button>
-
-            <button class="cmd-btn" onclick="runCommand('tailscale')">
-                Install Tailscale
-                <code>sandbox tailscale</code>
-            </button>
-
-            <button class="cmd-btn" onclick="runCommand('status')">
-                Check Status
-                <code>sandbox status</code>
-            </button>
-
-            <button class="cmd-btn" onclick="runCommand('start')">
-                Start Gateway
-                <code>sandbox start</code>
-            </button>
-
-            <h3 style="color: #7ee787; font-size: 14px; margin: 20px 0 10px;">Manual Commands</h3>
-
-            <div style="margin-bottom: 15px;">
-                <input type="text" id="cmdInput" placeholder="Enter command..."
-                    style="width: 100%; padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-family: monospace;"
-                    onkeypress="if(event.key==='Enter')runCustom()">
-                <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="runCustom()">Run</button>
-            </div>
-
-            <h3 style="color: #7ee787; font-size: 14px; margin: 20px 0 10px;">Resources</h3>
-            <p style="font-size: 12px;">
-                <a href="commands/manifest.json">Command Manifest</a><br>
-                <a href="cli/">CLI Tools</a><br>
-                <a href="https://github.com/teslasolar/ignition-sandbox">GitHub Repo</a>
-            </p>
+        <div class="cmd">
+            <div class="label">Install Ignition Gateway (Debian/Ubuntu)</div>
+            <code id="cmd1">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
+            <button onclick="copy('cmd1', this)">Copy</button>
         </div>
 
-        <div class="sandbox-main">
-            <div class="sandbox-header">
-                <span style="color: #7ee787;">sandbox@ignition:~$</span>
-                <span id="status" style="color: #8b949e;">Ready</span>
+        <div class="cmd">
+            <div class="label">Install Tailscale (remote access)</div>
+            <code id="cmd2">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
+            <button onclick="copy('cmd2', this)">Copy</button>
+        </div>
+
+        <div class="cmd">
+            <div class="label">Full setup (Ignition + Tailscale)</div>
+            <code id="cmd3">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash</code>
+            <button onclick="copy('cmd3', this)">Copy</button>
+        </div>
+
+        <h2>After Installation</h2>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Access Gateway</h3>
+                <p>Open <code style="color:#7ee787">http://localhost:8088</code><br>Login: admin / password</p>
             </div>
-            <div class="sandbox-terminal">
-                <div id="terminal"></div>
+            <div class="card">
+                <h3>Start/Stop</h3>
+                <p><code style="color:#7ee787">/opt/ignition/ignition.sh start</code><br>
+                <code style="color:#7ee787">/opt/ignition/ignition.sh stop</code></p>
             </div>
-            <div class="status-bar">
-                <span id="connection">Local</span> ·
-                <span id="info">Type 'help' or click a command</span>
+            <div class="card">
+                <h3>Connect Tailscale</h3>
+                <p><code style="color:#7ee787">tailscale up</code><br>
+                <code style="color:#7ee787">tailscale ip</code></p>
             </div>
+            <div class="card">
+                <h3>Check Status</h3>
+                <p><code style="color:#7ee787">/opt/ignition/ignition.sh status</code><br>
+                <code style="color:#7ee787">tailscale status</code></p>
+            </div>
+        </div>
+
+        <h2>Resources</h2>
+        <p>
+            <a href="commands/manifest.json">Command Manifest (JSON)</a> ·
+            <a href="cli/">CLI Tools</a> ·
+            <a href="https://github.com/teslasolar/ignition-sandbox">GitHub Repo</a>
+        </p>
+
+        <div class="footer">
+            <p>Scripts fetch from this repo. Run on any Debian/Ubuntu Linux.</p>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
     <script>
-        const BASE_URL = 'https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main';
-
-        // Initialize terminal
-        const term = new Terminal({
-            theme: {
-                background: '#0d1117',
-                foreground: '#c9d1d9',
-                cursor: '#58a6ff',
-                green: '#7ee787',
-                yellow: '#d29922',
-                blue: '#58a6ff',
-                red: '#f85149'
-            },
-            fontFamily: '"SF Mono", Consolas, monospace',
-            fontSize: 14,
-            cursorBlink: true
-        });
-
-        const fitAddon = new FitAddon.FitAddon();
-        term.loadAddon(fitAddon);
-        term.open(document.getElementById('terminal'));
-        fitAddon.fit();
-
-        window.addEventListener('resize', () => fitAddon.fit());
-
-        // Welcome message
-        term.writeln('\x1b[1;34m╔════════════════════════════════════════╗\x1b[0m');
-        term.writeln('\x1b[1;34m║\x1b[0m   \x1b[1;32mIgnition Sandbox\x1b[0m                     \x1b[1;34m║\x1b[0m');
-        term.writeln('\x1b[1;34m║\x1b[0m   Custom Linux Environment             \x1b[1;34m║\x1b[0m');
-        term.writeln('\x1b[1;34m╚════════════════════════════════════════╝\x1b[0m');
-        term.writeln('');
-        term.writeln('Type \x1b[33mhelp\x1b[0m for available commands');
-        term.writeln('');
-        prompt();
-
-        let commandBuffer = '';
-
-        function prompt() {
-            term.write('\x1b[32msandbox@ignition\x1b[0m:\x1b[34m~\x1b[0m$ ');
-        }
-
-        // Handle keyboard input
-        term.onKey(({key, domEvent}) => {
-            const char = key;
-
-            if (domEvent.keyCode === 13) { // Enter
-                term.writeln('');
-                processCommand(commandBuffer);
-                commandBuffer = '';
-            } else if (domEvent.keyCode === 8) { // Backspace
-                if (commandBuffer.length > 0) {
-                    commandBuffer = commandBuffer.slice(0, -1);
-                    term.write('\b \b');
-                }
-            } else if (char >= ' ') {
-                commandBuffer += char;
-                term.write(char);
-            }
-        });
-
-        function processCommand(cmd) {
-            cmd = cmd.trim();
-            if (!cmd) {
-                prompt();
-                return;
-            }
-
-            const parts = cmd.split(' ');
-            const command = parts[0];
-            const args = parts.slice(1);
-
-            switch(command) {
-                case 'help':
-                    showHelp();
-                    break;
-                case 'install':
-                    showInstallCommand();
-                    break;
-                case 'tailscale':
-                case 'ts':
-                    showTailscaleCommand();
-                    break;
-                case 'status':
-                    showStatus();
-                    break;
-                case 'start':
-                case 'stop':
-                    showGatewayCommand(command);
-                    break;
-                case 'clear':
-                    term.clear();
-                    break;
-                case 'manifest':
-                    fetchManifest();
-                    break;
-                case 'curl':
-                    simulateCurl(args.join(' '));
-                    break;
-                default:
-                    term.writeln(`\x1b[33mCommand not found: ${command}\x1b[0m`);
-                    term.writeln('Type \x1b[33mhelp\x1b[0m for available commands');
-            }
-            prompt();
-        }
-
-        function showHelp() {
-            term.writeln('\x1b[1;32mAvailable Commands:\x1b[0m');
-            term.writeln('');
-            term.writeln('  \x1b[33minstall\x1b[0m     Install Ignition Gateway');
-            term.writeln('  \x1b[33mtailscale\x1b[0m   Install Tailscale');
-            term.writeln('  \x1b[33mstatus\x1b[0m      Check services status');
-            term.writeln('  \x1b[33mstart\x1b[0m       Start Ignition Gateway');
-            term.writeln('  \x1b[33mstop\x1b[0m        Stop Ignition Gateway');
-            term.writeln('  \x1b[33mmanifest\x1b[0m    Show command manifest');
-            term.writeln('  \x1b[33mclear\x1b[0m       Clear terminal');
-            term.writeln('  \x1b[33mhelp\x1b[0m        Show this help');
-            term.writeln('');
-        }
-
-        function showInstallCommand() {
-            term.writeln('\x1b[1;34mTo install Ignition Gateway:\x1b[0m');
-            term.writeln('');
-            term.writeln('\x1b[32mcurl -sL ' + BASE_URL + '/ignition-install.sh | sudo bash\x1b[0m');
-            term.writeln('');
-            term.writeln('Copy this command and run in your terminal.');
-            term.writeln('');
-        }
-
-        function showTailscaleCommand() {
-            term.writeln('\x1b[1;34mTo install Tailscale:\x1b[0m');
-            term.writeln('');
-            term.writeln('\x1b[32mcurl -sL ' + BASE_URL + '/tailscale-install.sh | bash\x1b[0m');
-            term.writeln('');
-            term.writeln('Then connect: \x1b[33mtailscale up --authkey=tskey-xxx\x1b[0m');
-            term.writeln('');
-        }
-
-        function showStatus() {
-            term.writeln('\x1b[1;34mService Status:\x1b[0m');
-            term.writeln('');
-            term.writeln('  Ignition Gateway: \x1b[33mCheck with /opt/ignition/ignition.sh status\x1b[0m');
-            term.writeln('  Tailscale:        \x1b[33mCheck with tailscale status\x1b[0m');
-            term.writeln('');
-        }
-
-        function showGatewayCommand(cmd) {
-            term.writeln(`\x1b[1;34mTo ${cmd} Ignition Gateway:\x1b[0m`);
-            term.writeln('');
-            term.writeln(`\x1b[32m/opt/ignition/ignition.sh ${cmd}\x1b[0m`);
-            term.writeln('');
-        }
-
-        async function fetchManifest() {
-            term.writeln('\x1b[34mFetching manifest...\x1b[0m');
-            try {
-                const resp = await fetch(BASE_URL + '/commands/manifest.json');
-                const data = await resp.json();
-                term.writeln('');
-                term.writeln('\x1b[1;32mCommands:\x1b[0m');
-                data.commands.forEach(cmd => {
-                    term.writeln(`  \x1b[33m${cmd.name}\x1b[0m - ${cmd.description}`);
-                });
-                term.writeln('');
-            } catch(e) {
-                term.writeln('\x1b[31mFailed to fetch manifest\x1b[0m');
-            }
-        }
-
-        function simulateCurl(url) {
-            term.writeln(`\x1b[34mFetching: ${url}\x1b[0m`);
-            term.writeln('\x1b[33m(Use actual terminal for curl)\x1b[0m');
-            term.writeln('');
-        }
-
-        function runCommand(cmd) {
-            term.write(cmd);
-            commandBuffer = cmd;
-            term.writeln('');
-            processCommand(cmd);
-        }
-
-        function runCustom() {
-            const input = document.getElementById('cmdInput');
-            const cmd = input.value.trim();
-            if (cmd) {
-                runCommand(cmd);
-                input.value = '';
-            }
+        function copy(id, btn) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         }
     </script>
 </body>
