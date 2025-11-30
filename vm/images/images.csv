@@ -1,5 +1,7 @@
-id,name,size,mem,boot,priority,compressed
-ignition-kernel,Ignition Kernel,512,64,<50ms,critical,false
-minimal-kernel,Minimal Kernel,512,64,<50ms,critical,false
-alpine,Alpine Linux,50MB,512,~10s,high,true
-buildroot,Buildroot,20MB,256,~5s,medium,true
+id,name,size,type,path,priority,desc
+bios,SeaBIOS,64KB,bios,seabios/bios.bin,critical,System BIOS ROM
+vgabios,VGA BIOS,32KB,vgabios,seabios/vgabios.bin,critical,VGA BIOS ROM
+boot-minimal,Minimal Boot,512B,bootsector,kernels/boot-minimal.bin,critical,Banner display boot
+boot-shell,Interactive Shell,512B,bootsector,kernels/boot-shell.bin,high,Keyboard input shell
+boot-gateway,Gateway Display,512B,bootsector,kernels/boot-gateway.bin,high,PLC/Gateway status
+ignaite-floppy,IgnAIte OS,1.44MB,fda,rootfs/ignaite.img,medium,FAT12 bootable floppy
