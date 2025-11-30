@@ -1,107 +1,11 @@
-{
-  "name": "ignition-sandbox",
-  "version": "1.0.0",
-  "description": "MCP server for testing Ignition GitHub Pages sandbox",
-  "tools": [
-    {
-      "name": "sandbox_ping",
-      "description": "Check if GitHub Pages sandbox is accessible and responding",
-      "inputSchema": {
-        "type": "object",
-        "properties": {},
-        "required": []
-      }
-    },
-    {
-      "name": "sandbox_fetch",
-      "description": "Fetch a specific file from the sandbox and return status/hash",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": "string",
-            "description": "File path relative to sandbox root (e.g., 'index.html')"
-          }
-        },
-        "required": ["path"]
-      }
-    },
-    {
-      "name": "sandbox_sync_check",
-      "description": "Check if local repo version matches deployed GitHub Pages version",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "File to check sync status for",
-            "default": "index.html"
-          }
-        },
-        "required": []
-      }
-    },
-    {
-      "name": "sandbox_sync_watch",
-      "description": "Watch and wait for repo changes to sync to GitHub Pages",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "file": {
-            "type": "string",
-            "description": "File to watch",
-            "default": "index.html"
-          },
-          "interval": {
-            "type": "integer",
-            "description": "Check interval in seconds",
-            "default": 5
-          },
-          "max_wait": {
-            "type": "integer",
-            "description": "Maximum wait time in seconds",
-            "default": 300
-          }
-        },
-        "required": []
-      }
-    },
-    {
-      "name": "sandbox_run_command",
-      "description": "Execute a pre-defined command from cli/commands/",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Command name to execute"
-          }
-        },
-        "required": ["name"]
-      }
-    },
-    {
-      "name": "sandbox_list_commands",
-      "description": "List all available commands loaded from cli/commands/",
-      "inputSchema": {
-        "type": "object",
-        "properties": {},
-        "required": []
-      }
-    },
-    {
-      "name": "sandbox_status",
-      "description": "Get full status report of sandbox including sync state and loaded commands",
-      "inputSchema": {
-        "type": "object",
-        "properties": {},
-        "required": []
-      }
-    }
-  ],
-  "config": {
-    "pages_url": "https://teslasolar.github.io/ignition-sandbox",
-    "repo_url": "https://github.com/teslasolar/ignition-sandbox",
-    "raw_url": "https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main"
-  }
-}
+{"name":"ignition-sandbox","version":"1.0.0",
+"tools":[
+  {"name":"sandbox_ping","desc":"Check if sandbox is accessible"},
+  {"name":"sandbox_fetch","desc":"Fetch file from sandbox","input":{"path":"string"}},
+  {"name":"sandbox_sync_check","desc":"Check local vs deployed sync","input":{"file":"index.html"}},
+  {"name":"sandbox_sync_watch","desc":"Watch for sync","input":{"file":"index.html","interval":5,"max_wait":300}},
+  {"name":"sandbox_run_command","desc":"Run command from cli/commands/","input":{"name":"string"}},
+  {"name":"sandbox_list_commands","desc":"List available commands"},
+  {"name":"sandbox_status","desc":"Full status report"}
+],
+"config":{"pages":"https://teslasolar.github.io/ignition-sandbox","repo":"https://github.com/teslasolar/ignition-sandbox"}}

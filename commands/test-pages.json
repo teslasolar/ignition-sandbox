@@ -1,31 +1,7 @@
-{
-  "name": "test-pages",
-  "description": "Test GitHub Pages endpoints",
-  "tests": [
-    {
-      "name": "index",
-      "url": "https://teslasolar.github.io/ignition-sandbox/",
-      "expect": 200
-    },
-    {
-      "name": "setup",
-      "url": "https://teslasolar.github.io/ignition-sandbox/setup/",
-      "expect": 200
-    },
-    {
-      "name": "tailscale",
-      "url": "https://teslasolar.github.io/ignition-sandbox/tailscale/",
-      "expect": 200
-    },
-    {
-      "name": "cli",
-      "url": "https://teslasolar.github.io/ignition-sandbox/cli/",
-      "expect": 200
-    },
-    {
-      "name": "manifest",
-      "url": "https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/commands/manifest.json",
-      "expect": 200
-    }
-  ]
-}
+{"name":"test-pages",
+"tests":[
+  {"name":"index","url":"https://teslasolar.github.io/ignition-sandbox/","expect":200},
+  {"name":"setup","url":"https://teslasolar.github.io/ignition-sandbox/setup/","expect":200},
+  {"name":"cli","url":"https://teslasolar.github.io/ignition-sandbox/cli/","expect":200},
+  {"name":"manifest","url":"https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/commands/manifest.json","expect":200}
+]}

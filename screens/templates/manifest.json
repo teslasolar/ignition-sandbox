@@ -1,97 +1,18 @@
-{
-  "version": "1.0",
-  "description": "Perspective JSON Templates Library",
-  "templates": {
-    "views": [
-      {
-        "id": "tank-farm",
-        "name": "Tank Farm",
-        "description": "Industrial tank farm with distribution piping",
-        "file": "views/tank-farm.json",
-        "category": "process"
-      },
-      {
-        "id": "overview",
-        "name": "System Overview",
-        "description": "Basic overview screen template",
-        "file": "views/overview.json",
-        "category": "layout"
-      }
-    ],
-    "components": [
-      {
-        "id": "tank",
-        "name": "Tank",
-        "description": "Configurable tank with level indicator",
-        "file": "components/tank.json",
-        "category": "equipment"
-      },
-      {
-        "id": "valve",
-        "name": "Control Valve",
-        "description": "Valve with position feedback",
-        "file": "components/valve.json",
-        "category": "equipment"
-      },
-      {
-        "id": "pump",
-        "name": "Pump",
-        "description": "Pump symbol with status",
-        "file": "components/pump.json",
-        "category": "equipment"
-      },
-      {
-        "id": "sensor",
-        "name": "Sensor",
-        "description": "Generic sensor display",
-        "file": "components/sensor.json",
-        "category": "instrumentation"
-      },
-      {
-        "id": "pipe-h",
-        "name": "Horizontal Pipe",
-        "description": "Horizontal pipe segment",
-        "file": "components/pipe-horizontal.json",
-        "category": "piping"
-      },
-      {
-        "id": "pipe-v",
-        "name": "Vertical Pipe",
-        "description": "Vertical pipe segment",
-        "file": "components/pipe-vertical.json",
-        "category": "piping"
-      }
-    ],
-    "symbols": [
-      {
-        "id": "hopper",
-        "name": "Hopper Feeder",
-        "description": "Hopper feeder symbol",
-        "file": "symbols/hopper.json",
-        "category": "feeders"
-      },
-      {
-        "id": "belt",
-        "name": "Belt Conveyor",
-        "description": "Belt conveyor symbol",
-        "file": "symbols/belt.json",
-        "category": "feeders"
-      },
-      {
-        "id": "screw",
-        "name": "Screw Conveyor",
-        "description": "Screw conveyor/feeder symbol",
-        "file": "symbols/screw.json",
-        "category": "feeders"
-      }
-    ]
-  },
-  "categories": {
-    "process": "Process Views",
-    "layout": "Layout Templates",
-    "equipment": "Equipment Components",
-    "instrumentation": "Instrumentation",
-    "piping": "Piping Elements",
-    "feeders": "Feeder Symbols"
-  }
-}
+{"version":"1.0",
+"views":[
+  {"id":"tank-farm","name":"Tank Farm","file":"views/tank-farm.json","cat":"process"},
+  {"id":"overview","name":"Overview","file":"views/overview.json","cat":"layout"}
+],
+"components":[
+  {"id":"tank","name":"Tank","file":"components/tank.json","cat":"equipment"},
+  {"id":"valve","name":"Valve","file":"components/valve.json","cat":"equipment"},
+  {"id":"pump","name":"Pump","file":"components/pump.json","cat":"equipment"},
+  {"id":"sensor","name":"Sensor","file":"components/sensor.json","cat":"instrumentation"},
+  {"id":"pipe-h","name":"Pipe H","file":"components/pipe-horizontal.json","cat":"piping"},
+  {"id":"pipe-v","name":"Pipe V","file":"components/pipe-vertical.json","cat":"piping"}
+],
+"symbols":[
+  {"id":"hopper","name":"Hopper","file":"symbols/hopper.json","cat":"feeders"},
+  {"id":"belt","name":"Belt","file":"symbols/belt.json","cat":"feeders"},
+  {"id":"screw","name":"Screw","file":"symbols/screw.json","cat":"feeders"}
+]}
