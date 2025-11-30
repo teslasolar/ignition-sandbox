@@ -1,0 +1,4 @@
+id,name,file,size,desc,features
+minimal,Minimal,minimal.asm,512,Bare boot sector,boot|logo|halt
+ignition,Ignition,ignition.asm,512,Gateway kernel,boot|status|shell
+full,Full OS,full.asm,512,Complete shell,boot|shell|commands|reboot

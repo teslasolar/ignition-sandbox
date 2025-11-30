@@ -6,7 +6,8 @@
   {"id":"system","label":"System","src":"templates/commands/system.json"},
   {"id":"setup","label":"Setup","src":"templates/commands/setup.json"},
   {"id":"designer","label":"Designer","src":"templates/tabs/designer.json"},
-  {"id":"vm","label":"VM","src":"templates/tabs/vm.json","highlight":true}
+  {"id":"vm","label":"VM","src":"templates/tabs/vm.json","highlight":true},
+  {"id":"plc","label":"PLC","src":"templates/tabs/plc.json","highlight":true}
 ],
 "resources":[
   {"id":"plc","title":"Virtual PLC","href":"plc/","icon":"zap","highlight":true},

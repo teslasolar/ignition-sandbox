@@ -1,0 +1,7 @@
+id,name,type,unit,location,plc_addr
+LT101,Tank 1 Level,level,ft,Tank Farm,AI:0
+LT102,Tank 2 Level,level,ft,Tank Farm,AI:1
+FT201,Main Flow,flow,gpm,Process,AI:2
+PT301,Discharge Pressure,pressure,psi,Loading,AI:3
+TT401,Reactor Temp,temp,F,Reactor,AI:4
+TT402,Outlet Temp,temp,F,Reactor,AI:5

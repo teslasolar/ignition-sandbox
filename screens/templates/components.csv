@@ -1,0 +1,7 @@
+id,type,text,shape,width,height
+pump,label,P,circle,0.06,0.1
+tank,tank,,rect,0.1,0.2
+valve,label,V,rect,0.05,0.05
+sensor,label,--,rect,0.08,0.04
+pipe-h,shape,,rect,0.2,0.01
+pipe-v,shape,,rect,0.01,0.2

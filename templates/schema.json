@@ -1,0 +1,18 @@
+{"$schema":"template-schema-1.0",
+"definitions":{
+  "command":{"props":["id","label","cmd","icon","desc"]},
+  "tab":{"props":["id","label","src","icon","highlight"]},
+  "resource":{"props":["id","title","href","icon","highlight"]}
+},
+"defaults":{
+  "command":{"icon":"terminal","highlight":false},
+  "tab":{"highlight":false},
+  "resource":{"highlight":false}
+},
+"categories":{
+  "ignition":{"label":"Ignition","icon":"server","color":"#f97316"},
+  "tailscale":{"label":"Tailscale","icon":"network","color":"#4f46e5"},
+  "system":{"label":"System","icon":"cpu","color":"#10b981"},
+  "setup":{"label":"Setup","icon":"settings","color":"#8b5cf6"},
+  "plc":{"label":"PLC","icon":"zap","color":"#eab308"}
+}}

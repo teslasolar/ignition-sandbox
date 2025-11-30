@@ -1,0 +1,7 @@
+id,name,location,plc_addr
+P101,Inlet Pump 1,Tank Farm,I:0/0
+P102,Inlet Pump 2,Tank Farm,I:0/1
+P103,Transfer Pump,Process Area,I:0/2
+P201,Discharge Pump 1,Loading,I:0/3
+P202,Discharge Pump 2,Loading,I:0/4
+P301,Recirculation,Reactor,I:0/5

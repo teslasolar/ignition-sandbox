@@ -1,0 +1,8 @@
+id,label,src,icon,highlight
+ignition,Ignition,commands/ignition.json,server,false
+tailscale,Tailscale,commands/tailscale.json,network,false
+system,System,commands/system.json,cpu,false
+setup,Setup,commands/setup.json,settings,false
+designer,Designer,tabs/designer.json,grid,false
+vm,VM,tabs/vm.json,terminal,true
+plc,PLC,tabs/plc.json,zap,true
