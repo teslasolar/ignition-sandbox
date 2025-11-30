@@ -1,37 +1,8 @@
-{
-  "id": "setup",
-  "title": "Setup Scripts",
-  "icon": "cog",
-  "commands": [
-    {
-      "label": "Full Setup",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/full-setup | bash",
-      "description": "Complete environment setup"
-    },
-    {
-      "label": "Docker Setup",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | bash",
-      "description": "Install Docker and Docker Compose"
-    },
-    {
-      "label": "Java Setup",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | bash",
-      "description": "Install OpenJDK 17"
-    },
-    {
-      "label": "Python Setup",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash",
-      "description": "Setup Python environment"
-    },
-    {
-      "label": "Node.js Setup",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/node-setup | bash",
-      "description": "Install Node.js via nvm"
-    },
-    {
-      "label": "Security Hardening",
-      "code": "curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/security-setup | bash",
-      "description": "Apply security best practices"
-    }
-  ]
-}
+{"id":"setup","title":"Setup Scripts","commands":[
+{"label":"Full Setup","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/full-setup | bash"},
+{"label":"Docker Setup","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | bash"},
+{"label":"Java Setup","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | bash"},
+{"label":"Python Setup","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash"},
+{"label":"Node.js Setup","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/node-setup | bash"},
+{"label":"Security Hardening","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/security-setup | bash"}
+]}

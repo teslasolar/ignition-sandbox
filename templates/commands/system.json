@@ -1,47 +1,10 @@
-{
-  "id": "system",
-  "title": "System Commands",
-  "icon": "terminal",
-  "commands": [
-    {
-      "label": "System Info",
-      "code": "uname -a",
-      "description": "Display system information"
-    },
-    {
-      "label": "Disk Usage",
-      "code": "df -h",
-      "description": "Show disk space usage"
-    },
-    {
-      "label": "Memory Usage",
-      "code": "free -h",
-      "description": "Display memory statistics"
-    },
-    {
-      "label": "Running Processes",
-      "code": "ps aux | head -20",
-      "description": "List top 20 processes"
-    },
-    {
-      "label": "Network Interfaces",
-      "code": "ip addr",
-      "description": "Show network configuration"
-    },
-    {
-      "label": "Open Ports",
-      "code": "sudo netstat -tlnp",
-      "description": "List listening ports"
-    },
-    {
-      "label": "System Logs",
-      "code": "sudo journalctl -f",
-      "description": "Follow system journal"
-    },
-    {
-      "label": "CPU Info",
-      "code": "lscpu",
-      "description": "Display CPU architecture info"
-    }
-  ]
-}
+{"id":"system","title":"System Commands","commands":[
+{"label":"System Info","code":"uname -a"},
+{"label":"Disk Usage","code":"df -h"},
+{"label":"Memory Usage","code":"free -h"},
+{"label":"Running Processes","code":"ps aux | head -20"},
+{"label":"Network Interfaces","code":"ip addr"},
+{"label":"Open Ports","code":"sudo netstat -tlnp"},
+{"label":"System Logs","code":"sudo journalctl -f"},
+{"label":"CPU Info","code":"lscpu"}
+]}

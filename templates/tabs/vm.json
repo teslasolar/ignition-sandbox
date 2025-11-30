@@ -1,35 +1,11 @@
-{
-  "id": "vm",
-  "title": "Browser VM Sandbox",
-  "type": "custom",
-  "description": "Run a real Linux VM directly in your browser. No installation required.",
-
-  "sections": [
-    {
-      "title": null,
-      "type": "cards",
-      "items": [
-        { "title": "Launch VM Sandbox", "href": "vm/", "description": "Boot Alpine/Debian Linux in browser using v86 emulator", "highlight": true },
-        { "title": "How it Works", "description": "Uses v86 (JS x86 emulator) to run real Linux. State saves to browser storage." }
-      ]
-    },
-    {
-      "title": "Available Images",
-      "type": "cards",
-      "items": [
-        { "title": "Alpine Linux", "description": "~50MB, fast boot (~10s), minimal", "note": "Recommended for quick testing" },
-        { "title": "Debian", "description": "~200MB, slower boot (~30s), full environment", "note": "Better for Ignition install" },
-        { "title": "Buildroot", "description": "~20MB, fastest boot (~5s), ultra minimal", "note": "For basic testing only" }
-      ]
-    },
-    {
-      "title": "Requirements",
-      "type": "info",
-      "content": [
-        "Modern browser with WebAssembly support (Chrome 90+, Firefox 85+, Safari 14+)",
-        "~500MB RAM available for browser tab",
-        "IndexedDB for persistent storage"
-      ]
-    }
-  ]
-}
+{"id":"vm","title":"Browser VM Sandbox","type":"custom","description":"Run Linux in browser. No install required.","sections":[
+{"type":"cards","items":[
+  {"title":"Launch VM","href":"vm/","description":"Boot Linux with v86 emulator","highlight":true},
+  {"title":"How it Works","description":"JS x86 emulator. State saves to browser."}
+]},
+{"title":"Images","type":"cards","items":[
+  {"title":"Alpine","description":"~50MB, ~10s boot","note":"Recommended"},
+  {"title":"Debian","description":"~200MB, ~30s boot","note":"Full environment"},
+  {"title":"Buildroot","description":"~20MB, ~5s boot","note":"Minimal"}
+]}
+]}
