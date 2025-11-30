@@ -1,60 +1,68 @@
-# Ignition Browser Sandbox
+# Ignition Sandbox
 
-Full Ignition SCADA running in your browser via WebAssembly
+Custom Linux sandbox for Ignition SCADA testing via GitHub Pages.
 
 ## Quick Start
 
-1. **Visit**: https://teslasolar.github.io/ignition-sandbox
-2. **Copy** the install command from the sidebar (one-click)
-3. **Paste** in the WebVM terminal (right-click or Ctrl+Shift+V)
-4. **Wait** 3-5 minutes for installation
-5. **Access** Ignition at `localhost:8088` inside VM browser
-6. **Login**: admin/password
+Visit: https://teslasolar.github.io/ignition-sandbox
 
-## Current Setup: Guided Installation
+Or run directly in any Linux terminal:
 
-The sandbox uses a **side-by-side interface**:
-- Left: Step-by-step instructions with one-click copy
-- Right: Live WebVM terminal
-- Installation happens once, persists via browser cache
+```bash
+# Install Ignition Gateway
+curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash
 
-## Future: Fully Automated (Optional)
-
-See [DEPLOY.md](DEPLOY.md) for building a custom Docker image with Ignition pre-installed:
-- Zero manual steps - Ignition auto-starts on boot
-- Requires building and hosting custom WebVM image
-- Uses GitHub Actions + Container Registry
-- See `index-custom-image.html` for the automated version
-
-## How It Works
-
-- **WebVM**: Runs full Debian Linux in browser via WebAssembly
-- **Installation Script**: Hosted on GitHub, fetched via curl
-- **One-Time Setup**: Install command runs apt, downloads Ignition, configures gateway
-- **Persistence**: IndexedDB caches the VM state across sessions
-- **All Client-Side**: No server required, runs entirely in your browser
+# Install Tailscale for remote access
+curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash
+```
 
 ## Features
 
-- Full Designer access
-- Tag provider
-- Perspective/Vision modules
-- Scripting console
-- Persistent via IndexedDB
+- Custom xterm.js terminal interface
+- Command manifest system (JSON-defined commands)
+- CLI tools for testing and automation
+- Tailscale integration for remote access
+- No external VM dependencies
 
-## Tech Stack
+## Structure
 
-- WebVM: https://webvm.io
-- Ignition: https://inductiveautomation.com
-- Host: GitHub Pages
+```
+ignition-sandbox/
+├── index.html              # Terminal UI
+├── commands/
+│   └── manifest.json       # Command definitions
+├── scripts/
+│   ├── sandbox             # CLI for Linux
+│   └── install-cli         # CLI installer
+├── cli/                    # Python CLI tools
+│   ├── sandbox-cli         # Main CLI
+│   └── wrappers/           # API/MCP wrappers
+└── *.sh                    # Install scripts
+```
 
-## Size
+## CLI Usage
 
-- Initial load: ~50MB
-- Full VM: ~800MB (streamed)
-- Boot time: 30-60s
+```bash
+# Install sandbox CLI
+curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/install-cli | bash
+
+# Commands
+sandbox install     # Install Ignition
+sandbox tailscale   # Install Tailscale
+sandbox status      # Check status
+sandbox start       # Start gateway
+sandbox stop        # Stop gateway
+```
+
+## Python CLI
+
+```bash
+./cli/sandbox-cli ping      # Check Pages status
+./cli/sandbox-cli sync      # Check repo→pages sync
+./cli/sandbox-cli commands  # List commands
+./cli/sandbox-cli ts status # Tailscale status
+```
 
 ## License
 
-Ignition: Trial mode (2hr reset)
-WebVM: Apache 2.0
+MIT

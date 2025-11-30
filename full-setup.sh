@@ -1,10 +1,10 @@
 #!/bin/bash
-# Full setup: Ignition + Tailscale for WebVM
+# Full setup: Ignition + Tailscale
 # One command to install everything
 set -e
 
 echo '================================================'
-echo '🏭 Full Ignition + Tailscale Setup for WebVM'
+echo '🏭 Full Ignition + Tailscale Setup'
 echo '================================================'
 echo ''
 
