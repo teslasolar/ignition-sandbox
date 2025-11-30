@@ -1,7 +1,9 @@
-id,type,text,shape,width,height
-pump,label,P,circle,0.06,0.1
-tank,tank,,rect,0.1,0.2
-valve,label,V,rect,0.05,0.05
-sensor,label,--,rect,0.08,0.04
-pipe-h,shape,,rect,0.2,0.01
-pipe-v,shape,,rect,0.01,0.2
+id,type,text,shape,width,height,fill,stroke
+pump,label,P,circle,0.06,0.1,#6b7280,#9ca3af
+tank,tank,,rect,0.1,0.2,#6b7280,#9ca3af
+valve,label,V,rect,0.05,0.05,#6b7280,#9ca3af
+sensor,label,--,rect,0.08,0.04,#161b22,#6b7280
+pipe-h,shape,,rect,0.2,0.01,#6b7280,#9ca3af
+pipe-v,shape,,rect,0.01,0.2,#6b7280,#9ca3af
+motor,label,M,circle,0.06,0.06,#6b7280,#9ca3af
+vfd,label,VFD,rect,0.08,0.06,#161b22,#4f46e5

@@ -1,0 +1,30 @@
+/* Konomi IgnAIte - Icon Styles */
+
+.icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon-sm { width: 16px; height: 16px; }
+.icon-lg { width: 32px; height: 32px; }
+.icon-xl { width: 48px; height: 48px; }
+
+/* Icon usage: <svg class="icon"><use href="icons.svg#icon-name"/></svg> */
+
+/* State colors */
+.icon-running { color: #10b981; }
+.icon-stopped { color: #6b7280; }
+.icon-fault { color: #ef4444; }
+.icon-alarm { color: #f59e0b; }
+.icon-primary { color: #f97316; }
+
+/* Animation */
+.icon-spin { animation: spin 1s linear infinite; }
+.icon-pulse { animation: pulse 1s ease-in-out infinite; }
+.icon-blink { animation: blink 0.5s step-end infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes blink { 50% { opacity: 0; } }
