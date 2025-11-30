@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
-<title>Konomi IgnAIte v1.1 | Browser Ignition OS</title>
+<title>Konomi IgnAIte v1.2 | Browser Ignition OS</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--text:#c9d1d9;--text2:#8b949e;--accent:#f97316;--border:#30363d;--ok:#3fb950;--warn:#f0883e;--err:#f85149}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}
@@ -13,17 +13,16 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 .cur{animation:blink 1s infinite}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
 @keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 .os{display:none;width:100vw;height:100vh}
 .os.active{display:grid;grid-template-rows:40px 1fr 24px}
 .tb{background:var(--bg2);border-bottom:2px solid var(--accent);padding:8px 15px;display:flex;align-items:center;gap:15px}
-.logo{font-size:15px;font-weight:700;color:var(--accent);text-shadow:0 0 8px rgba(249,115,22,.5)}
-.menu{display:flex;gap:6px}
+.logo{font-size:15px;font-weight:700;color:var(--accent);text-shadow:0 0 8px rgba(249,115,22,.5);cursor:pointer}
+.menu{display:flex;gap:6px;flex-wrap:wrap}
 .mi{padding:5px 12px;background:rgba(249,115,22,.1);border:1px solid var(--accent);border-radius:4px;cursor:pointer;font-size:11px;color:var(--text);transition:all .2s}
 .mi:hover{background:rgba(249,115,22,.2);box-shadow:0 0 8px rgba(249,115,22,.3)}
 .mi.active{background:var(--accent);color:#000}
-.mi .key{font-size:8px;opacity:.6;margin-left:4px}
+.mi.highlight{border-color:var(--ok);box-shadow:0 0 8px rgba(63,185,80,.3)}
 .desk{display:grid;grid-template-columns:220px 1fr 260px;gap:2px;background:var(--bg);padding:2px}
 .pan{background:rgba(22,27,34,.95);border:1px solid var(--border);border-radius:4px;overflow-y:auto}
 .pan::-webkit-scrollbar{width:4px}
@@ -35,19 +34,16 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 .sb{background:var(--bg2);border-top:1px solid var(--border);padding:4px 15px;display:flex;justify-content:space-between;font-size:9px;color:var(--text2)}
 .tree{list-style:none}
 .tree li{padding:3px 0 3px 14px;cursor:pointer;position:relative;font-size:10px;border-left:1px solid var(--border);margin-left:8px;display:flex;align-items:center;justify-content:space-between}
-.tree li:before{content:"📁";position:absolute;left:-2px;font-size:8px}
-.tree li.f:before{content:"📄"}.tree li.vm:before{content:"💻"}.tree li.tpl:before{content:"📋"}.tree li.kern:before{content:"⚙️"}.tree li.fav:before{content:"⭐"}
 .tree li:hover{background:rgba(249,115,22,.1);color:var(--accent)}
 .tree>li{border-left:none;margin-left:0}
 .tree li .star{opacity:0;cursor:pointer;font-size:10px;margin-left:auto}
 .tree li:hover .star{opacity:.5}
-.tree li .star:hover{opacity:1}
-.tree li .star.active{opacity:1;color:gold}
+.tree li .star:hover,.tree li .star.active{opacity:1;color:gold}
 .cv{background:#000;border-radius:4px;height:100%;display:flex;align-items:center;justify-content:center;position:relative;flex-direction:column}
 .cv-inner{text-align:center}
 .cv h2{color:var(--accent);margin-bottom:10px}
 .cv p{color:var(--text2);font-size:11px;margin-bottom:15px}
-.cv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px}
+.cv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:20px}
 .cv-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:15px;text-align:center;cursor:pointer;transition:all .2s}
 .cv-card:hover{border-color:var(--accent);transform:translateY(-2px)}
 .cv-card.hl{border-color:var(--ok)}
@@ -62,12 +58,8 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 .cmd:hover{border-color:var(--accent)}
 .cmd .label{color:var(--accent);margin-bottom:2px}
 .cmd code{color:var(--ok);font-size:9px}
-.term-wrap{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.term-wrap span{color:var(--text2);font-size:8px;text-transform:uppercase}
-.term-wrap button{background:none;border:none;color:var(--text2);cursor:pointer;font-size:9px}
-.term{background:#000;border:1px solid var(--border);border-radius:4px 4px 0 0;padding:8px;height:120px;overflow-y:auto;font-size:9px;color:var(--ok)}
-.term .ln{margin:2px 0;cursor:pointer}.term .ln:hover{background:rgba(249,115,22,.1)}
-.term .pr{color:var(--accent)}
+.term{background:#000;border:1px solid var(--border);border-radius:4px;padding:8px;height:120px;overflow-y:auto;font-size:9px;color:var(--ok)}
+.term .ln{margin:2px 0}.term .pr{color:var(--accent)}
 .term-input{display:flex;background:#000;border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:4px 8px}
 .term-input span{color:var(--accent);font-size:9px;margin-right:4px}
 .term-input input{flex:1;background:none;border:none;color:var(--ok);font-size:9px;font-family:inherit;outline:none}
@@ -75,34 +67,18 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 .bpf{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));width:0;transition:width .3s}
 .btn{background:var(--accent);color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:700;margin:3px}
 .btn:hover{background:#ea580c}
-.btn-sm{padding:3px 6px;font-size:9px;margin:2px}
 .skip-btn{position:absolute;top:20px;right:20px;background:var(--accent);color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:10px}
 #toast-container{position:fixed;bottom:20px;right:20px;z-index:10001;display:flex;flex-direction:column;gap:8px}
 .toast{padding:10px 16px;border-radius:6px;font-size:11px;font-weight:600;animation:slideIn .3s;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .toast.info{background:var(--accent);color:#000}
 .toast.success{background:var(--ok);color:#000}
 .toast.error{background:var(--err);color:#fff}
-.toast.removing{animation:slideOut .3s}
-#cmd-palette,#search-modal{position:fixed;top:20%;left:50%;transform:translateX(-50%);width:500px;background:var(--bg2);border:2px solid var(--accent);border-radius:8px;z-index:10000;box-shadow:0 10px 40px rgba(0,0,0,.6);display:none}
-#cmd-palette.active,#search-modal.active{display:block;animation:popIn .2s}
-#cmd-palette input,#search-modal input{width:100%;padding:12px;background:var(--bg);color:var(--text);border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:12px}
-#cmd-palette .results,#search-modal .results{max-height:300px;overflow-y:auto}
-#cmd-palette .result,#search-modal .result{padding:10px 12px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-#cmd-palette .result:hover,#cmd-palette .result.sel,#search-modal .result:hover{background:rgba(249,115,22,.15)}
-#cmd-palette .result .keys,#search-modal .result .path{color:var(--text2);font-size:9px}
-#search-modal .result .icon{margin-right:8px}
-#settings-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9998;display:none;align-items:center;justify-content:center}
-#settings-modal.active{display:flex}
-#settings-modal .modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;width:400px}
-#settings-modal h3{color:var(--accent);margin-bottom:15px}
-#settings-modal .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px}
-#settings-modal select,#settings-modal input[type=range]{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px;border-radius:4px}
-#context-menu{position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 0;min-width:160px;z-index:10002;display:none;box-shadow:0 4px 12px rgba(0,0,0,.4);animation:popIn .15s}
-#context-menu.active{display:block}
-#context-menu .ctx-item{padding:8px 12px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:8px}
-#context-menu .ctx-item:hover{background:rgba(249,115,22,.15);color:var(--accent)}
-#context-menu .ctx-item.danger{color:var(--err)}
-#context-menu .ctx-sep{height:1px;background:var(--border);margin:4px 0}
+#cmd-palette{position:fixed;top:20%;left:50%;transform:translateX(-50%);width:500px;background:var(--bg2);border:2px solid var(--accent);border-radius:8px;z-index:10000;box-shadow:0 10px 40px rgba(0,0,0,.6);display:none}
+#cmd-palette.active{display:block;animation:popIn .2s}
+#cmd-palette input{width:100%;padding:12px;background:var(--bg);color:var(--text);border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:12px}
+#cmd-palette .results{max-height:300px;overflow-y:auto}
+#cmd-palette .result{padding:10px 12px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+#cmd-palette .result:hover,#cmd-palette .result.sel{background:rgba(249,115,22,.15)}
 .vm-widget{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:10px}
 .vm-widget h4{color:var(--accent);font-size:10px;margin-bottom:8px;display:flex;justify-content:space-between}
 .vm-widget .vm-stat{display:flex;justify-content:space-between;font-size:9px;padding:3px 0;border-bottom:1px solid var(--border)}
@@ -110,9 +86,12 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 .vm-widget .vm-stat span:first-child{color:var(--text2)}
 .vm-widget .vm-stat span:last-child{color:var(--ok)}
 .favs{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.favs-title{font-size:9px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between}
+.favs-title{font-size:9px;color:var(--text2);margin-bottom:5px}
 .fav-item{padding:3px 6px;font-size:10px;cursor:pointer;display:flex;align-items:center;gap:4px;border-radius:3px}
 .fav-item:hover{background:rgba(249,115,22,.1);color:var(--accent)}
+.links{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.links a{color:var(--accent);text-decoration:none;font-size:10px;padding:4px 8px;border:1px solid var(--border);border-radius:4px}
+.links a:hover{background:rgba(249,115,22,.1)}
 </style>
 </head>
 <body>
@@ -125,7 +104,7 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
  ██╔═██╗ ██║   ██║██║╚██╗██║██║   ██║██║╚██╔╝██║██║
  ██║  ██╗╚██████╔╝██║ ╚████║╚██████╔╝██║ ╚═╝ ██║██║
  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝╚═╝
-    IgnAIte v1.1 | Browser-Based Ignition Sandbox
+    IgnAIte v1.2 | Browser-Based Ignition Sandbox
 </pre>
 <div id="bo"></div>
 <div class="bp"><div class="bpf" id="bb"></div></div>
@@ -134,31 +113,20 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 
 <div class="os" id="os">
 <div class="tb">
-<div class="logo">🔥 KONOMI IgnAIte</div>
-<div class="menu">
-<div class="mi active" onclick="K.view('home')">🏠 Home<span class="key">1</span></div>
-<div class="mi" onclick="K.view('vm')">💻 VM<span class="key">2</span></div>
-<div class="mi" onclick="K.view('designer')">🎨 Designer<span class="key">3</span></div>
-<div class="mi" onclick="K.view('cli')">⌨️ CLI<span class="key">4</span></div>
-<div class="mi" onclick="K.view('kernels')">⚙️ Kernels<span class="key">5</span></div>
-</div>
+<div class="logo" onclick="K.view('home')">🔥 KONOMI IgnAIte</div>
+<div class="menu" id="tabMenu"></div>
 <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-<button onclick="K.showSearch()" style="background:none;border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:9px">🔍</button>
 <button onclick="K.togglePalette()" style="background:none;border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:9px">⌘K</button>
-<button onclick="K.showSettings()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px">⚙️</button>
 <span id="time" style="color:var(--text2);font-size:10px"></span>
 </div>
 </div>
 
 <div class="desk">
 <div class="pan" id="leftPanel">
-<div class="pt">📁 REPOSITORY<button onclick="K.togglePanel('left')">−</button></div>
+<div class="pt">📁 RESOURCES</div>
 <div class="pc">
 <div class="favs" id="favs"></div>
 <ul class="tree" id="tree"></ul>
-<div style="margin-top:10px">
-<button class="btn btn-sm" onclick="K.action('refresh')">↻ Refresh</button>
-</div>
 </div>
 </div>
 
@@ -168,314 +136,391 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 </div>
 
 <div class="pan" id="rightPanel">
-<div class="pt">⚡ QUICK ACTIONS<button onclick="K.togglePanel('right')">−</button></div>
+<div class="pt">⚡ SYSTEM</div>
 <div class="pc">
-<div class="vm-widget" id="vmWidget">
-<h4>💻 VM Status <span id="vmStatus" style="color:var(--ok)">●</span></h4>
+<div class="vm-widget">
+<h4>💻 Status <span id="vmStatus" style="color:var(--ok)">●</span></h4>
+<div class="vm-stat"><span>Version</span><span id="sysVersion">1.2.0</span></div>
+<div class="vm-stat"><span>Modules</span><span id="sysModules">0</span></div>
 <div class="vm-stat"><span>Uptime</span><span id="vmUptime">00:00</span></div>
-<div class="vm-stat"><span>Memory</span><span id="vmMem">128MB</span></div>
-<div class="vm-stat"><span>Kernel</span><span id="vmKernel">ignition</span></div>
-<div class="vm-stat"><span>Gateway</span><span id="vmGw">Running</span></div>
 </div>
 <div class="stat">
-<div class="stat-box"><div class="stat-label">Modules</div><div class="stat-val" id="mods">6</div></div>
-<div class="stat-box"><div class="stat-label">Favorites</div><div class="stat-val" id="favCount">0</div></div>
+<div class="stat-box"><div class="stat-label">Resources</div><div class="stat-val" id="resCount">0</div></div>
+<div class="stat-box"><div class="stat-label">Tabs</div><div class="stat-val" id="tabCount">0</div></div>
 </div>
-<div id="cmds"></div>
-<div class="term-wrap"><span>Terminal</span><button onclick="K.clearTerm()">Clear</button></div>
+<div id="quickLinks"></div>
+<div style="margin-top:10px;font-size:9px;color:var(--text2)">TERMINAL</div>
 <div class="term" id="term"></div>
-<div class="term-input"><span>ignite$</span><input type="text" id="termIn" placeholder="Type command..." onkeydown="K.termKey(event)"></div>
+<div class="term-input"><span>$</span><input type="text" id="termIn" placeholder="Type command..." onkeydown="K.termKey(event)"></div>
 </div>
 </div>
 </div>
 
 <div class="sb">
-<div id="sbLeft">Ignition Gateway • Perspective • v86 VM • Custom Kernels</div>
-<div><span style="color:var(--accent)">Ctrl+K</span> commands | <span style="color:var(--accent)">Ctrl+F</span> search | <span style="color:var(--accent)">Alt+1-5</span> nav | <span style="color:var(--accent)">Right-click</span> menu</div>
+<div id="sbLeft">Loading...</div>
+<div><span style="color:var(--accent)">Ctrl+K</span> commands | Auto-loaded from config</div>
 </div>
 </div>
 
 <div id="toast-container"></div>
 
 <div id="cmd-palette">
-<input type="text" placeholder="Type a command... (↑↓ navigate, Enter select, Esc close)" id="cmd-input">
+<input type="text" placeholder="Type a command... (Enter select, Esc close)" id="cmd-input">
 <div class="results" id="cmd-results"></div>
 </div>
 
-<div id="search-modal">
-<input type="text" placeholder="Search files, commands, views... (Esc close)" id="search-input">
-<div class="results" id="search-results"></div>
-</div>
-
-<div id="settings-modal"><div class="modal"><h3>⚙️ Settings</h3>
-<div class="row"><span>Theme</span><select id="set-theme" onchange="K.setTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option><option value="hacker">Hacker</option><option value="ocean">Ocean</option></select></div>
-<div class="row"><span>Skip Boot</span><input type="checkbox" id="set-skipboot" onchange="K.setSetting('skipBoot',this.checked)"></div>
-<div class="row"><span>Sound Effects</span><input type="checkbox" id="set-sound" onchange="K.setSetting('sound',this.checked)"></div>
-<div class="row"><span>VM Auto-start</span><input type="checkbox" id="set-vmstart" onchange="K.setSetting('vmAutoStart',this.checked)"></div>
-<div style="margin-top:15px;display:flex;justify-content:space-between">
-<button class="btn btn-sm" onclick="K.resetPrefs()" style="background:var(--err)">Reset All</button>
-<button class="btn" onclick="K.hideSettings()">Close</button>
-</div>
-</div></div>
-
-<div id="context-menu">
-<div class="ctx-item" onclick="K.ctxAction('open')">📂 Open</div>
-<div class="ctx-item" onclick="K.ctxAction('openNew')">↗️ Open in New Tab</div>
-<div class="ctx-sep"></div>
-<div class="ctx-item" onclick="K.ctxAction('fav')">⭐ Add to Favorites</div>
-<div class="ctx-item" onclick="K.ctxAction('copy')">📋 Copy Path</div>
-<div class="ctx-sep"></div>
-<div class="ctx-item" onclick="K.ctxAction('info')">ℹ️ Properties</div>
-</div>
-
 <script>
-const K={
-data:{},current:'home',prefs:{},favorites:[],cmdHistory:[],historyIdx:-1,ctxTarget:null,vmUptime:0,
-searchIndex:[
-{name:'Home',path:'/',type:'view',icon:'🏠'},
-{name:'VM Sandbox',path:'vm/',type:'module',icon:'💻'},
-{name:'Designer',path:'screens/designer/',type:'module',icon:'🎨'},
-{name:'CLI Tools',path:'cli/',type:'module',icon:'⌨️'},
-{name:'Kernels',path:'kernels/',type:'module',icon:'⚙️'},
-{name:'Tags',path:'tags/',type:'module',icon:'🏷️'},
-{name:'Templates',path:'templates/',type:'folder',icon:'📋'},
-{name:'minimal.asm',path:'kernels/minimal.asm',type:'file',icon:'📄'},
-{name:'ignition.asm',path:'kernels/ignition.asm',type:'file',icon:'🔥'},
-{name:'full.asm',path:'kernels/full.asm',type:'file',icon:'📄'},
-{name:'repo.udt',path:'tags/repo.udt',type:'file',icon:'📄'},
-{name:'tank.json',path:'screens/templates/components/tank.json',type:'file',icon:'🛢️'},
-{name:'pump.json',path:'screens/templates/components/pump.json',type:'file',icon:'⚙️'},
-],
-commands:[
-{name:'Go to Home',key:'Alt+1',action:()=>K.view('home')},
-{name:'Go to VM',key:'Alt+2',action:()=>K.view('vm')},
-{name:'Go to Designer',key:'Alt+3',action:()=>K.view('designer')},
-{name:'Go to CLI',key:'Alt+4',action:()=>K.view('cli')},
-{name:'Go to Kernels',key:'Alt+5',action:()=>K.view('kernels')},
-{name:'Go to Tags',key:'Alt+6',action:()=>K.view('tags')},
-{name:'Launch VM Sandbox',key:'',action:()=>K.nav('vm/')},
-{name:'Open Designer',key:'',action:()=>K.nav('screens/designer/')},
-{name:'Browse Templates',key:'',action:()=>K.nav('templates/')},
-{name:'View Tag Provider',key:'',action:()=>K.nav('tags/')},
-{name:'Search Files',key:'Ctrl+F',action:()=>K.showSearch()},
-{name:'Settings',key:'Ctrl+,',action:()=>K.showSettings()},
-{name:'Refresh',key:'Ctrl+R',action:()=>location.reload()},
-{name:'Toggle Theme',key:'',action:()=>K.cycleTheme()},
-{name:'Clear Terminal',key:'',action:()=>K.clearTerm()},
-{name:'Clear Favorites',key:'',action:()=>{K.favorites=[];K.saveFavs();K.renderFavs();K.toast('Favorites cleared','info')}},
-],
+const K = {
+  config: null,
+  manifest: null,
+  current: 'home',
+  prefs: {},
+  favorites: [],
+  vmUptime: 0,
+  commands: [],
 
-loadPrefs(){
-try{this.prefs=JSON.parse(localStorage.getItem('konomi_prefs'))||{}}catch(e){this.prefs={}}
-try{this.favorites=JSON.parse(localStorage.getItem('konomi_favs'))||[]}catch(e){this.favorites=[]}
-try{this.cmdHistory=JSON.parse(localStorage.getItem('konomi_history'))||[]}catch(e){this.cmdHistory=[]}
-if(this.prefs.theme)this.applyTheme(this.prefs.theme);
-document.getElementById('set-theme').value=this.prefs.theme||'dark';
-document.getElementById('set-skipboot').checked=this.prefs.skipBoot||false;
-},
-savePrefs(){localStorage.setItem('konomi_prefs',JSON.stringify(this.prefs))},
-saveFavs(){localStorage.setItem('konomi_favs',JSON.stringify(this.favorites));document.getElementById('favCount').textContent=this.favorites.length},
-saveHistory(){localStorage.setItem('konomi_history',JSON.stringify(this.cmdHistory.slice(-50)))},
-setSetting(k,v){this.prefs[k]=v;this.savePrefs();this.toast('Setting saved','success')},
-resetPrefs(){localStorage.clear();location.reload()},
+  async boot() {
+    this.loadPrefs();
+    if (this.prefs.skipBoot || sessionStorage.getItem('booted')) {
+      this.finishBoot();
+      return;
+    }
 
-async boot(){
-this.loadPrefs();
-if(this.prefs.skipBoot||sessionStorage.getItem('booted')){this.finishBoot();return}
-const lines=[
-{m:'Init Konomi IgnAIte v1.1...',d:'Loading OS kernel'},
-{m:'Load index.json...',d:'Parsing repo structure'},
-{m:'Mount /kernels...',d:'3 custom x86 kernels'},
-{m:'Init v86-lite VM...',d:'x86 emulator ready'},
-{m:'Load Perspective...',d:'Designer framework'},
-{m:'Mount /tags...',d:'UDT provider ready'},
-{m:'Init favorites...',d:this.favorites.length+' items'},
-{m:'All systems ready.',d:'Boot complete'}
-];
-let i=0;const ou=document.getElementById('bo'),ba=document.getElementById('bb');
-const iv=setInterval(()=>{if(i<lines.length){const l=document.createElement('div');l.className='bline ok';l.innerHTML=`[  OK  ] ${lines[i].m}<br><span style="color:var(--text2);font-size:10px;margin-left:28px">› ${lines[i].d}</span>`;ou.appendChild(l);ba.style.width=((i+1)/lines.length*100)+'%';i++}else{clearInterval(iv);setTimeout(()=>this.finishBoot(),400)}},140)},
+    const lines = [
+      { m: 'Loading index.json...', d: 'Configuration' },
+      { m: 'Loading manifest.json...', d: 'Module registry' },
+      { m: 'Auto-detecting resources...', d: 'Scanning directories' },
+      { m: 'Building navigation...', d: 'Tabs and menus' },
+      { m: 'Initializing modules...', d: 'PLC, VM, Tags' },
+      { m: 'System ready.', d: 'Boot complete' }
+    ];
 
-skipBoot(){sessionStorage.setItem('booted','1');this.finishBoot()},
-finishBoot(){document.getElementById('boot').style.display='none';document.getElementById('os').classList.add('active');sessionStorage.setItem('booted','1');this.init()},
+    let i = 0;
+    const ou = document.getElementById('bo'), ba = document.getElementById('bb');
+    const iv = setInterval(() => {
+      if (i < lines.length) {
+        const l = document.createElement('div');
+        l.className = 'bline ok';
+        l.innerHTML = `[  OK  ] ${lines[i].m}<br><span style="color:var(--text2);font-size:10px;margin-left:28px">› ${lines[i].d}</span>`;
+        ou.appendChild(l);
+        ba.style.width = ((i + 1) / lines.length * 100) + '%';
+        i++;
+      } else {
+        clearInterval(iv);
+        setTimeout(() => this.finishBoot(), 400);
+      }
+    }, 120);
+  },
 
-async init(){
-try{this.data.root=await this.load('index.json')}catch(e){}
-this.renderTree();this.renderFavs();this.view('home');this.clock();this.initKeys();this.initContextMenu();this.startVMMonitor();
-this.log('System initialized');this.toast('Konomi IgnAIte v1.1 ready','success')},
+  skipBoot() {
+    sessionStorage.setItem('booted', '1');
+    this.finishBoot();
+  },
 
-async load(p){const r=await fetch(p);return r.ok?r.json():null},
+  finishBoot() {
+    document.getElementById('boot').style.display = 'none';
+    document.getElementById('os').classList.add('active');
+    sessionStorage.setItem('booted', '1');
+    this.init();
+  },
 
-renderFavs(){
-const el=document.getElementById('favs');
-if(!this.favorites.length){el.innerHTML='';return}
-el.innerHTML=`<div class="favs-title">⭐ FAVORITES <span>${this.favorites.length}</span></div>`+
-this.favorites.map(f=>`<div class="fav-item" onclick="K.nav('${f.path}')" oncontextmenu="K.showCtx(event,'${f.path}','${f.name}')">⭐ ${f.name}</div>`).join('');
-document.getElementById('favCount').textContent=this.favorites.length},
+  async init() {
+    try {
+      // Auto-load config files
+      this.config = await this.load('index.json');
+      this.manifest = await this.load('manifest.json').catch(() => null);
 
-renderTree(){
-const tree=document.getElementById('tree');
-const items=[{name:'/',children:[
-{name:'cli/',path:'cli/',cls:'',children:[{name:'commands/',path:'cli/commands/',cls:'f'}]},
-{name:'screens/',path:'screens/',cls:'',children:[{name:'designer/',path:'screens/designer/',cls:'f'}]},
-{name:'vm/',path:'vm/',cls:'vm',children:[{name:'lib/',path:'vm/lib/',cls:'f'}]},
-{name:'kernels/',path:'kernels/',cls:'kern',children:[{name:'minimal.asm',path:'kernels/minimal.asm',cls:'f'},{name:'ignition.asm',path:'kernels/ignition.asm',cls:'f'}]},
-{name:'tags/',path:'tags/',cls:'tpl',children:[{name:'udt/',path:'tags/udt/',cls:'f'}]},
-{name:'templates/',path:'templates/',cls:'tpl'}
-]}];
-const render=(list,ul)=>{list.forEach(it=>{
-const li=document.createElement('li');li.className=it.cls||'';
-const isFav=this.favorites.some(f=>f.path===it.path);
-li.innerHTML=`<span>${it.name}</span><span class="star ${isFav?'active':''}" onclick="event.stopPropagation();K.toggleFav('${it.path}','${it.name}')">★</span>`;
-li.onclick=(e)=>{if(e.target.classList.contains('star'))return;e.stopPropagation();this.select(it.name,it.path)};
-li.oncontextmenu=(e)=>this.showCtx(e,it.path,it.name);
-if(it.children){const sub=document.createElement('ul');sub.className='tree';render(it.children,sub);li.appendChild(sub)}
-ul.appendChild(li)})};
-tree.innerHTML='';render(items,tree)},
+      // Update UI with loaded data
+      this.renderTabs();
+      this.renderTree();
+      this.renderFavs();
+      this.buildCommands();
+      this.updateStats();
+      this.view('home');
+      this.clock();
+      this.initKeys();
+      this.startMonitor();
 
-toggleFav(path,name){
-const idx=this.favorites.findIndex(f=>f.path===path);
-if(idx>=0){this.favorites.splice(idx,1);this.toast('Removed from favorites','info')}
-else{this.favorites.push({path,name});this.toast('Added to favorites','success')}
-this.saveFavs();this.renderFavs();this.renderTree()},
+      document.getElementById('sbLeft').textContent =
+        `${this.config?.name || 'IgnAIte'} v${this.config?.version || '1.0'} • Auto-loaded from config`;
 
-select(name,path){this.log('Selected: '+name);if(path)this.nav(path)},
+      this.log('System initialized');
+      this.toast(`${this.config?.name} ready`, 'success');
+    } catch (e) {
+      this.log('Init error: ' + e.message);
+      this.toast('Config load failed', 'error');
+    }
+  },
 
-view(v){
-this.current=v;
-document.querySelectorAll('.mi').forEach(m=>m.classList.remove('active'));
-document.querySelector(`.mi[onclick*="${v}"]`)?.classList.add('active');
-const cv=document.getElementById('cv'),title=document.getElementById('cvTitle'),cmds=document.getElementById('cmds');
-const views={
-home:{title:'🏠 KONOMI IgnAIte',content:`<div class="cv-inner"><h2>🔥 Konomi IgnAIte v1.1</h2><p>Browser-based Ignition sandbox with custom x86 kernels</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">💻</div><h4>VM Sandbox</h4><p>Boot custom kernel</p></div><div class="cv-card" onclick="K.nav('kernels/')"><div class="icon">⚙️</div><h4>Kernels</h4><p>Assembly kernels</p></div><div class="cv-card" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Designer</h4><p>Perspective views</p></div><div class="cv-card" onclick="K.nav('tags/')"><div class="icon">🏷️</div><h4>Tags</h4><p>UDT provider</p></div><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">⌨️</div><h4>CLI Tools</h4><p>Command framework</p></div><div class="cv-card" onclick="window.open('https://github.com/teslasolar/ignition-sandbox')"><div class="icon">🐙</div><h4>GitHub</h4><p>Source code</p></div></div>`,cmds:[{l:'Launch VM',c:'vm/'},{l:'Browse Kernels',c:'kernels/'}]},
-vm:{title:'💻 VM SANDBOX',content:`<div class="cv-inner"><h2>💻 Browser VM</h2><p>v86-lite emulator with custom kernel support</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">🚀</div><h4>Launch VM</h4><p>Boot default kernel</p></div><div class="cv-card" onclick="K.nav('vm/terminal.html')"><div class="icon">>_</div><h4>Terminal</h4><p>Web terminal</p></div><div class="cv-card" onclick="K.nav('kernels/')"><div class="icon">⚙️</div><h4>Kernels</h4><p>Select kernel</p></div></div>`,cmds:[{l:'ignition status',c:'ignition status'},{l:'uname -a',c:'uname -a'}]},
-designer:{title:'🎨 PERSPECTIVE DESIGNER',content:`<div class="cv-inner"><h2>🎨 Designer</h2><p>Visual Perspective view builder</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Open Designer</h4><p>Drag & drop</p></div><div class="cv-card" onclick="K.nav('screens/templates/')"><div class="icon">📋</div><h4>Templates</h4><p>Components</p></div><div class="cv-card" onclick="K.nav('screens/sandbox/')"><div class="icon">>_</div><h4>Sandbox</h4><p>Test commands</p></div></div>`,cmds:[{l:'Tank',c:'screens/templates/components/tank.json'}]},
-cli:{title:'⌨️ CLI TOOLS',content:`<div class="cv-inner"><h2>⌨️ CLI Framework</h2><p>Command-line tools</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">📖</div><h4>CLI Docs</h4><p>Reference</p></div><div class="cv-card" onclick="K.nav('commands/')"><div class="icon">⚡</div><h4>Commands</h4><p>All commands</p></div><div class="cv-card"><div class="icon">🔗</div><h4>MCP Tools</h4><p>Integration</p></div></div>`,cmds:[{l:'ping',c:'./sandbox-cli ping'}]},
-kernels:{title:'⚙️ CUSTOM KERNELS',content:`<div class="cv-inner"><h2>⚙️ Assembly Kernels</h2><p>Custom x86 bootloaders</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('kernels/minimal.asm')"><div class="icon">📦</div><h4>Minimal</h4><p>512 bytes</p></div><div class="cv-card hl" onclick="K.nav('kernels/ignition.asm')"><div class="icon">🔥</div><h4>Ignition</h4><p>Gateway</p></div><div class="cv-card" onclick="K.nav('kernels/full.asm')"><div class="icon">🖥️</div><h4>Full OS</h4><p>Shell</p></div></div>`,cmds:[{l:'Load Ignition',c:'kernel load ignition'}]},
-tags:{title:'🏷️ TAG PROVIDER',content:`<div class="cv-inner"><h2>🏷️ UDT System</h2><p>User Defined Types</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('tags/udt/')"><div class="icon">📋</div><h4>UDT Library</h4><p>Definitions</p></div><div class="cv-card" onclick="K.nav('tags/instances/')"><div class="icon">📍</div><h4>Instances</h4><p>Tags</p></div><div class="cv-card" onclick="K.nav('tags/repo.udt')"><div class="icon">📄</div><h4>repo.udt</h4><p>Master</p></div></div>`,cmds:[{l:'View UDTs',c:'tags/udt/'}]}
+  async load(p) {
+    const r = await fetch(p);
+    if (!r.ok) throw new Error(`Failed to load ${p}`);
+    return r.json();
+  },
+
+  loadPrefs() {
+    try { this.prefs = JSON.parse(localStorage.getItem('konomi_prefs')) || {}; } catch { this.prefs = {}; }
+    try { this.favorites = JSON.parse(localStorage.getItem('konomi_favs')) || []; } catch { this.favorites = []; }
+  },
+
+  savePrefs() { localStorage.setItem('konomi_prefs', JSON.stringify(this.prefs)); },
+  saveFavs() { localStorage.setItem('konomi_favs', JSON.stringify(this.favorites)); },
+
+  // Auto-render tabs from config
+  renderTabs() {
+    const menu = document.getElementById('tabMenu');
+    const tabs = this.config?.tabs || [];
+
+    menu.innerHTML = tabs.map((t, i) =>
+      `<div class="mi${t.highlight ? ' highlight' : ''}" data-tab="${t.id}" onclick="K.viewTab('${t.id}')">${t.label}</div>`
+    ).join('');
+
+    document.getElementById('tabCount').textContent = tabs.length;
+  },
+
+  // Auto-render resource tree from config
+  renderTree() {
+    const tree = document.getElementById('tree');
+    const resources = this.config?.resources || [];
+    const children = this.config?.children || [];
+
+    // Build tree from resources
+    let html = resources.map(r => {
+      const isFav = this.favorites.some(f => f.path === r.href);
+      const icon = this.getIcon(r.icon);
+      return `<li onclick="K.nav('${r.href}')" class="${r.highlight ? 'hl' : ''}">
+        <span>${icon} ${r.title}</span>
+        <span class="star ${isFav ? 'active' : ''}" onclick="event.stopPropagation();K.toggleFav('${r.href}','${r.title}')">★</span>
+      </li>`;
+    }).join('');
+
+    // Add children directories
+    children.forEach(c => {
+      if (!resources.find(r => r.id === c)) {
+        html += `<li onclick="K.nav('${c}/')">${c}/</li>`;
+      }
+    });
+
+    tree.innerHTML = html;
+    document.getElementById('resCount').textContent = resources.length;
+  },
+
+  getIcon(name) {
+    const icons = {
+      zap: '⚡', terminal: '💻', cpu: '🔧', tag: '🏷️',
+      grid: '📊', code: '💾', file: '📄', server: '🖥️',
+      network: '🌐', settings: '⚙️'
+    };
+    return icons[name] || '📁';
+  },
+
+  renderFavs() {
+    const el = document.getElementById('favs');
+    if (!this.favorites.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="favs-title">⭐ FAVORITES</div>` +
+      this.favorites.map(f => `<div class="fav-item" onclick="K.nav('${f.path}')">⭐ ${f.name}</div>`).join('');
+  },
+
+  toggleFav(path, name) {
+    const idx = this.favorites.findIndex(f => f.path === path);
+    if (idx >= 0) { this.favorites.splice(idx, 1); this.toast('Removed', 'info'); }
+    else { this.favorites.push({ path, name }); this.toast('Added to favorites', 'success'); }
+    this.saveFavs();
+    this.renderFavs();
+    this.renderTree();
+  },
+
+  buildCommands() {
+    // Build commands from config
+    this.commands = [
+      { name: 'Go Home', action: () => this.view('home') },
+      { name: 'Dashboard', action: () => this.nav('dashboard.html') },
+      { name: 'Demo', action: () => this.nav('demo.html') },
+    ];
+
+    // Add resource navigation commands
+    (this.config?.resources || []).forEach(r => {
+      this.commands.push({ name: `Open ${r.title}`, action: () => this.nav(r.href) });
+    });
+
+    // Add tab commands
+    (this.config?.tabs || []).forEach(t => {
+      this.commands.push({ name: `Tab: ${t.label}`, action: () => this.viewTab(t.id) });
+    });
+
+    this.commands.push(
+      { name: 'Refresh', action: () => location.reload() },
+      { name: 'Clear Terminal', action: () => this.clearTerm() }
+    );
+  },
+
+  updateStats() {
+    document.getElementById('sysVersion').textContent = this.config?.version || '1.0.0';
+    document.getElementById('sysModules').textContent = this.manifest?.modules ? Object.keys(this.manifest.modules).length : 0;
+
+    // Quick links
+    const links = document.getElementById('quickLinks');
+    links.innerHTML = `<div class="links">
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="demo.html">🎮 Demo</a>
+      <a href="plc/">⚡ PLC</a>
+    </div>`;
+  },
+
+  view(v) {
+    this.current = v;
+    document.querySelectorAll('.mi').forEach(m => m.classList.remove('active'));
+
+    const cv = document.getElementById('cv');
+    const title = document.getElementById('cvTitle');
+
+    if (v === 'home') {
+      title.textContent = `🏠 ${this.config?.name || 'IgnAIte'}`;
+
+      // Auto-generate cards from resources
+      const resources = this.config?.resources || [];
+      const cards = resources.map(r => `
+        <div class="cv-card${r.highlight ? ' hl' : ''}" onclick="K.nav('${r.href}')">
+          <div class="icon">${this.getIcon(r.icon)}</div>
+          <h4>${r.title}</h4>
+          <p>${r.href}</p>
+        </div>
+      `).join('');
+
+      cv.innerHTML = `
+        <div class="cv-inner">
+          <h2>🔥 ${this.config?.name || 'Konomi IgnAIte'}</h2>
+          <p>${this.config?.description || 'Browser-based Ignition sandbox'}</p>
+        </div>
+        <div class="cv-grid">${cards}</div>
+      `;
+    }
+  },
+
+  viewTab(tabId) {
+    const tab = this.config?.tabs?.find(t => t.id === tabId);
+    if (!tab) return;
+
+    document.querySelectorAll('.mi').forEach(m => m.classList.remove('active'));
+    document.querySelector(`.mi[data-tab="${tabId}"]`)?.classList.add('active');
+
+    const cv = document.getElementById('cv');
+    const title = document.getElementById('cvTitle');
+    title.textContent = tab.label;
+
+    // Load tab content
+    this.load(tab.src).then(data => {
+      if (data.commands) {
+        const cmds = data.commands.map(c => `
+          <div class="cv-card" onclick="K.runCmd('${c.code || c.run}')">
+            <div class="icon">⚡</div>
+            <h4>${c.label || c.name}</h4>
+            <p>${c.code || c.run || ''}</p>
+          </div>
+        `).join('');
+        cv.innerHTML = `<div class="cv-grid">${cmds}</div>`;
+      } else {
+        cv.innerHTML = `<div class="cv-inner"><h2>${tab.label}</h2><p>Tab loaded from ${tab.src}</p></div>`;
+      }
+    }).catch(() => {
+      cv.innerHTML = `<div class="cv-inner"><h2>${tab.label}</h2><p><a href="${tab.src}" style="color:var(--accent)">Open ${tab.src}</a></p></div>`;
+    });
+  },
+
+  nav(url) {
+    this.log('Navigate: ' + url);
+    location.href = url;
+  },
+
+  runCmd(c) {
+    this.log('Run: ' + c);
+    this.toast('Executed: ' + c, 'success');
+  },
+
+  initKeys() {
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'k') { e.preventDefault(); this.togglePalette(); }
+      if (e.key === 'Escape') this.hidePalette();
+    });
+  },
+
+  togglePalette() {
+    const p = document.getElementById('cmd-palette');
+    p.classList.toggle('active');
+    if (p.classList.contains('active')) {
+      document.getElementById('cmd-input').value = '';
+      document.getElementById('cmd-input').focus();
+      this.filterCommands('');
+    }
+  },
+
+  hidePalette() {
+    document.getElementById('cmd-palette').classList.remove('active');
+  },
+
+  filterCommands(q) {
+    const r = document.getElementById('cmd-results');
+    const filtered = this.commands.filter(c => c.name.toLowerCase().includes(q.toLowerCase()));
+    r.innerHTML = filtered.map((c, i) =>
+      `<div class="result${i === 0 ? ' sel' : ''}" onclick="K.commands[${this.commands.indexOf(c)}].action();K.hidePalette()"><span>${c.name}</span></div>`
+    ).join('');
+  },
+
+  termKey(e) {
+    const inp = document.getElementById('termIn');
+    if (e.key === 'Enter' && inp.value.trim()) {
+      const cmd = inp.value.trim();
+      inp.value = '';
+      this.log(cmd);
+      this.toast('Executed', 'success');
+    }
+  },
+
+  log(m) {
+    const t = document.getElementById('term');
+    const ln = document.createElement('div');
+    ln.className = 'ln';
+    ln.innerHTML = `<span class="pr">$</span> ${m}`;
+    t.appendChild(ln);
+    t.scrollTop = t.scrollHeight;
+  },
+
+  clearTerm() {
+    document.getElementById('term').innerHTML = '';
+  },
+
+  toast(msg, type = 'info', dur = 2500) {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), dur);
+  },
+
+  startMonitor() {
+    setInterval(() => {
+      this.vmUptime++;
+      const m = Math.floor(this.vmUptime / 60), s = this.vmUptime % 60;
+      document.getElementById('vmUptime').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }, 1000);
+  },
+
+  clock() {
+    setInterval(() => {
+      document.getElementById('time').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+  }
 };
-const vw=views[v]||views.home;title.textContent=vw.title;cv.innerHTML=vw.content;
-cmds.innerHTML=(vw.cmds||[]).map(c=>`<div class="cmd" onclick="K.runCmd('${c.c}')"><div class="label">${c.l}</div><code>${c.c}</code></div>`).join('')},
 
-initKeys(){
-document.addEventListener('keydown',e=>{
-if(e.ctrlKey&&e.key==='k'){e.preventDefault();this.togglePalette()}
-if(e.ctrlKey&&e.key==='f'){e.preventDefault();this.showSearch()}
-if(e.ctrlKey&&e.key===','){e.preventDefault();this.showSettings()}
-if(e.key==='Escape'){this.hidePalette();this.hideSearch();this.hideSettings();this.hideCtx()}
-if(e.altKey&&e.key>='1'&&e.key<='6'){e.preventDefault();const views=['home','vm','designer','cli','kernels','tags'];this.view(views[e.key-1])}
-})},
+document.getElementById('cmd-input').addEventListener('input', e => K.filterCommands(e.target.value));
+document.getElementById('cmd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const sel = document.querySelector('#cmd-results .result.sel');
+    if (sel) sel.click();
+  }
+});
 
-initContextMenu(){
-document.addEventListener('click',()=>this.hideCtx());
-document.addEventListener('contextmenu',e=>{if(!e.target.closest('.tree')&&!e.target.closest('.fav-item'))return;e.preventDefault()})},
-
-showCtx(e,path,name){
-e.preventDefault();e.stopPropagation();
-this.ctxTarget={path,name};
-const menu=document.getElementById('context-menu');
-menu.style.left=e.pageX+'px';menu.style.top=e.pageY+'px';
-menu.classList.add('active')},
-hideCtx(){document.getElementById('context-menu').classList.remove('active')},
-ctxAction(act){
-if(!this.ctxTarget)return;
-const{path,name}=this.ctxTarget;
-switch(act){
-case'open':this.nav(path);break;
-case'openNew':window.open(path,'_blank');break;
-case'fav':this.toggleFav(path,name);break;
-case'copy':navigator.clipboard.writeText(path);this.toast('Path copied','success');break;
-case'info':this.toast(`${name}\nPath: ${path}`,'info',4000);break;
-}
-this.hideCtx()},
-
-togglePalette(){const p=document.getElementById('cmd-palette');p.classList.toggle('active');if(p.classList.contains('active')){document.getElementById('cmd-input').value='';document.getElementById('cmd-input').focus();this.filterCommands('')}},
-hidePalette(){document.getElementById('cmd-palette').classList.remove('active')},
-filterCommands(q){
-const r=document.getElementById('cmd-results');
-const filtered=this.commands.filter(c=>c.name.toLowerCase().includes(q.toLowerCase()));
-r.innerHTML=filtered.map((c,i)=>`<div class="result${i===0?' sel':''}" onclick="K.commands[${this.commands.indexOf(c)}].action();K.hidePalette()"><span>${c.name}</span><span class="keys">${c.key}</span></div>`).join('')},
-
-showSearch(){const s=document.getElementById('search-modal');s.classList.add('active');document.getElementById('search-input').value='';document.getElementById('search-input').focus();this.filterSearch('')},
-hideSearch(){document.getElementById('search-modal').classList.remove('active')},
-filterSearch(q){
-const r=document.getElementById('search-results');
-const filtered=q?this.searchIndex.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.path.toLowerCase().includes(q.toLowerCase())):this.searchIndex.slice(0,8);
-r.innerHTML=filtered.map(s=>`<div class="result" onclick="K.nav('${s.path}');K.hideSearch()"><span><span class="icon">${s.icon}</span>${s.name}</span><span class="path">${s.path}</span></div>`).join('')},
-
-showSettings(){document.getElementById('settings-modal').classList.add('active')},
-hideSettings(){document.getElementById('settings-modal').classList.remove('active')},
-setTheme(t){this.prefs.theme=t;this.savePrefs();this.applyTheme(t)},
-cycleTheme(){const themes=['dark','light','hacker','ocean'];const i=(themes.indexOf(this.prefs.theme||'dark')+1)%4;this.setTheme(themes[i])},
-applyTheme(t){
-const themes={
-dark:{bg:'#0d1117',bg2:'#161b22',text:'#c9d1d9',accent:'#f97316'},
-light:{bg:'#f6f8fa',bg2:'#ffffff',text:'#1f2937',accent:'#ea580c'},
-hacker:{bg:'#0a0a0a',bg2:'#111',text:'#00ff00',accent:'#00ff00'},
-ocean:{bg:'#0f172a',bg2:'#1e293b',text:'#e2e8f0',accent:'#0ea5e9'}
-};
-const th=themes[t]||themes.dark;
-Object.entries(th).forEach(([k,v])=>document.documentElement.style.setProperty('--'+k,v));
-this.toast(`Theme: ${t}`,'info')},
-
-togglePanel(side){const p=document.getElementById(side==='left'?'leftPanel':'rightPanel');p.style.display=p.style.display==='none'?'block':'none'},
-
-nav(url){this.log('Navigate: '+url);this.toast('Loading...','info');setTimeout(()=>location.href=url,150)},
-runCmd(c){
-if(c.startsWith('./')||c.startsWith('kernel')||c.startsWith('ignition')||c.startsWith('uname')){
-this.execCmd(c)}else{this.nav(c)}},
-
-execCmd(cmd){
-this.log(cmd);this.cmdHistory.push(cmd);this.saveHistory();this.historyIdx=this.cmdHistory.length;
-const responses={
-'ignition status':'Gateway: RUNNING on :8088\nModules: Perspective, OPC-UA, Tags\nUptime: '+this.formatTime(this.vmUptime),
-'ignition start':'Starting Ignition Gateway...\n[OK] Gateway started on port 8088',
-'ignition stop':'Stopping Ignition Gateway...\n[OK] Gateway stopped',
-'uname -a':'IgnAIte OS 1.1 x86_64 Konomi',
-'kernel load minimal':'Loading minimal kernel (512 bytes)...\n[OK] Kernel loaded',
-'kernel load ignition':'Loading ignition kernel...\n[OK] Gateway kernel active',
-'help':'Commands: ignition [status|start|stop], kernel load [name], uname, clear, help'
-};
-const resp=responses[cmd]||`Executed: ${cmd}`;
-resp.split('\n').forEach(l=>this.log(l));
-this.toast('Command executed','success')},
-
-termKey(e){
-const inp=document.getElementById('termIn');
-if(e.key==='Enter'&&inp.value.trim()){
-const cmd=inp.value.trim();inp.value='';
-if(cmd==='clear'){this.clearTerm()}else{this.execCmd(cmd)}}
-else if(e.key==='ArrowUp'){
-e.preventDefault();
-if(this.historyIdx>0){this.historyIdx--;inp.value=this.cmdHistory[this.historyIdx]||''}}
-else if(e.key==='ArrowDown'){
-e.preventDefault();
-if(this.historyIdx<this.cmdHistory.length-1){this.historyIdx++;inp.value=this.cmdHistory[this.historyIdx]||''}
-else{this.historyIdx=this.cmdHistory.length;inp.value=''}}},
-
-log(m){const t=document.getElementById('term'),ln=document.createElement('div');ln.className='ln';ln.innerHTML=`<span class="pr">ignite$</span> ${this.escHtml(m)}`;ln.onclick=()=>this.copy(m);t.appendChild(ln);t.scrollTop=t.scrollHeight;if(t.children.length>100)t.removeChild(t.children[0])},
-escHtml(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;')},
-clearTerm(){document.getElementById('term').innerHTML=''},
-copy(txt){navigator.clipboard.writeText(txt);this.toast('Copied!','success')},
-action(a){this.log('Action: '+a);if(a==='refresh')location.reload()},
-
-toast(msg,type='info',dur=2500){
-const c=document.getElementById('toast-container'),t=document.createElement('div');
-t.className='toast '+type;t.textContent=msg;c.appendChild(t);
-setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300)},dur)},
-
-startVMMonitor(){
-setInterval(()=>{
-this.vmUptime++;
-document.getElementById('vmUptime').textContent=this.formatTime(this.vmUptime)},1000)},
-formatTime(s){const m=Math.floor(s/60),sec=s%60;return`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`},
-
-clock(){setInterval(()=>{document.getElementById('time').textContent=new Date().toLocaleTimeString()},1000)}
-};
-
-document.getElementById('cmd-input').addEventListener('input',e=>K.filterCommands(e.target.value));
-document.getElementById('cmd-input').addEventListener('keydown',e=>{if(e.key==='Enter'){const sel=document.querySelector('#cmd-results .result.sel');if(sel)sel.click()}});
-document.getElementById('search-input').addEventListener('input',e=>K.filterSearch(e.target.value));
-document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter'){const sel=document.querySelector('#search-results .result');if(sel)sel.click()}});
 K.boot();
 </script>
 </body>
