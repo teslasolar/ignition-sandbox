@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Scripts | Konomi IgnAIte</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}body{background:#0d1117;color:#c9d1d9;padding:20px}.h{color:#f97316;border-bottom:2px solid #f97316;padding-bottom:10px;margin-bottom:20px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.c{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px}.c h3{color:#3fb950;font-size:12px;margin-bottom:4px}.c p{color:#8b949e;font-size:10px}.b{margin-top:20px}.b a{color:#f97316;text-decoration:none}</style>
+</head><body>
+<h1 class="h">📜 Scripts</h1>
+<div class="g" id="list"></div>
+<div class="b"><a href="../">← Back to IgnAIte</a></div>
+<script>
+fetch('index.json').then(r=>r.json()).then(d=>{
+  const el=document.getElementById('list');
+  d.files.forEach(f=>{el.innerHTML+=`<div class="c"><h3>$ ${f.file}</h3><p>${f.desc}</p></div>`;});
+});
+</script>
+</body></html>
