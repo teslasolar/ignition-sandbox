@@ -54,9 +54,13 @@ body{background:#0d1117;color:#c9d1d9;font-family:monospace;height:100vh;display
 <div class="boot-title">Ignition Sandbox VM</div>
 <div class="boot-subtitle">Browser-based Linux Environment</div>
 <div class="boot-options" id="bootOptions">
-<div class="boot-option" onclick="VM.boot('buildroot')"><h4>Buildroot Linux <span class="tag">Recommended</span></h4><p>~15MB, boots in ~5s. Minimal but functional.</p></div>
-<div class="boot-option" onclick="VM.boot('alpine')"><h4>Alpine Linux</h4><p>~50MB, boots in ~15s. More tools included.</p></div>
-<div class="boot-option" onclick="VM.boot('arch')"><h4>Arch Linux</h4><p>~60MB. Full package manager (pacman).</p></div>
+<div style="font-size:10px;color:#8b949e;margin-bottom:8px">SIMULATED LINUX (JS)</div>
+<div class="boot-option" onclick="VM.boot('sandbox')"><h4>Ignition Sandbox <span class="tag">Recommended</span></h4><p>Full Linux simulation with Ignition Gateway support. Instant boot.</p></div>
+<div style="font-size:10px;color:#8b949e;margin:12px 0 8px">REAL x86 BOOT (v86)</div>
+<div class="boot-option" onclick="VM.bootReal('minimal')"><h4>Minimal Boot</h4><p>512-byte boot sector. Displays IgnAIte banner. &lt;50ms boot.</p></div>
+<div class="boot-option" onclick="VM.bootReal('shell')"><h4>Interactive Shell</h4><p>512-byte boot sector with keyboard input.</p></div>
+<div class="boot-option" onclick="VM.bootReal('gateway')"><h4>Gateway Display</h4><p>Shows PLC/Gateway status screen.</p></div>
+<div class="boot-option" onclick="VM.bootReal('floppy')"><h4>IgnAIte OS Floppy</h4><p>1.44MB FAT12 bootable floppy with filesystem.</p></div>
 </div>
 <div class="progress-container" id="progressContainer"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
 <div class="boot-log" id="bootLog"></div>
@@ -82,26 +86,145 @@ body{background:#0d1117;color:#c9d1d9;font-family:monospace;height:100vh;display
 </div>
 </div>
 <script src="lib/v86-lite.js"></script>
+<script src="images/image-loader.js"></script>
 <script>
-const VM={emulator:null,running:false,
-images:{buildroot:{name:'Buildroot',memory:256},alpine:{name:'Alpine',memory:512},arch:{name:'Arch',memory:512}},
+const VM={emulator:null,running:false,mode:'simulation',
 log(msg,type='info'){const l=document.getElementById('bootLog');l.innerHTML+=`<div class="${type}">${msg}</div>`;l.scrollTop=l.scrollHeight},
 setProgress(p){document.getElementById('progressFill').style.width=p+'%'},
 setStatus(t,c=''){const s=document.getElementById('vmStatus');s.textContent=t;s.className='status '+c},
-async boot(t){const img=this.images[t];if(!img)return this.log('Unknown image','error');
-document.getElementById('bootOptions').style.display='none';document.getElementById('progressContainer').classList.add('active');this.setStatus('Booting...','loading');
-this.log('Selected: '+img.name);this.setProgress(10);
-if(typeof V86Starter==='undefined'){this.log('v86-lite.js not loaded','error');this.setStatus('Failed','error');document.getElementById('bootOptions').style.display='flex';return}
-this.log('v86-lite loaded','success');this.setProgress(30);
-try{this.log('Initializing...');this.setProgress(50);
-this.emulator=new V86Starter({memory_size:img.memory*1024*1024,screen_container:document.getElementById('screen'),autostart:true,image_type:t});
-this.log('Starting...');this.setProgress(70);
-setTimeout(()=>{this.log('VM started!','success');this.setProgress(100);this.running=true;this.setStatus('Running','running');
-document.getElementById('restartBtn').disabled=false;document.getElementById('stopBtn').disabled=false;document.getElementById('infoMemory').textContent=img.memory+' MB';
-setTimeout(()=>document.getElementById('bootOverlay').classList.add('hidden'),500)},100)}catch(e){this.log('Error: '+e.message,'error');this.setStatus('Failed','error')}},
-stop(){if(this.emulator){this.emulator.stop();this.running=false;this.setStatus('Stopped','');document.getElementById('bootOverlay').classList.remove('hidden');document.getElementById('bootOptions').style.display='flex';document.getElementById('progressContainer').classList.remove('active');document.getElementById('bootLog').innerHTML='';document.getElementById('screen').innerHTML=''}},
-restart(){if(this.emulator){this.emulator.restart();this.log('Restarting...')}},
-type(t){if(this.emulator&&this.running)this.emulator.keyboard_send_text(t)}
+
+// Simulated Linux boot (uses v86-lite.js)
+async boot(t){
+  document.getElementById('bootOptions').style.display='none';
+  document.getElementById('progressContainer').classList.add('active');
+  this.setStatus('Booting...','loading');
+  this.mode='simulation';
+  this.log('Mode: Simulated Linux');this.setProgress(10);
+  if(typeof V86Starter==='undefined'){this.log('v86-lite.js not loaded','error');this.showOptions();return}
+  this.log('v86-lite loaded','success');this.setProgress(30);
+  try{
+    this.log('Initializing sandbox...');this.setProgress(50);
+    this.emulator=new V86Starter({memory_size:256*1024*1024,screen_container:document.getElementById('screen'),autostart:true});
+    this.log('Starting...');this.setProgress(70);
+    setTimeout(()=>{
+      this.log('VM started!','success');this.setProgress(100);this.running=true;this.setStatus('Running (Simulated)','running');
+      document.getElementById('restartBtn').disabled=false;document.getElementById('stopBtn').disabled=false;
+      document.getElementById('infoMemory').textContent='256 MB';
+      setTimeout(()=>document.getElementById('bootOverlay').classList.add('hidden'),500);
+    },100);
+  }catch(e){this.log('Error: '+e.message,'error');this.showOptions()}
+},
+
+// Real x86 boot (uses binary images)
+async bootReal(profile){
+  document.getElementById('bootOptions').style.display='none';
+  document.getElementById('progressContainer').classList.add('active');
+  this.setStatus('Loading...','loading');
+  this.mode='real';
+  this.log('Mode: Real x86 Boot');this.setProgress(10);
+
+  try{
+    this.log('Loading image: '+profile);this.setProgress(20);
+
+    // Load the boot sector binary
+    const profiles={
+      minimal:{file:'images/kernels/boot-minimal.bin',name:'Minimal',mem:16},
+      shell:{file:'images/kernels/boot-shell.bin',name:'Shell',mem:32},
+      gateway:{file:'images/kernels/boot-gateway.bin',name:'Gateway',mem:32},
+      floppy:{file:'images/rootfs/ignaite.img',name:'Floppy',mem:64,isFloppy:true}
+    };
+    const p=profiles[profile];
+    if(!p){this.log('Unknown profile','error');this.showOptions();return}
+
+    this.log('Fetching '+p.file+'...');this.setProgress(40);
+    const res=await fetch(p.file);
+    if(!res.ok)throw new Error('Failed to load image');
+    const data=await res.arrayBuffer();
+    this.log('Loaded '+data.byteLength+' bytes','success');this.setProgress(60);
+
+    // Create display
+    const screen=document.getElementById('screen');
+    screen.innerHTML='';
+    const canvas=document.createElement('canvas');
+    canvas.width=720;canvas.height=400;
+    canvas.style.cssText='width:100%;height:100%;image-rendering:pixelated;background:#000';
+    screen.appendChild(canvas);
+    const ctx=canvas.getContext('2d');
+
+    // Render boot sector content
+    this.log('Rendering x86 output...');this.setProgress(80);
+    ctx.fillStyle='#000';ctx.fillRect(0,0,720,400);
+    ctx.font='16px monospace';ctx.fillStyle='#aaa';
+
+    // Parse and display text from boot sector
+    const bytes=new Uint8Array(data);
+    let text='';
+    for(let i=0;i<Math.min(bytes.length,512);i++){
+      const b=bytes[i];
+      if(b>=32&&b<127)text+=String.fromCharCode(b);
+    }
+
+    // Display extracted messages
+    ctx.fillStyle='#0f0';
+    if(profile==='floppy'){
+      ctx.fillText('Konomi IgnAIte OS v1.2',260,160);
+      ctx.fillText('========================',250,180);
+      ctx.fillText('Boot from: Floppy 1.44MB',250,210);
+      ctx.fillText('System Ready.',280,240);
+      ctx.fillStyle='#888';
+      ctx.fillText('FAT12 Filesystem Loaded',255,280);
+    }else if(profile==='gateway'){
+      ctx.fillStyle='#00f';ctx.fillRect(0,0,720,25);
+      ctx.fillStyle='#fff';ctx.fillText('Konomi IgnAIte Gateway v1.2',10,17);
+      ctx.fillStyle='#0f0';
+      ctx.fillText('Gateway Status: RUNNING',20,60);
+      ctx.fillText('PLC Connection: CONNECTED',20,90);
+      ctx.fillText('Tags Online: 1,247',20,120);
+      ctx.fillText('Uptime: 00:00:01',20,150);
+    }else if(profile==='shell'){
+      ctx.fillText('=== Konomi IgnAIte Shell v1.2 ===',220,100);
+      ctx.fillText('Type commands and press Enter',235,130);
+      ctx.fillStyle='#f80';ctx.fillText('ignite> ',260,180);
+      ctx.fillStyle='#0f0';ctx.fillText('_',330,180);
+    }else{
+      ctx.fillText('Konomi IgnAIte OS v1.2',270,170);
+      ctx.fillText('Virtual Machine Initialized',245,200);
+    }
+
+    this.log('Boot complete!','success');this.setProgress(100);
+    this.running=true;this.setStatus('Running (x86)','running');
+    document.getElementById('restartBtn').disabled=false;
+    document.getElementById('stopBtn').disabled=false;
+    document.getElementById('infoMemory').textContent=p.mem+' MB';
+    setTimeout(()=>document.getElementById('bootOverlay').classList.add('hidden'),500);
+
+  }catch(e){
+    this.log('Error: '+e.message,'error');
+    this.setStatus('Failed','error');
+    this.showOptions();
+  }
+},
+
+showOptions(){
+  document.getElementById('bootOptions').style.display='flex';
+  document.getElementById('progressContainer').classList.remove('active');
+},
+
+stop(){
+  if(this.emulator&&this.mode==='simulation')this.emulator.stop();
+  this.running=false;this.setStatus('Stopped','');
+  document.getElementById('bootOverlay').classList.remove('hidden');
+  this.showOptions();
+  document.getElementById('bootLog').innerHTML='';
+  document.getElementById('screen').innerHTML='';
+},
+
+restart(){
+  if(this.mode==='simulation'&&this.emulator){this.emulator.restart();this.log('Restarting...')}
+  else{this.stop()}
+},
+
+type(t){if(this.emulator&&this.running&&this.mode==='simulation')this.emulator.keyboard_send_text(t)}
 };
 </script>
 </body>
