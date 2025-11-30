@@ -1,11 +1,12 @@
-{"id":"vm","title":"Browser VM Sandbox","type":"custom","description":"Run Linux in browser. No install required.","sections":[
-{"type":"cards","items":[
-  {"title":"Launch VM","href":"vm/","description":"Boot Linux with v86 emulator","highlight":true},
-  {"title":"How it Works","description":"JS x86 emulator. State saves to browser."}
-]},
-{"title":"Images","type":"cards","items":[
-  {"title":"Alpine","description":"~50MB, ~10s boot","note":"Recommended"},
-  {"title":"Debian","description":"~200MB, ~30s boot","note":"Full environment"},
-  {"title":"Buildroot","description":"~20MB, ~5s boot","note":"Minimal"}
-]}
+{"id":"vm","title":"VM Sandbox","type":"tab",
+"description":"Browser-based x86 emulation with bootable images",
+"commands":[
+  {"label":"Boot Minimal","code":"ImageLoader.buildConfig('minimal')","desc":"Quick banner display (<50ms)"},
+  {"label":"Boot Shell","code":"ImageLoader.buildConfig('shell')","desc":"Interactive keyboard shell"},
+  {"label":"Boot Gateway","code":"ImageLoader.buildConfig('gateway')","desc":"PLC/Gateway status display"},
+  {"label":"Boot Floppy","code":"ImageLoader.buildConfig('floppy')","desc":"Full 1.44MB FAT12 OS"},
+  {"label":"Open VM Page","code":"location.href='vm/'","desc":"Full VM interface"},
+  {"label":"List Images","code":"ImageLoader.listImages()","desc":"Show all available images"},
+  {"label":"Cache Stats","code":"ImageLoader.getStats()","desc":"IndexedDB cache info"},
+  {"label":"Clear Cache","code":"ImageLoader.clearCache()","desc":"Remove cached images"}
 ]}

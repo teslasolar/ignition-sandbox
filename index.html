@@ -410,19 +410,25 @@ const K = {
 
     // Load tab content
     this.load(tab.src).then(data => {
-      if (data.commands) {
+      if (data.commands && data.commands.length) {
         const cmds = data.commands.map(c => `
-          <div class="cv-card" onclick="K.runCmd('${c.code || c.run}')">
+          <div class="cv-card" onclick="K.runCmd(\`${(c.code || c.run || '').replace(/`/g, '\\`')}\`)">
             <div class="icon">⚡</div>
             <h4>${c.label || c.name}</h4>
-            <p>${c.code || c.run || ''}</p>
+            <p>${c.desc || c.description || ''}</p>
           </div>
         `).join('');
-        cv.innerHTML = `<div class="cv-grid">${cmds}</div>`;
+        cv.innerHTML = `
+          <div class="cv-inner" style="padding:15px 0">
+            <h2 style="font-size:16px">${data.title || tab.label}</h2>
+            <p>${data.description || ''}</p>
+          </div>
+          <div class="cv-grid">${cmds}</div>`;
       } else {
         cv.innerHTML = `<div class="cv-inner"><h2>${tab.label}</h2><p>Tab loaded from ${tab.src}</p></div>`;
       }
-    }).catch(() => {
+    }).catch(e => {
+      console.error('Tab load error:', e);
       cv.innerHTML = `<div class="cv-inner"><h2>${tab.label}</h2><p><a href="${tab.src}" style="color:var(--accent)">Open ${tab.src}</a></p></div>`;
     });
   },
@@ -434,7 +440,27 @@ const K = {
 
   runCmd(c) {
     this.log('Run: ' + c);
-    this.toast('Executed: ' + c, 'success');
+    try {
+      // Handle navigation commands
+      if (c.startsWith('location.href=')) {
+        eval(c);
+        return;
+      }
+      // Execute and show result
+      const result = eval(c);
+      if (result instanceof Promise) {
+        result.then(r => {
+          console.log('Result:', r);
+          this.toast('Executed successfully', 'success');
+        }).catch(e => this.toast('Error: ' + e.message, 'error'));
+      } else {
+        console.log('Result:', result);
+        this.toast('Executed', 'success');
+      }
+    } catch (e) {
+      console.error(e);
+      this.toast('Error: ' + e.message, 'error');
+    }
   },
 
   initKeys() {

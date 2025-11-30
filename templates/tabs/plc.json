@@ -1,11 +1,13 @@
-{"id":"plc","label":"PLC","icon":"zap","highlight":true,
-"description":"Virtual PLC with L5K support",
-"content":{
-  "type":"plc-panel",
-  "sections":[
-    {"id":"status","title":"PLC Status","component":"plc-status"},
-    {"id":"io","title":"I/O Monitor","component":"io-panel"},
-    {"id":"tags","title":"Tag Browser","component":"tag-browser"},
-    {"id":"program","title":"Program","component":"l5k-editor"}
-  ]
-}}
+{"id":"plc","title":"Virtual PLC","type":"tab",
+"description":"Allen-Bradley L5K ladder logic emulation",
+"commands":[
+  {"label":"Open PLC Dashboard","code":"location.href='dashboard.html'","desc":"Real-time PLC status and I/O"},
+  {"label":"Open Demo Page","code":"location.href='demo.html'","desc":"Interactive tank, conveyor, batch"},
+  {"label":"Browse PLC Files","code":"location.href='plc/'","desc":"L5K programs and runtime"},
+  {"label":"Load Starter Program","code":"fetch('plc/programs/starter.l5k').then(r=>r.text())","desc":"Basic motor control"},
+  {"label":"Load Process Program","code":"fetch('plc/programs/process.l5k').then(r=>r.text())","desc":"Tank level control"},
+  {"label":"Load Conveyor Program","code":"fetch('plc/programs/conveyor.l5k').then(r=>r.text())","desc":"3-zone conveyor system"},
+  {"label":"Load Batch Program","code":"fetch('plc/programs/batch.l5k').then(r=>r.text())","desc":"5-step batch mixing"},
+  {"label":"Start PLC","code":"IgnAIte?.startPLC?.()","desc":"Begin scan cycle"},
+  {"label":"Stop PLC","code":"IgnAIte?.stopPLC?.()","desc":"Halt execution"}
+]}
