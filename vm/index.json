@@ -1,18 +1,23 @@
-{"name":"VM Sandbox","type":"module","parent":"/",
-"description":"Browser-based Linux environment powered by v86",
-"images":[
-  {"id":"buildroot","name":"Buildroot Linux","memory":256,"boot":"~5s","size":"~15MB","recommended":true},
-  {"id":"alpine","name":"Alpine Linux","memory":512,"boot":"~15s","size":"~50MB"},
-  {"id":"arch","name":"Arch Linux","memory":512,"boot":"~20s","size":"~60MB"}
+{"name":"VM Sandbox","type":"module","parent":"/","version":"1.2.0",
+"description":"Browser-based x86 emulation with bootable images",
+"profiles":[
+  {"id":"minimal","name":"Minimal Boot","memory":16,"boot":"<50ms","desc":"Banner display"},
+  {"id":"shell","name":"Interactive Shell","memory":32,"boot":"<100ms","desc":"Keyboard input","recommended":true},
+  {"id":"gateway","name":"Gateway Display","memory":32,"boot":"<100ms","desc":"PLC status"},
+  {"id":"floppy","name":"IgnAIte OS","memory":64,"boot":"~2s","desc":"Full FAT12 floppy"}
 ],
+"images":{
+  "bios":["seabios/bios.bin","seabios/vgabios.bin"],
+  "kernels":["boot-minimal.bin","boot-shell.bin","boot-gateway.bin"],
+  "rootfs":["ignaite.img"]
+},
 "commands":[
-  {"label":"System Info","code":"uname -a"},
-  {"label":"Memory","code":"free -h"},
-  {"label":"Disk","code":"df -h"},
-  {"label":"Processes","code":"ps aux"},
-  {"label":"Network","code":"ifconfig"},
-  {"label":"Ignition Status","code":"ignition status"},
-  {"label":"Ignition Install","code":"ignition install"}
+  {"label":"Boot Minimal","code":"ImageLoader.buildConfig('minimal')"},
+  {"label":"Boot Shell","code":"ImageLoader.buildConfig('shell')"},
+  {"label":"Boot Gateway","code":"ImageLoader.buildConfig('gateway')"},
+  {"label":"Boot Floppy","code":"ImageLoader.buildConfig('floppy')"},
+  {"label":"List Images","code":"ImageLoader.listImages()"},
+  {"label":"Cache Stats","code":"ImageLoader.getStats()"}
 ],
-"features":["x86 emulation","Virtual filesystem","Ignition gateway simulation","Network simulation"],
-"children":["lib","boot"]}
+"features":["x86 emulation","Real boot sectors","FAT12 filesystem","IndexedDB caching","BIOS emulation"],
+"children":["lib","boot","images"]}

@@ -1,0 +1,22 @@
+{"name":"VM Images","version":"1.2.0",
+"desc":"Bootable images for v86 emulator",
+"directories":{
+  "kernels":"Boot sector binaries (512 bytes each)",
+  "rootfs":"Disk images (floppy, HDD)",
+  "seabios":"BIOS ROM files"
+},
+"images":[
+  {"id":"bios","path":"seabios/bios.bin","size":65536,"type":"bios"},
+  {"id":"vgabios","path":"seabios/vgabios.bin","size":32768,"type":"vgabios"},
+  {"id":"boot-minimal","path":"kernels/boot-minimal.bin","size":512,"type":"bootsector"},
+  {"id":"boot-shell","path":"kernels/boot-shell.bin","size":512,"type":"bootsector"},
+  {"id":"boot-gateway","path":"kernels/boot-gateway.bin","size":512,"type":"bootsector"},
+  {"id":"ignaite-floppy","path":"rootfs/ignaite.img","size":1474560,"type":"fda"}
+],
+"profiles":{
+  "minimal":"boot-minimal with 16MB RAM",
+  "shell":"boot-shell with 32MB RAM",
+  "gateway":"boot-gateway with 32MB RAM",
+  "floppy":"ignaite.img with 64MB RAM"
+},
+"loader":"image-loader.js"}

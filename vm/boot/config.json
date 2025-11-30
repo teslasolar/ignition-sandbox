@@ -1,14 +1,19 @@
-{"name":"Ignition Sandbox VM","version":"1.1.0",
-"kernels":{
-  "minimal":{"size":512,"boot":"<50ms","desc":"Bare boot sector"},
-  "ignition":{"size":512,"boot":"<50ms","desc":"Gateway kernel"},
-  "full":{"size":512,"boot":"<50ms","desc":"Full OS shell"}
+{"name":"Konomi IgnAIte VM","version":"1.2.0",
+"profiles":{
+  "minimal":{"boot":"boot-minimal","mem":16,"desc":"Quick banner display","time":"<50ms"},
+  "shell":{"boot":"boot-shell","mem":32,"desc":"Interactive keyboard shell","time":"<100ms"},
+  "gateway":{"boot":"boot-gateway","mem":32,"desc":"PLC/Gateway status display","time":"<100ms"},
+  "floppy":{"fda":"ignaite-floppy","mem":64,"desc":"Full IgnAIte OS from floppy","time":"~2s"}
+},
+"bios":{
+  "system":"seabios/bios.bin",
+  "vga":"seabios/vgabios.bin"
 },
 "images":{
-  "alpine":{"size":"50MB","mem":512,"boot":"~10s","rec":true},
-  "buildroot":{"size":"20MB","mem":256,"boot":"~5s"}
+  "kernels":["boot-minimal.bin","boot-shell.bin","boot-gateway.bin"],
+  "rootfs":["ignaite.img"]
 },
-"boot":{"cache":true,"preload":true,"verify":true,"target":"<100ms"},
-"req":{"browser":"Chrome 90+|Firefox 85+|Safari 14+","wasm":true},
+"boot":{"cache":true,"preload":"critical","verify":true,"target":"<100ms"},
+"req":{"browser":"Chrome 90+|Firefox 85+|Safari 14+","wasm":true,"memory":"64MB"},
 "net":{"mode":"nat","ports":"8088:HTTP|8043:HTTPS"},
-"storage":{"backend":"indexeddb","max":"500MB"}}
+"storage":{"backend":"indexeddb","max":"500MB","cache":"vm-images"}}

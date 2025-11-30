@@ -26,25 +26,58 @@ const ImageLoader = {
     });
   },
 
-  // Image manifest
+  // Image manifest - actual bootable images
   images: {
-    'alpine': {
-      url: 'https://example.com/alpine-3.18.img.gz',
-      size: 52428800,  // 50MB
-      compressed: true,
-      priority: 'high'
-    },
-    'buildroot': {
-      url: 'https://example.com/buildroot.img.gz',
-      size: 20971520,  // 20MB
-      compressed: true,
-      priority: 'medium'
-    },
-    'ignition-kernel': {
-      url: 'kernels/ignition.bin',
-      size: 512,
+    // BIOS files (required for v86)
+    'bios': {
+      url: 'vm/images/seabios/bios.bin',
+      size: 65536,
+      type: 'bios',
       compressed: false,
       priority: 'critical'
+    },
+    'vgabios': {
+      url: 'vm/images/seabios/vgabios.bin',
+      size: 32768,
+      type: 'vgabios',
+      compressed: false,
+      priority: 'critical'
+    },
+
+    // Boot sectors (512 bytes each)
+    'boot-minimal': {
+      url: 'vm/images/kernels/boot-minimal.bin',
+      size: 512,
+      type: 'bootsector',
+      compressed: false,
+      priority: 'critical',
+      desc: 'Minimal boot - displays IgnAIte banner'
+    },
+    'boot-shell': {
+      url: 'vm/images/kernels/boot-shell.bin',
+      size: 512,
+      type: 'bootsector',
+      compressed: false,
+      priority: 'high',
+      desc: 'Interactive shell with keyboard input'
+    },
+    'boot-gateway': {
+      url: 'vm/images/kernels/boot-gateway.bin',
+      size: 512,
+      type: 'bootsector',
+      compressed: false,
+      priority: 'high',
+      desc: 'Gateway status display'
+    },
+
+    // Floppy disk images
+    'ignaite-floppy': {
+      url: 'vm/images/rootfs/ignaite.img',
+      size: 1474560,
+      type: 'fda',
+      compressed: false,
+      priority: 'medium',
+      desc: 'IgnAIte OS 1.44MB floppy with FAT12 filesystem'
     }
   },
 
@@ -194,6 +227,102 @@ const ImageLoader = {
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
     });
+  },
+
+  // Build v86 configuration for a specific boot profile
+  async buildConfig(profile = 'minimal', options = {}) {
+    const profiles = {
+      'minimal': {
+        bios: 'bios',
+        vgabios: 'vgabios',
+        boot: 'boot-minimal',
+        memory: 16 * 1024 * 1024  // 16MB
+      },
+      'shell': {
+        bios: 'bios',
+        vgabios: 'vgabios',
+        boot: 'boot-shell',
+        memory: 32 * 1024 * 1024  // 32MB
+      },
+      'gateway': {
+        bios: 'bios',
+        vgabios: 'vgabios',
+        boot: 'boot-gateway',
+        memory: 32 * 1024 * 1024
+      },
+      'floppy': {
+        bios: 'bios',
+        vgabios: 'vgabios',
+        fda: 'ignaite-floppy',
+        memory: 64 * 1024 * 1024  // 64MB
+      }
+    };
+
+    const p = profiles[profile] || profiles.minimal;
+    const config = {
+      memory_size: p.memory,
+      vga_memory_size: 2 * 1024 * 1024,
+      autostart: true,
+      ...options
+    };
+
+    // Load BIOS files
+    if (p.bios) {
+      config.bios = { buffer: await this.load(p.bios) };
+    }
+    if (p.vgabios) {
+      config.vga_bios = { buffer: await this.load(p.vgabios) };
+    }
+
+    // Load boot image
+    if (p.boot) {
+      const bootData = await this.load(p.boot);
+      // Create a floppy image with boot sector
+      const floppy = new Uint8Array(1474560);
+      floppy.set(bootData, 0);
+      config.fda = { buffer: floppy };
+    } else if (p.fda) {
+      config.fda = { buffer: await this.load(p.fda) };
+    }
+
+    return config;
+  },
+
+  // List available boot profiles
+  getProfiles() {
+    return [
+      { id: 'minimal', name: 'Minimal Boot', desc: 'Quick boot banner display' },
+      { id: 'shell', name: 'Interactive Shell', desc: 'Keyboard input shell' },
+      { id: 'gateway', name: 'Gateway Display', desc: 'PLC/Gateway status' },
+      { id: 'floppy', name: 'IgnAIte OS', desc: 'Full 1.44MB FAT12 floppy' }
+    ];
+  },
+
+  // Get image info
+  getImageInfo(id) {
+    const img = this.images[id];
+    if (!img) return null;
+    return {
+      id,
+      ...img,
+      sizeFormatted: this.formatSize(img.size)
+    };
+  },
+
+  // Format bytes
+  formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  },
+
+  // List all available images
+  listImages() {
+    return Object.entries(this.images).map(([id, info]) => ({
+      id,
+      ...info,
+      sizeFormatted: this.formatSize(info.size)
+    }));
   }
 };
 
