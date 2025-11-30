@@ -1,0 +1,3 @@
+{"name":"programs","type":"directory",
+"description":"Sample L5K ladder logic programs",
+"files":["starter.l5k","process.l5k"]}

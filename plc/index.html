@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>PLC | Konomi IgnAIte</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}body{background:#0d1117;color:#c9d1d9;padding:20px}.h{color:#f97316;border-bottom:2px solid #f97316;padding-bottom:10px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px;margin-bottom:20px}.c{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px}.c h3{color:#f97316;font-size:14px;margin-bottom:8px}.c p{color:#8b949e;font-size:11px;margin-bottom:10px}.status{display:flex;gap:10px;margin-bottom:20px}.status span{padding:4px 12px;border-radius:4px;font-size:11px}.status .run{background:#238636;color:#fff}.status .stop{background:#da3633;color:#fff}.status .fault{background:#9e6a03;color:#fff}.editor{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}.code{background:#000;border:1px solid #30363d;border-radius:6px;padding:15px;min-height:300px}.code textarea{width:100%;height:280px;background:transparent;border:none;color:#3fb950;font-family:Consolas,monospace;font-size:11px;resize:none}.code h4{color:#8b949e;font-size:10px;margin-bottom:10px}.output{background:#000;border:1px solid #30363d;border-radius:6px;padding:15px;font-size:11px}.output pre{color:#58a6ff;white-space:pre-wrap}.btn{background:#f97316;color:#000;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;margin-right:10px}.btn:hover{background:#ea580c}.btn.stop{background:#da3633;color:#fff}.io-panel{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px;margin-top:20px}.io-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:10px}.io-bit{width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer}.io-bit.on{background:#238636;color:#fff}.io-bit.off{background:#21262d;color:#8b949e}.tags{margin-top:20px;font-size:11px}.tags table{width:100%;border-collapse:collapse}.tags th,.tags td{padding:6px;text-align:left;border-bottom:1px solid #30363d}.tags th{color:#8b949e}.tags td{color:#c9d1d9}.b{margin-top:20px}.b a{color:#f97316;text-decoration:none}</style>
+</head><body>
+<h1 class="h">⚡ Virtual PLC <span class="status"><span class="stop" id="plcStatus">STOPPED</span></span></h1>
+
+<div class="g">
+<div class="c"><h3>📁 Compiler</h3><p>L5K lexer, parser, and code generator</p><a href="compiler/">Browse →</a></div>
+<div class="c"><h3>🔧 Runtime</h3><p>Ladder logic CPU, I/O, and memory</p><a href="runtime/">Browse →</a></div>
+<div class="c"><h3>📄 Programs</h3><p>Sample L5K programs</p><a href="programs/">Browse →</a></div>
+</div>
+
+<div class="editor">
+<div class="code">
+<h4>L5K PROGRAM</h4>
+<textarea id="l5kCode">; Starter Program - Motor Control
+; Allen-Bradley Logix5000 Format
+
+ROUTINE MainRoutine
+  ; Start/Stop Logic
+  XIC StartPB OTE MotorRun
+  XIC StopPB OTU MotorRun
+
+  ; Running Indicator
+  XIC MotorRun OTE RunningLamp
+
+  ; Fault Detection
+  XIC MotorFault OTE FaultLamp
+  XIC MotorFault OTU MotorRun
+END_ROUTINE
+
+DATA
+  StartPB    : BOOL := I:0/0
+  StopPB     : BOOL := I:0/1
+  MotorFault : BOOL := I:0/2
+  MotorRun   : BOOL := O:0/0
+  RunningLamp: BOOL := O:0/1
+  FaultLamp  : BOOL := O:0/2
+END_DATA</textarea>
+</div>
+<div class="output">
+<h4 style="color:#8b949e;font-size:10px;margin-bottom:10px">COMPILED OUTPUT</h4>
+<pre id="output">Click "Compile" to process L5K code...</pre>
+</div>
+</div>
+
+<div style="margin-top:15px">
+<button class="btn" onclick="compile()">Compile</button>
+<button class="btn" onclick="runPLC()">Run PLC</button>
+<button class="btn stop" onclick="stopPLC()">Stop</button>
+<button class="btn" onclick="stepPLC()">Step</button>
+</div>
+
+<div class="io-panel">
+<h4 style="color:#f97316;margin-bottom:5px">I/O Panel</h4>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div>
+<div style="color:#8b949e;font-size:10px;margin-bottom:5px">INPUTS (Click to toggle)</div>
+<div class="io-grid" id="inputs"></div>
+</div>
+<div>
+<div style="color:#8b949e;font-size:10px;margin-bottom:5px">OUTPUTS (Read-only)</div>
+<div class="io-grid" id="outputs"></div>
+</div>
+</div>
+</div>
+
+<div class="tags">
+<h4 style="color:#f97316;margin-bottom:10px">Tag Monitor</h4>
+<table>
+<tr><th>Tag</th><th>Type</th><th>Value</th><th>Address</th></tr>
+<tbody id="tagTable"></tbody>
+</table>
+</div>
+
+<div class="b"><a href="../">← Back to IgnAIte</a></div>
+
+<script>
+const PLC = {
+  running: false,
+  interval: null,
+  memory: { I: new Uint8Array(8), O: new Uint8Array(8) },
+  tags: {},
+  program: [],
+
+  compile(src) {
+    this.tags = {};
+    this.program = [];
+    const lines = src.split('\n');
+    let inRoutine = false, inData = false;
+
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t || t.startsWith(';')) continue;
+
+      if (t === 'ROUTINE MainRoutine') { inRoutine = true; continue; }
+      if (t === 'END_ROUTINE') { inRoutine = false; continue; }
+      if (t === 'DATA') { inData = true; continue; }
+      if (t === 'END_DATA') { inData = false; continue; }
+
+      if (inData) {
+        const m = t.match(/(\w+)\s*:\s*(\w+)\s*:=\s*([IO]):(\d+)\/(\d+)/);
+        if (m) {
+          this.tags[m[1]] = { type: m[2], area: m[3], byte: +m[4], bit: +m[5] };
+        }
+      }
+
+      if (inRoutine) {
+        const instr = this.parseInstruction(t);
+        if (instr) this.program.push(instr);
+      }
+    }
+
+    return { tags: Object.keys(this.tags).length, instructions: this.program.length };
+  },
+
+  parseInstruction(line) {
+    const parts = line.split(/\s+/);
+    if (parts.length < 2) return null;
+
+    const instr = { conditions: [], action: null };
+    let i = 0;
+
+    while (i < parts.length) {
+      const op = parts[i];
+      if (['XIC', 'XIO'].includes(op)) {
+        instr.conditions.push({ op, tag: parts[++i] });
+      } else if (['OTE', 'OTL', 'OTU'].includes(op)) {
+        instr.action = { op, tag: parts[++i] };
+      }
+      i++;
+    }
+
+    return instr.action ? instr : null;
+  },
+
+  readBit(tag) {
+    const t = this.tags[tag];
+    if (!t) return false;
+    return (this.memory[t.area][t.byte] >> t.bit) & 1;
+  },
+
+  writeBit(tag, val) {
+    const t = this.tags[tag];
+    if (!t || t.area !== 'O') return;
+    if (val) this.memory[t.area][t.byte] |= (1 << t.bit);
+    else this.memory[t.area][t.byte] &= ~(1 << t.bit);
+  },
+
+  scan() {
+    for (const instr of this.program) {
+      let rung = true;
+      for (const cond of instr.conditions) {
+        const bit = this.readBit(cond.tag);
+        if (cond.op === 'XIC') rung = rung && bit;
+        if (cond.op === 'XIO') rung = rung && !bit;
+      }
+
+      const { op, tag } = instr.action;
+      if (op === 'OTE') this.writeBit(tag, rung);
+      if (op === 'OTL' && rung) this.writeBit(tag, 1);
+      if (op === 'OTU' && rung) this.writeBit(tag, 0);
+    }
+  },
+
+  toggleInput(byte, bit) {
+    this.memory.I[byte] ^= (1 << bit);
+    updateIO();
+  }
+};
+
+function compile() {
+  const src = document.getElementById('l5kCode').value;
+  const result = PLC.compile(src);
+  document.getElementById('output').textContent =
+    `Compiled successfully!\n\nTags: ${result.tags}\nInstructions: ${result.instructions}\n\n` +
+    `Program:\n${PLC.program.map((p,i) =>
+      `${i}: ${p.conditions.map(c => c.op + ' ' + c.tag).join(' ')} → ${p.action.op} ${p.action.tag}`
+    ).join('\n')}\n\nTags:\n${Object.entries(PLC.tags).map(([k,v]) =>
+      `${k}: ${v.area}:${v.byte}/${v.bit}`
+    ).join('\n')}`;
+  updateTagTable();
+  updateIO();
+}
+
+function runPLC() {
+  if (PLC.running) return;
+  PLC.running = true;
+  document.getElementById('plcStatus').className = 'run';
+  document.getElementById('plcStatus').textContent = 'RUNNING';
+  PLC.interval = setInterval(() => { PLC.scan(); updateIO(); updateTagTable(); }, 100);
+}
+
+function stopPLC() {
+  PLC.running = false;
+  clearInterval(PLC.interval);
+  document.getElementById('plcStatus').className = 'stop';
+  document.getElementById('plcStatus').textContent = 'STOPPED';
+}
+
+function stepPLC() {
+  PLC.scan();
+  updateIO();
+  updateTagTable();
+}
+
+function updateIO() {
+  let inHtml = '', outHtml = '';
+  for (let i = 0; i < 8; i++) {
+    const iOn = (PLC.memory.I[0] >> i) & 1;
+    const oOn = (PLC.memory.O[0] >> i) & 1;
+    inHtml += `<div class="io-bit ${iOn ? 'on' : 'off'}" onclick="PLC.toggleInput(0,${i})">${i}</div>`;
+    outHtml += `<div class="io-bit ${oOn ? 'on' : 'off'}">${i}</div>`;
+  }
+  document.getElementById('inputs').innerHTML = inHtml;
+  document.getElementById('outputs').innerHTML = outHtml;
+}
+
+function updateTagTable() {
+  const rows = Object.entries(PLC.tags).map(([name, t]) => {
+    const val = PLC.readBit(name);
+    return `<tr><td>${name}</td><td>${t.type}</td><td style="color:${val ? '#3fb950' : '#8b949e'}">${val ? 'TRUE' : 'FALSE'}</td><td>${t.area}:${t.byte}/${t.bit}</td></tr>`;
+  }).join('');
+  document.getElementById('tagTable').innerHTML = rows;
+}
+
+// Initialize
+updateIO();
+</script>
+</body></html>

@@ -1,0 +1,3 @@
+{"name":"compiler","type":"directory",
+"description":"L5K compiler components",
+"files":["lexer.js","parser.js","codegen.js"]}

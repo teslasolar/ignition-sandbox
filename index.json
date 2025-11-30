@@ -9,6 +9,7 @@
   {"id":"vm","label":"VM","src":"templates/tabs/vm.json","highlight":true}
 ],
 "resources":[
+  {"id":"plc","title":"Virtual PLC","href":"plc/","icon":"zap","highlight":true},
   {"id":"vm","title":"VM Sandbox","href":"vm/","icon":"terminal","highlight":true},
   {"id":"kernels","title":"Custom Kernels","href":"kernels/","icon":"cpu"},
   {"id":"tags","title":"Tag Provider","href":"tags/","icon":"tag"},
@@ -16,4 +17,4 @@
   {"id":"cli","title":"CLI Tools","href":"cli/","icon":"code"},
   {"id":"templates","title":"Templates","href":"templates/","icon":"file"}
 ],
-"children":["cli","screens","vm","templates","tags","kernels"]}
+"children":["cli","screens","vm","templates","tags","kernels","plc"]}
