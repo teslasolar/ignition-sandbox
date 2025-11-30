@@ -1,0 +1,4 @@
+{"name":"Views","type":"views","items":[
+{"id":"overview","file":"overview.json","desc":"System overview"},
+{"id":"tank-farm","file":"tank-farm.json","desc":"Tank farm layout"}
+]}

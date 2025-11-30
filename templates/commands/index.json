@@ -1,0 +1,6 @@
+{"name":"Command Templates","type":"commands","files":[
+{"id":"ignition","file":"ignition.json","category":"gateway"},
+{"id":"tailscale","file":"tailscale.json","category":"vpn"},
+{"id":"system","file":"system.json","category":"linux"},
+{"id":"setup","file":"setup.json","category":"install"}
+]}

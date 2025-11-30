@@ -1,0 +1,4 @@
+{"name":"Boot Config","type":"boot","files":[
+{"id":"config","file":"config.json","desc":"VM configuration"},
+{"id":"install","file":"install-ignition.sh","desc":"Gateway installer"}
+]}

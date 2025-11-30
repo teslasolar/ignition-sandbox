@@ -1,0 +1,5 @@
+{"name":"API Wrappers","type":"wrappers","files":[
+{"id":"api","file":"api-wrapper.py","lang":"python","desc":"REST API client"},
+{"id":"tailscale","file":"tailscale_wrapper.py","lang":"python","desc":"Tailscale VPN control"},
+{"id":"mcp","file":"mcp-server.json","type":"config","desc":"MCP server definition"}
+]}

@@ -1,0 +1,8 @@
+{"name":"Components","type":"components","items":[
+{"id":"tank","file":"tank.json","icon":"🛢️"},
+{"id":"valve","file":"valve.json","icon":"🔧"},
+{"id":"pump","file":"pump.json","icon":"⚙️"},
+{"id":"sensor","file":"sensor.json","icon":"📡"},
+{"id":"pipe-h","file":"pipe-horizontal.json","icon":"━"},
+{"id":"pipe-v","file":"pipe-vertical.json","icon":"│"}
+]}

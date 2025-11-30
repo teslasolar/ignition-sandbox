@@ -1,0 +1,3 @@
+{"name":"VM Library","type":"lib","files":[
+{"id":"v86-lite","file":"v86-lite.js","desc":"Custom x86 emulator"}
+],"features":["boot-sequence","virtual-fs","linux-commands","ignition-cli"]}

@@ -1,0 +1,3 @@
+{"name":"Command Sandbox","type":"module","files":[
+{"id":"terminal","file":"index.html","type":"html","desc":"Interactive command terminal"}
+],"features":["command-execution","output-display","history"]}

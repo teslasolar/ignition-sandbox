@@ -1,0 +1,10 @@
+{"name":"Scripts","type":"scripts","files":[
+{"id":"sandbox","file":"sandbox","desc":"Main sandbox runner"},
+{"id":"loader","file":"loader","desc":"Dynamic script loader"},
+{"id":"sysinfo","file":"sysinfo","desc":"System information"},
+{"id":"netinfo","file":"netinfo","desc":"Network information"},
+{"id":"docker-setup","file":"docker-setup","desc":"Docker installation"},
+{"id":"java-setup","file":"java-setup","desc":"Java installation"},
+{"id":"python-setup","file":"python-setup","desc":"Python installation"},
+{"id":"install-cli","file":"install-cli","desc":"CLI installer"}
+]}
