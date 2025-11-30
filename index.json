@@ -1,5 +1,6 @@
-{"name":"Konomi IgnAIte","version":"1.0.0","type":"project",
-"description":"Browser-based Ignition sandbox with custom OS",
+{"name":"Konomi IgnAIte","version":"1.2.0","type":"project",
+"description":"Browser-based Ignition sandbox with virtual PLC and custom OS",
+"manifest":"manifest.json","entry":"main.js",
 "tabs":[
   {"id":"ignition","label":"Ignition","src":"templates/commands/ignition.json"},
   {"id":"tailscale","label":"Tailscale","src":"templates/commands/tailscale.json"},

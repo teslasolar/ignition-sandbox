@@ -1,0 +1,17 @@
+{"name":"Konomi IgnAIte","version":"1.2.0","type":"ignition-sandbox",
+"description":"Browser-based Ignition sandbox with virtual PLC and custom OS",
+"entry":"main.js",
+"modules":{
+  "core":{"scripts":["scripts/common.js","main.js"]},
+  "plc":{"scripts":["plc/plc-loader.js","plc/compiler/lexer.js","plc/compiler/parser.js","plc/compiler/codegen.js","plc/runtime/cpu.js","plc/runtime/io.js","plc/runtime/memory.js","plc/gateway-bridge.js"]},
+  "vm":{"scripts":["vm/boot/fast-boot.js","vm/images/image-loader.js","vm/lib/integration.js","vm/plc-interface.js"]},
+  "tags":{"scripts":["tags/tag-utils.js","tags/plc-bridge.js"],"data":["tags/properties.csv","tags/instances/pumps/instances.csv","tags/instances/tanks/instances.csv","tags/instances/valves/instances.csv","tags/instances/sensors/instances.csv"]},
+  "screens":{"scripts":["screens/renderer.js","templates/views/view-renderer.js"],"data":["screens/templates/components.csv","screens/templates/symbols.csv","templates/views/views.csv"]},
+  "kernels":{"files":["kernels/minimal.asm","kernels/ignition.asm","kernels/full.asm","kernels/macros.inc"]}
+},
+"assets":{"icons":"assets/icons.svg","styles":"assets/icons.css"},
+"config":{
+  "plc":{"scanRate":100,"ioBase":"0x300"},
+  "vm":{"bootTarget":"<100ms","cacheEnabled":true},
+  "tags":{"udtPath":"tags/udt/","instancePath":"tags/instances/"}
+}}
