@@ -1,0 +1,6 @@
+id,name,location,capacity,plc_level
+T101,Raw Water Tank,Intake,10000,AI:0
+T102,Buffer Tank,Process,5000,AI:1
+T201,Product Tank 1,Storage,20000,AI:2
+T202,Product Tank 2,Storage,20000,AI:3
+T301,Waste Tank,Treatment,8000,AI:4

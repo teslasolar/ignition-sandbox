@@ -1,0 +1,17 @@
+{"$schema":"component-schema-1.0",
+"definitions":{
+  "position":{"type":"object","props":["x","y","width","height"]},
+  "states":{"running":"#10b981","stopped":"#6b7280","fault":"#ef4444","alarm":"#f59e0b"},
+  "colors":{"primary":"#f97316","bg":"#161b22","border":"#30363d","text":"#c9d1d9"}
+},
+"baseComponent":{
+  "version":0,
+  "position":{"x":0.1,"y":0.1,"width":0.1,"height":0.1},
+  "custom":{"tagPath":"","states":{"$ref":"#/definitions/states"}}
+},
+"types":{
+  "pump":{"$extends":"baseComponent","type":"ia.display.label","props":{"text":"P","style":{"borderRadius":"50%"}}},
+  "tank":{"$extends":"baseComponent","type":"ia.display.tank","props":{"level":50,"orientation":"vertical"}},
+  "valve":{"$extends":"baseComponent","type":"ia.display.label","props":{"text":"V","style":{"borderRadius":"4px"}}},
+  "sensor":{"$extends":"baseComponent","type":"ia.display.label","props":{"text":"--","style":{"borderRadius":"4px"}}}
+}}

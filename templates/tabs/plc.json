@@ -1,0 +1,11 @@
+{"id":"plc","label":"PLC","icon":"zap","highlight":true,
+"description":"Virtual PLC with L5K support",
+"content":{
+  "type":"plc-panel",
+  "sections":[
+    {"id":"status","title":"PLC Status","component":"plc-status"},
+    {"id":"io","title":"I/O Monitor","component":"io-panel"},
+    {"id":"tags","title":"Tag Browser","component":"tag-browser"},
+    {"id":"program","title":"Program","component":"l5k-editor"}
+  ]
+}}

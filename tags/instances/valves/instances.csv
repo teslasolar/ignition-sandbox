@@ -1,0 +1,7 @@
+id,name,type,location,plc_addr
+XV101,Inlet Isolation,ball,Tank Farm,O:0/0
+XV102,Tank 1 Inlet,ball,Tank Farm,O:0/1
+FV201,Flow Control,control,Process,AO:0
+XV301,Discharge,ball,Loading,O:0/2
+XV302,Drain,ball,Loading,O:0/3
+PRV401,Pressure Relief,relief,Reactor,O:0/4
