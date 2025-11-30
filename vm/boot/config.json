@@ -1,10 +1,14 @@
-{"name":"Ignition Sandbox VM","version":"1.0.0",
-"images":{
-  "alpine":{"name":"Alpine 3.18","size":"50MB","mem":512,"boot":"~10s","rec":true},
-  "debian":{"name":"Debian 11","size":"200MB","mem":512,"boot":"~30s"},
-  "buildroot":{"name":"Buildroot","size":"20MB","mem":256,"boot":"~5s"},
-  "custom":{"name":"Ignition Image","size":"500MB","mem":1024,"boot":"~45s"}
+{"name":"Ignition Sandbox VM","version":"1.1.0",
+"kernels":{
+  "minimal":{"size":512,"boot":"<50ms","desc":"Bare boot sector"},
+  "ignition":{"size":512,"boot":"<50ms","desc":"Gateway kernel"},
+  "full":{"size":512,"boot":"<50ms","desc":"Full OS shell"}
 },
-"req":{"browser":["Chrome 90+","Firefox 85+","Safari 14+"],"wasm":true},
-"net":{"mode":"nat","ports":{"8088":"Gateway HTTP","8043":"Gateway HTTPS"}},
-"storage":{"persistent":true,"backend":"indexeddb","max":"500MB"}}
+"images":{
+  "alpine":{"size":"50MB","mem":512,"boot":"~10s","rec":true},
+  "buildroot":{"size":"20MB","mem":256,"boot":"~5s"}
+},
+"boot":{"cache":true,"preload":true,"verify":true,"target":"<100ms"},
+"req":{"browser":"Chrome 90+|Firefox 85+|Safari 14+","wasm":true},
+"net":{"mode":"nat","ports":"8088:HTTP|8043:HTTPS"},
+"storage":{"backend":"indexeddb","max":"500MB"}}
