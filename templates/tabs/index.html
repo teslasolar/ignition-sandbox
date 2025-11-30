@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Tab Templates</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}body{background:#0d1117;color:#c9d1d9;padding:20px}.h{color:#f97316;margin-bottom:15px}.g{display:grid;gap:10px}.c{background:#161b22;border:1px solid #30363d;border-radius:4px;padding:10px;cursor:pointer;font-size:12px}.c:hover{border-color:#f97316}.b a{color:#f97316;text-decoration:none;font-size:12px}</style>
+</head><body>
+<h2 class="h">📑 Tab Templates</h2>
+<div class="g" id="l"></div>
+<div class="b"><a href="../">← Back</a></div>
+<script>
+['designer','vm'].forEach(f=>{
+  document.getElementById('l').innerHTML+=`<div class="c" onclick="location='${f}.json'">${f}.json</div>`;
+});
+</script>
+</body></html>
