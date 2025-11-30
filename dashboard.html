@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Konomi IgnAIte</title>
+<link rel="stylesheet" href="assets/icons.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+.header{background:#161b22;border-bottom:1px solid #30363d;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:18px;color:#f97316;display:flex;align-items:center;gap:10px}
+.status{display:flex;gap:15px}
+.status-item{display:flex;align-items:center;gap:6px;font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-dot.on{background:#10b981}
+.status-dot.off{background:#6b7280}
+.status-dot.fault{background:#ef4444;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:0.5}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;padding:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:15px}
+.card h3{font-size:14px;color:#f97316;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #21262d}
+.metric:last-child{border-bottom:none}
+.metric-label{color:#8b949e;font-size:12px}
+.metric-value{font-weight:600;font-size:14px}
+.metric-value.good{color:#10b981}
+.metric-value.warn{color:#f59e0b}
+.metric-value.bad{color:#ef4444}
+.io-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:10px}
+.io-bit{width:100%;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;cursor:pointer;transition:all 0.15s}
+.io-bit.off{background:#21262d;color:#6b7280}
+.io-bit.on{background:#10b981;color:#fff}
+.io-bit:hover{transform:scale(1.1)}
+.prog-list{margin-top:10px}
+.prog-item{display:flex;justify-content:space-between;align-items:center;padding:8px;background:#21262d;border-radius:4px;margin-bottom:6px;cursor:pointer;transition:background 0.15s}
+.prog-item:hover{background:#30363d}
+.prog-name{font-size:12px;font-weight:500}
+.prog-size{font-size:10px;color:#8b949e}
+.btn{background:#f97316;color:#000;border:none;padding:8px 16px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;transition:background 0.15s}
+.btn:hover{background:#ea580c}
+.btn.secondary{background:#21262d;color:#c9d1d9}
+.btn.secondary:hover{background:#30363d}
+.btn-group{display:flex;gap:8px;margin-top:12px}
+.terminal{background:#000;border-radius:4px;padding:10px;font-family:Consolas,monospace;font-size:11px;height:150px;overflow-y:auto;margin-top:10px}
+.terminal-line{margin:2px 0}
+.terminal-line.info{color:#58a6ff}
+.terminal-line.success{color:#3fb950}
+.terminal-line.error{color:#f85149}
+.terminal-line.warn{color:#d29922}
+.gauge{position:relative;width:100%;height:20px;background:#21262d;border-radius:10px;overflow:hidden;margin:8px 0}
+.gauge-fill{height:100%;border-radius:10px;transition:width 0.3s}
+.gauge-fill.cpu{background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444)}
+.gauge-fill.mem{background:#3b82f6}
+.gauge-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1><svg class="icon" style="color:#f97316"><use href="assets/icons.svg#icon-zap"/></svg> Konomi IgnAIte Dashboard</h1>
+  <div class="status">
+    <div class="status-item"><span class="status-dot on" id="plcDot"></span> PLC</div>
+    <div class="status-item"><span class="status-dot off" id="vmDot"></span> VM</div>
+    <div class="status-item"><span class="status-dot on" id="gwDot"></span> Gateway</div>
+  </div>
+</div>
+
+<div class="grid">
+  <!-- PLC Status -->
+  <div class="card">
+    <h3><svg class="icon icon-sm"><use href="assets/icons.svg#icon-cpu"/></svg> Virtual PLC</h3>
+    <div class="metric"><span class="metric-label">Status</span><span class="metric-value good" id="plcStatus">RUNNING</span></div>
+    <div class="metric"><span class="metric-label">Scan Time</span><span class="metric-value" id="scanTime">0.8 ms</span></div>
+    <div class="metric"><span class="metric-label">Scan Count</span><span class="metric-value" id="scanCount">0</span></div>
+    <div class="metric"><span class="metric-label">Program</span><span class="metric-value" id="plcProgram">starter.l5k</span></div>
+    <div class="btn-group">
+      <button class="btn" onclick="startPLC()">Run</button>
+      <button class="btn secondary" onclick="stopPLC()">Stop</button>
+      <button class="btn secondary" onclick="stepPLC()">Step</button>
+    </div>
+  </div>
+
+  <!-- I/O Monitor -->
+  <div class="card">
+    <h3><svg class="icon icon-sm"><use href="assets/icons.svg#icon-zap"/></svg> Digital I/O</h3>
+    <div style="color:#8b949e;font-size:11px;margin-bottom:5px">INPUTS (click to toggle)</div>
+    <div class="io-grid" id="inputs"></div>
+    <div style="color:#8b949e;font-size:11px;margin:10px 0 5px">OUTPUTS</div>
+    <div class="io-grid" id="outputs"></div>
+  </div>
+
+  <!-- System Metrics -->
+  <div class="card">
+    <h3><svg class="icon icon-sm"><use href="assets/icons.svg#icon-server"/></svg> System</h3>
+    <div class="metric"><span class="metric-label">CPU Usage</span></div>
+    <div class="gauge"><div class="gauge-fill cpu" id="cpuGauge" style="width:35%"></div><span class="gauge-label" id="cpuLabel">35%</span></div>
+    <div class="metric"><span class="metric-label">Memory</span></div>
+    <div class="gauge"><div class="gauge-fill mem" id="memGauge" style="width:48%"></div><span class="gauge-label" id="memLabel">48%</span></div>
+    <div class="metric"><span class="metric-label">Uptime</span><span class="metric-value" id="uptime">00:00:00</span></div>
+    <div class="metric"><span class="metric-label">Version</span><span class="metric-value">1.2.0</span></div>
+  </div>
+
+  <!-- Programs -->
+  <div class="card">
+    <h3><svg class="icon icon-sm"><use href="assets/icons.svg#icon-file"/></svg> L5K Programs</h3>
+    <div class="prog-list">
+      <div class="prog-item" onclick="loadProgram('starter')"><span class="prog-name">starter.l5k</span><span class="prog-size">Motor Control</span></div>
+      <div class="prog-item" onclick="loadProgram('process')"><span class="prog-name">process.l5k</span><span class="prog-size">Tank Level</span></div>
+      <div class="prog-item" onclick="loadProgram('conveyor')"><span class="prog-name">conveyor.l5k</span><span class="prog-size">3-Zone Conveyor</span></div>
+      <div class="prog-item" onclick="loadProgram('batch')"><span class="prog-name">batch.l5k</span><span class="prog-size">Batch Mixing</span></div>
+    </div>
+  </div>
+
+  <!-- Console -->
+  <div class="card" style="grid-column:span 2">
+    <h3><svg class="icon icon-sm"><use href="assets/icons.svg#icon-terminal"/></svg> Console</h3>
+    <div class="terminal" id="terminal">
+      <div class="terminal-line info">[System] Konomi IgnAIte v1.2.0</div>
+      <div class="terminal-line success">[PLC] Virtual PLC initialized</div>
+      <div class="terminal-line info">[PLC] Loaded: starter.l5k (4 rungs, 6 tags)</div>
+    </div>
+  </div>
+</div>
+
+<script src="scripts/common.js"></script>
+<script>
+const D = {
+  plcRunning: true,
+  scanCount: 0,
+  startTime: Date.now(),
+  inputs: 0,
+  outputs: 0,
+
+  init() {
+    this.renderIO();
+    this.startUpdates();
+    this.log('info', '[Dashboard] Initialized');
+  },
+
+  renderIO() {
+    let inHtml = '', outHtml = '';
+    for (let i = 0; i < 8; i++) {
+      const iOn = (this.inputs >> i) & 1;
+      const oOn = (this.outputs >> i) & 1;
+      inHtml += `<div class="io-bit ${iOn?'on':'off'}" onclick="D.toggleInput(${i})">${i}</div>`;
+      outHtml += `<div class="io-bit ${oOn?'on':'off'}">${i}</div>`;
+    }
+    document.getElementById('inputs').innerHTML = inHtml;
+    document.getElementById('outputs').innerHTML = outHtml;
+  },
+
+  toggleInput(bit) {
+    this.inputs ^= (1 << bit);
+    this.renderIO();
+    this.log('info', `[I/O] Input ${bit} = ${(this.inputs >> bit) & 1}`);
+  },
+
+  startUpdates() {
+    setInterval(() => {
+      if (this.plcRunning) {
+        this.scanCount++;
+        document.getElementById('scanCount').textContent = this.scanCount.toLocaleString();
+        document.getElementById('scanTime').textContent = (Math.random() * 2 + 0.5).toFixed(1) + ' ms';
+
+        // Simulate I/O
+        if (this.inputs & 1) this.outputs |= 1;
+        else this.outputs &= ~1;
+        this.renderIO();
+      }
+
+      // Update uptime
+      const s = Math.floor((Date.now() - this.startTime) / 1000);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      document.getElementById('uptime').textContent =
+        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+
+      // Random CPU/mem
+      const cpu = 30 + Math.random() * 20;
+      const mem = 45 + Math.random() * 10;
+      document.getElementById('cpuGauge').style.width = cpu + '%';
+      document.getElementById('cpuLabel').textContent = cpu.toFixed(0) + '%';
+      document.getElementById('memGauge').style.width = mem + '%';
+      document.getElementById('memLabel').textContent = mem.toFixed(0) + '%';
+    }, 100);
+  },
+
+  log(type, msg) {
+    const term = document.getElementById('terminal');
+    const line = document.createElement('div');
+    line.className = `terminal-line ${type}`;
+    line.textContent = msg;
+    term.appendChild(line);
+    term.scrollTop = term.scrollHeight;
+  }
+};
+
+function startPLC() {
+  D.plcRunning = true;
+  document.getElementById('plcStatus').textContent = 'RUNNING';
+  document.getElementById('plcStatus').className = 'metric-value good';
+  document.getElementById('plcDot').className = 'status-dot on';
+  D.log('success', '[PLC] Started');
+}
+
+function stopPLC() {
+  D.plcRunning = false;
+  document.getElementById('plcStatus').textContent = 'STOPPED';
+  document.getElementById('plcStatus').className = 'metric-value warn';
+  document.getElementById('plcDot').className = 'status-dot off';
+  D.log('warn', '[PLC] Stopped');
+}
+
+function stepPLC() {
+  D.scanCount++;
+  document.getElementById('scanCount').textContent = D.scanCount.toLocaleString();
+  D.log('info', '[PLC] Single scan executed');
+}
+
+function loadProgram(name) {
+  document.getElementById('plcProgram').textContent = name + '.l5k';
+  D.log('success', `[PLC] Loaded: ${name}.l5k`);
+}
+
+D.init();
+</script>
+</body>
+</html>

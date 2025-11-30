@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo | Konomi IgnAIte</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh;display:flex;flex-direction:column}
+.header{background:linear-gradient(135deg,#161b22 0%,#1a1f26 100%);padding:40px 20px;text-align:center;border-bottom:1px solid #30363d}
+.header h1{font-size:32px;color:#f97316;margin-bottom:10px}
+.header p{color:#8b949e;font-size:14px}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px;max-width:1200px;margin:0 auto;flex:1}
+@media(max-width:768px){.demo-grid{grid-template-columns:1fr}}
+.demo-panel{background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
+.panel-header{background:#21262d;padding:12px 15px;font-weight:600;font-size:14px;color:#f97316;display:flex;align-items:center;gap:8px}
+.panel-body{padding:15px}
+.tank{width:100%;height:200px;background:#21262d;border-radius:8px;position:relative;overflow:hidden;margin-bottom:15px}
+.tank-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#3b82f6 0%,#1d4ed8 100%);transition:height 0.5s}
+.tank-level{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:4px;font-size:12px;font-weight:600}
+.tank-marks{position:absolute;top:0;bottom:0;right:10px;display:flex;flex-direction:column;justify-content:space-between;padding:10px 0}
+.tank-mark{font-size:9px;color:#6b7280}
+.controls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.btn{padding:12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-fill{background:#10b981;color:#fff}
+.btn-fill:hover{background:#059669}
+.btn-drain{background:#ef4444;color:#fff}
+.btn-drain:hover{background:#dc2626}
+.btn-stop{background:#6b7280;color:#fff}
+.btn-stop:hover{background:#4b5563}
+.btn-auto{background:#3b82f6;color:#fff}
+.btn-auto:hover{background:#2563eb}
+.btn-auto.active{background:#f97316}
+.conveyor{background:#21262d;border-radius:8px;padding:20px;position:relative;height:120px;margin-bottom:15px}
+.belt{position:absolute;left:20px;right:20px;top:50%;height:20px;background:repeating-linear-gradient(90deg,#4b5563 0px,#4b5563 20px,#374151 20px,#374151 40px);border-radius:4px;transform:translateY(-50%)}
+.belt.running{animation:belt 0.5s linear infinite}
+@keyframes belt{to{background-position:40px 0}}
+.zone{position:absolute;top:20px;width:60px;height:60px;background:#30363d;border:2px solid #4b5563;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s}
+.zone.active{border-color:#10b981;background:#064e3b}
+.zone.occupied{background:#1e40af}
+.zone.occupied::after{content:'📦';font-size:20px}
+.zone-1{left:30px}
+.zone-2{left:50%;transform:translateX(-50%)}
+.zone-3{right:30px}
+.zone-label{font-weight:600;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+.stat{background:#21262d;padding:10px;border-radius:6px;text-align:center}
+.stat-value{font-size:20px;font-weight:700;color:#f97316}
+.stat-label{font-size:10px;color:#8b949e;margin-top:4px}
+.batch-steps{display:flex;gap:5px;margin-bottom:15px}
+.step{flex:1;height:40px;background:#21262d;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;transition:all 0.3s}
+.step.active{background:#f97316;color:#000}
+.step.done{background:#10b981;color:#fff}
+.ingredients{display:flex;gap:10px;margin-bottom:15px}
+.ingredient{flex:1;background:#21262d;border-radius:6px;padding:10px;text-align:center}
+.ingredient-icon{font-size:24px;margin-bottom:5px}
+.ingredient-name{font-size:11px;color:#8b949e}
+.ingredient-pct{font-size:14px;font-weight:600;color:#f97316}
+.mixer{width:80px;height:80px;background:#21262d;border-radius:50%;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;position:relative}
+.mixer-blade{width:50px;height:50px;border:3px solid #6b7280;border-radius:50%;position:relative}
+.mixer-blade::before,.mixer-blade::after{content:'';position:absolute;background:#6b7280;width:3px;height:100%;left:50%;transform:translateX(-50%)}
+.mixer-blade::after{transform:translateX(-50%) rotate(90deg)}
+.mixer.running .mixer-blade{animation:spin 0.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{background:#161b22;border-top:1px solid #30363d;padding:15px 20px;text-align:center;font-size:12px;color:#8b949e}
+.footer a{color:#f97316;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>⚡ Konomi IgnAIte Demo</h1>
+  <p>Interactive virtual PLC simulations</p>
+</div>
+
+<div class="demo-grid">
+  <!-- Tank Level Demo -->
+  <div class="demo-panel">
+    <div class="panel-header">🛢️ Tank Level Control</div>
+    <div class="panel-body">
+      <div class="tank">
+        <div class="tank-fill" id="tankFill" style="height:50%"></div>
+        <div class="tank-level" id="tankLevel">50%</div>
+        <div class="tank-marks"><span class="tank-mark">100%</span><span class="tank-mark">75%</span><span class="tank-mark">50%</span><span class="tank-mark">25%</span><span class="tank-mark">0%</span></div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-fill" onclick="Tank.fill()">▲ Fill</button>
+        <button class="btn btn-drain" onclick="Tank.drain()">▼ Drain</button>
+        <button class="btn btn-stop" onclick="Tank.stop()">■ Stop</button>
+        <button class="btn btn-auto" id="tankAutoBtn" onclick="Tank.toggleAuto()">⟳ Auto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conveyor Demo -->
+  <div class="demo-panel">
+    <div class="panel-header">�icing_conveyor️ 3-Zone Conveyor</div>
+    <div class="panel-body">
+      <div class="conveyor">
+        <div class="belt" id="belt"></div>
+        <div class="zone zone-1" id="zone1"><span class="zone-label">Z1</span></div>
+        <div class="zone zone-2" id="zone2"><span class="zone-label">Z2</span></div>
+        <div class="zone zone-3" id="zone3"><span class="zone-label">Z3</span></div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-fill" onclick="Conv.addProduct()">+ Add Box</button>
+        <button class="btn btn-auto" id="convRunBtn" onclick="Conv.toggleRun()">▶ Run</button>
+        <button class="btn btn-stop" onclick="Conv.reset()">↺ Reset</button>
+        <button class="btn btn-drain" onclick="Conv.clearAll()">✕ Clear</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-value" id="convCount">0</div><div class="stat-label">Products</div></div>
+        <div class="stat"><div class="stat-value" id="convRate">0</div><div class="stat-label">Rate/min</div></div>
+        <div class="stat"><div class="stat-value" id="convTime">0:00</div><div class="stat-label">Run Time</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch Demo -->
+  <div class="demo-panel" style="grid-column:span 2">
+    <div class="panel-header">🧪 Batch Mixing System</div>
+    <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="batch-steps">
+          <div class="step" id="bStep0">IDLE</div>
+          <div class="step" id="bStep1">ADD A</div>
+          <div class="step" id="bStep2">ADD B</div>
+          <div class="step" id="bStep3">ADD C</div>
+          <div class="step" id="bStep4">MIX</div>
+          <div class="step" id="bStep5">DRAIN</div>
+        </div>
+        <div class="ingredients">
+          <div class="ingredient"><div class="ingredient-icon">🔴</div><div class="ingredient-name">Ingredient A</div><div class="ingredient-pct" id="ingA">0%</div></div>
+          <div class="ingredient"><div class="ingredient-icon">🟢</div><div class="ingredient-name">Ingredient B</div><div class="ingredient-pct" id="ingB">0%</div></div>
+          <div class="ingredient"><div class="ingredient-icon">🔵</div><div class="ingredient-name">Ingredient C</div><div class="ingredient-pct" id="ingC">0%</div></div>
+        </div>
+        <div class="controls" style="grid-template-columns:repeat(3,1fr)">
+          <button class="btn btn-fill" onclick="Batch.start()">▶ Start Batch</button>
+          <button class="btn btn-stop" onclick="Batch.abort()">■ Abort</button>
+          <button class="btn btn-auto" onclick="Batch.reset()">↺ Reset</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div class="mixer" id="mixer"><div class="mixer-blade"></div></div>
+        <div class="stat" style="width:100%"><div class="stat-value" id="batchCount">0</div><div class="stat-label">Batches Complete</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="index.html">← Back to IgnAIte</a> | <a href="dashboard.html">Dashboard</a> | <a href="plc/">PLC</a>
+</div>
+
+<script>
+// Tank Level Control
+const Tank = {
+  level: 50, mode: 'stop', auto: false, lowSP: 20, highSP: 80,
+  init() {
+    setInterval(() => this.update(), 100);
+  },
+  update() {
+    if (this.auto) {
+      if (this.level <= this.lowSP) this.mode = 'fill';
+      if (this.level >= this.highSP) this.mode = 'drain';
+    }
+    if (this.mode === 'fill' && this.level < 100) this.level += 0.5;
+    if (this.mode === 'drain' && this.level > 0) this.level -= 0.3;
+    this.render();
+  },
+  render() {
+    document.getElementById('tankFill').style.height = this.level + '%';
+    document.getElementById('tankLevel').textContent = Math.round(this.level) + '%';
+  },
+  fill() { this.mode = 'fill'; },
+  drain() { this.mode = 'drain'; },
+  stop() { this.mode = 'stop'; },
+  toggleAuto() {
+    this.auto = !this.auto;
+    document.getElementById('tankAutoBtn').classList.toggle('active', this.auto);
+  }
+};
+
+// Conveyor System
+const Conv = {
+  running: false, zones: [0,0,0], count: 0, startTime: 0,
+  init() {
+    setInterval(() => this.update(), 500);
+  },
+  update() {
+    if (!this.running) return;
+    // Move products through zones
+    if (this.zones[2]) { this.zones[2] = 0; this.count++; }
+    if (this.zones[1]) { this.zones[2] = 1; this.zones[1] = 0; }
+    if (this.zones[0]) { this.zones[1] = 1; this.zones[0] = 0; }
+    this.render();
+  },
+  render() {
+    ['zone1','zone2','zone3'].forEach((id, i) => {
+      document.getElementById(id).classList.toggle('occupied', this.zones[i]);
+    });
+    document.getElementById('convCount').textContent = this.count;
+    const elapsed = this.running ? (Date.now() - this.startTime) / 1000 : 0;
+    const rate = elapsed > 0 ? Math.round(this.count / elapsed * 60) : 0;
+    document.getElementById('convRate').textContent = rate;
+    const m = Math.floor(elapsed / 60), s = Math.floor(elapsed % 60);
+    document.getElementById('convTime').textContent = m + ':' + String(s).padStart(2,'0');
+  },
+  addProduct() { if (!this.zones[0]) this.zones[0] = 1; this.render(); },
+  toggleRun() {
+    this.running = !this.running;
+    if (this.running && !this.startTime) this.startTime = Date.now();
+    document.getElementById('belt').classList.toggle('running', this.running);
+    document.getElementById('convRunBtn').textContent = this.running ? '⏸ Pause' : '▶ Run';
+  },
+  reset() { this.startTime = Date.now(); this.count = 0; this.render(); },
+  clearAll() { this.zones = [0,0,0]; this.render(); }
+};
+
+// Batch System
+const Batch = {
+  step: 0, running: false, progress: [0,0,0], batches: 0,
+  init() {
+    setInterval(() => this.update(), 100);
+  },
+  update() {
+    if (!this.running) return;
+    if (this.step === 1) { this.progress[0] += 2; if (this.progress[0] >= 100) this.step = 2; }
+    if (this.step === 2) { this.progress[1] += 3; if (this.progress[1] >= 100) this.step = 3; }
+    if (this.step === 3) { this.progress[2] += 2.5; if (this.progress[2] >= 100) this.step = 4; }
+    if (this.step === 4) { setTimeout(() => { this.step = 5; }, 2000); this.step = 4.5; }
+    if (this.step === 5) { this.progress = [0,0,0]; this.batches++; this.step = 0; this.running = false; }
+    this.render();
+  },
+  render() {
+    for (let i = 0; i <= 5; i++) {
+      const el = document.getElementById('bStep' + i);
+      el.classList.remove('active', 'done');
+      if (Math.floor(this.step) === i) el.classList.add('active');
+      if (i < Math.floor(this.step)) el.classList.add('done');
+    }
+    document.getElementById('ingA').textContent = Math.min(100, this.progress[0]) + '%';
+    document.getElementById('ingB').textContent = Math.min(100, this.progress[1]) + '%';
+    document.getElementById('ingC').textContent = Math.min(100, this.progress[2]) + '%';
+    document.getElementById('mixer').classList.toggle('running', this.step >= 4 && this.step < 5);
+    document.getElementById('batchCount').textContent = this.batches;
+  },
+  start() { if (!this.running) { this.running = true; this.step = 1; }},
+  abort() { this.running = false; this.step = 0; this.progress = [0,0,0]; this.render(); },
+  reset() { this.abort(); this.batches = 0; this.render(); }
+};
+
+Tank.init(); Conv.init(); Batch.init();
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+; Konomi IgnAIte - Conveyor System L5K Program
+; Multi-zone conveyor with photoeye tracking
+; Compatible with Allen-Bradley Logix5000
+
+PROGRAM ConveyorControl
+  DESCRIPTION "3-zone conveyor with product tracking"
+
+ROUTINE MainRoutine
+  ; ===== ZONE 1: Infeed =====
+
+  ; Rung 0: Zone 1 Run Permission
+  XIC SystemEnable XIC Zone1Request XIO Zone1Fault XIO Zone2Full OTE Zone1Run
+
+  ; Rung 1: Zone 1 Motor Output
+  XIC Zone1Run OTE Zone1Motor
+
+  ; Rung 2: Zone 1 Product Detect (leading edge)
+  XIC Zone1PE XIO Zone1PE_Prev OTL Zone1Occupied
+  XIC Zone1PE OTE Zone1PE_Prev
+
+  ; Rung 3: Zone 1 to Zone 2 Transfer
+  XIC Zone1Occupied XIC Zone2PE XIO Zone1PE OTU Zone1Occupied
+  XIC Zone1Occupied XIC Zone2PE XIO Zone1PE OTL Zone2Occupied
+
+  ; ===== ZONE 2: Accumulation =====
+
+  ; Rung 4: Zone 2 Run Permission
+  XIC SystemEnable XIC Zone2Request XIO Zone2Fault XIO Zone3Full OTE Zone2Run
+
+  ; Rung 5: Zone 2 Motor Output
+  XIC Zone2Run OTE Zone2Motor
+
+  ; Rung 6: Zone 2 Full Detection
+  XIC Zone2PE XIC Zone2Occupied OTE Zone2Full
+
+  ; Rung 7: Zone 2 to Zone 3 Transfer
+  XIC Zone2Occupied XIC Zone3PE XIO Zone2PE OTU Zone2Occupied
+  XIC Zone2Occupied XIC Zone3PE XIO Zone2PE OTL Zone3Occupied
+
+  ; ===== ZONE 3: Discharge =====
+
+  ; Rung 8: Zone 3 Run Permission
+  XIC SystemEnable XIC Zone3Request XIO Zone3Fault OTE Zone3Run
+
+  ; Rung 9: Zone 3 Motor Output
+  XIC Zone3Run OTE Zone3Motor
+
+  ; Rung 10: Zone 3 Clear (product exits)
+  XIC Zone3Occupied XIO Zone3PE OTU Zone3Occupied
+
+  ; ===== STATUS & ALARMS =====
+
+  ; Rung 11: System Running Indicator
+  XIC Zone1Motor OTE Zone1Lamp
+  XIC Zone2Motor OTE Zone2Lamp
+  XIC Zone3Motor OTE Zone3Lamp
+
+  ; Rung 12: Any Fault Indicator
+  XIC Zone1Fault OTE FaultLamp
+  XIC Zone2Fault OTE FaultLamp
+  XIC Zone3Fault OTE FaultLamp
+
+END_ROUTINE
+
+ROUTINE CountRoutine
+  ; Product Counter
+  XIC Zone3Occupied XIO Zone3PE CTU ProductCounter 9999
+
+END_ROUTINE
+
+DATA
+  ; === SYSTEM ===
+  SystemEnable   : BOOL := I:0/0   ; System enable switch
+
+  ; === ZONE 1 INPUTS ===
+  Zone1Request   : BOOL := I:0/1   ; Zone 1 run request
+  Zone1PE        : BOOL := I:0/2   ; Zone 1 photoeye
+  Zone1Fault     : BOOL := I:0/3   ; Zone 1 motor fault
+
+  ; === ZONE 2 INPUTS ===
+  Zone2Request   : BOOL := I:0/4   ; Zone 2 run request
+  Zone2PE        : BOOL := I:0/5   ; Zone 2 photoeye
+  Zone2Fault     : BOOL := I:0/6   ; Zone 2 motor fault
+
+  ; === ZONE 3 INPUTS ===
+  Zone3Request   : BOOL := I:0/7   ; Zone 3 run request
+  Zone3PE        : BOOL := I:1/0   ; Zone 3 photoeye
+  Zone3Fault     : BOOL := I:1/1   ; Zone 3 motor fault
+
+  ; === OUTPUTS ===
+  Zone1Motor     : BOOL := O:0/0   ; Zone 1 motor contactor
+  Zone2Motor     : BOOL := O:0/1   ; Zone 2 motor contactor
+  Zone3Motor     : BOOL := O:0/2   ; Zone 3 motor contactor
+  Zone1Lamp      : BOOL := O:0/3   ; Zone 1 running lamp
+  Zone2Lamp      : BOOL := O:0/4   ; Zone 2 running lamp
+  Zone3Lamp      : BOOL := O:0/5   ; Zone 3 running lamp
+  FaultLamp      : BOOL := O:0/6   ; Fault indicator lamp
+
+  ; === INTERNAL ===
+  Zone1Run       : BOOL := B:0/0   ; Zone 1 run command
+  Zone2Run       : BOOL := B:0/1   ; Zone 2 run command
+  Zone3Run       : BOOL := B:0/2   ; Zone 3 run command
+  Zone1Occupied  : BOOL := B:0/3   ; Zone 1 has product
+  Zone2Occupied  : BOOL := B:0/4   ; Zone 2 has product
+  Zone3Occupied  : BOOL := B:0/5   ; Zone 3 has product
+  Zone2Full      : BOOL := B:0/6   ; Zone 2 full flag
+  Zone3Full      : BOOL := B:0/7   ; Zone 3 full flag
+  Zone1PE_Prev   : BOOL := B:1/0   ; Zone 1 PE previous state
+
+  ; === COUNTERS ===
+  ProductCounter : COUNTER        ; Total products
+
+END_DATA
+
+END_PROGRAM

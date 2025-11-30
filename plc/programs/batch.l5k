@@ -1,0 +1,125 @@
+; Konomi IgnAIte - Batch Control L5K Program
+; Simple batch mixing with recipe steps
+; Compatible with Allen-Bradley Logix5000
+
+PROGRAM BatchControl
+  DESCRIPTION "3-ingredient batch mixing system"
+
+ROUTINE MainRoutine
+  ; ===== BATCH SEQUENCER =====
+
+  ; Rung 0: Start Batch (Step 0 -> Step 1)
+  XIC StartBatch XIC Step0 OTU Step0
+  XIC StartBatch XIC Step0 OTL Step1
+  XIC StartBatch OTU StartBatch
+
+  ; Rung 1: Step 1 - Add Ingredient A
+  XIC Step1 OTE InletValveA
+  XIC Step1 XIC WeightOK_A OTU Step1
+  XIC Step1 XIC WeightOK_A OTL Step2
+  XIC Step1 XIC WeightOK_A OTU InletValveA
+
+  ; Rung 2: Step 2 - Add Ingredient B
+  XIC Step2 OTE InletValveB
+  XIC Step2 XIC WeightOK_B OTU Step2
+  XIC Step2 XIC WeightOK_B OTL Step3
+  XIC Step2 XIC WeightOK_B OTU InletValveB
+
+  ; Rung 3: Step 3 - Add Ingredient C
+  XIC Step3 OTE InletValveC
+  XIC Step3 XIC WeightOK_C OTU Step3
+  XIC Step3 XIC WeightOK_C OTL Step4
+  XIC Step3 XIC WeightOK_C OTU InletValveC
+
+  ; Rung 4: Step 4 - Mix
+  XIC Step4 OTE Agitator
+  XIC Step4 XIC MixTimeComplete OTU Step4
+  XIC Step4 XIC MixTimeComplete OTL Step5
+  XIC Step4 XIC MixTimeComplete OTU Agitator
+
+  ; Rung 5: Step 5 - Discharge
+  XIC Step5 OTE DischargeValve
+  XIC Step5 XIC TankEmpty OTU Step5
+  XIC Step5 XIC TankEmpty OTL Step0
+  XIC Step5 XIC TankEmpty OTU DischargeValve
+
+  ; ===== WEIGHT COMPARISONS =====
+
+  ; Rung 6: Ingredient A Target (simulated)
+  XIC Step1 TON TimerA 3000
+  XIC TimerA.DN OTE WeightOK_A
+
+  ; Rung 7: Ingredient B Target
+  XIC Step2 TON TimerB 2000
+  XIC TimerB.DN OTE WeightOK_B
+
+  ; Rung 8: Ingredient C Target
+  XIC Step3 TON TimerC 2500
+  XIC TimerC.DN OTE WeightOK_C
+
+  ; Rung 9: Mix Time Complete
+  XIC Step4 TON MixTimer 5000
+  XIC MixTimer.DN OTE MixTimeComplete
+
+  ; Rung 10: Tank Empty (simulated)
+  XIC Step5 TON DischargeTimer 4000
+  XIC DischargeTimer.DN OTE TankEmpty
+
+  ; ===== STATUS =====
+
+  ; Rung 11: Batch In Progress
+  XIO Step0 OTE BatchInProgress
+
+  ; Rung 12: Current Step Display
+  XIC Step1 OTE StepLamp1
+  XIC Step2 OTE StepLamp2
+  XIC Step3 OTE StepLamp3
+  XIC Step4 OTE StepLamp4
+  XIC Step5 OTE StepLamp5
+
+END_ROUTINE
+
+DATA
+  ; === INPUTS ===
+  StartBatch     : BOOL := I:0/0   ; Start batch pushbutton
+  AbortBatch     : BOOL := I:0/1   ; Abort batch pushbutton
+  ResetBatch     : BOOL := I:0/2   ; Reset system
+
+  ; === OUTPUTS ===
+  InletValveA    : BOOL := O:0/0   ; Ingredient A valve
+  InletValveB    : BOOL := O:0/1   ; Ingredient B valve
+  InletValveC    : BOOL := O:0/2   ; Ingredient C valve
+  Agitator       : BOOL := O:0/3   ; Mixer agitator
+  DischargeValve : BOOL := O:0/4   ; Discharge valve
+  StepLamp1      : BOOL := O:0/5   ; Step 1 indicator
+  StepLamp2      : BOOL := O:0/6   ; Step 2 indicator
+  StepLamp3      : BOOL := O:0/7   ; Step 3 indicator
+  StepLamp4      : BOOL := O:1/0   ; Step 4 indicator
+  StepLamp5      : BOOL := O:1/1   ; Step 5 indicator
+  BatchInProgress: BOOL := O:1/2   ; Batch running lamp
+
+  ; === STEPS ===
+  Step0          : BOOL := B:0/0   ; Idle
+  Step1          : BOOL := B:0/1   ; Add A
+  Step2          : BOOL := B:0/2   ; Add B
+  Step3          : BOOL := B:0/3   ; Add C
+  Step4          : BOOL := B:0/4   ; Mix
+  Step5          : BOOL := B:0/5   ; Discharge
+
+  ; === INTERNAL ===
+  WeightOK_A     : BOOL := B:1/0   ; Ingredient A weight OK
+  WeightOK_B     : BOOL := B:1/1   ; Ingredient B weight OK
+  WeightOK_C     : BOOL := B:1/2   ; Ingredient C weight OK
+  MixTimeComplete: BOOL := B:1/3   ; Mix time done
+  TankEmpty      : BOOL := B:1/4   ; Tank is empty
+
+  ; === TIMERS ===
+  TimerA         : TIMER          ; Ingredient A timer
+  TimerB         : TIMER          ; Ingredient B timer
+  TimerC         : TIMER          ; Ingredient C timer
+  MixTimer       : TIMER          ; Mix timer
+  DischargeTimer : TIMER          ; Discharge timer
+
+END_DATA
+
+END_PROGRAM
