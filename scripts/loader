@@ -1,0 +1,55 @@
+#!/bin/bash
+# Command loader - fetch and run commands from manifest
+# curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/loader | bash -s -- <command>
+
+BASE_URL="https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main"
+MANIFEST_URL="$BASE_URL/commands/manifest.json"
+
+CMD="${1:-list}"
+
+# Fetch manifest
+fetch_manifest() {
+    curl -sL "$MANIFEST_URL" 2>/dev/null
+}
+
+# List available commands
+list_commands() {
+    echo "Available commands:"
+    echo ""
+    fetch_manifest | grep -o '"name": *"[^"]*"' | cut -d'"' -f4 | while read name; do
+        desc=$(fetch_manifest | grep -A1 "\"name\": *\"$name\"" | grep description | cut -d'"' -f4)
+        printf "  %-20s %s\n" "$name" "$desc"
+    done
+}
+
+# Get command run string
+get_command() {
+    local name="$1"
+    fetch_manifest | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for cmd in data.get('commands', []):
+    if cmd.get('name') == '$name':
+        print(cmd.get('run', ''))
+        break
+" 2>/dev/null
+}
+
+case "$CMD" in
+    list|help)
+        list_commands
+        ;;
+    *)
+        run_cmd=$(get_command "$CMD")
+        if [ -n "$run_cmd" ]; then
+            echo "Running: $CMD"
+            echo "Command: $run_cmd"
+            echo ""
+            eval "$run_cmd"
+        else
+            echo "Unknown command: $CMD"
+            echo ""
+            list_commands
+        fi
+        ;;
+esac

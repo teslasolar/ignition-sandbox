@@ -1,49 +1,123 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "base_url": "https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main",
+  "categories": {
+    "ignition": "Ignition Gateway",
+    "tailscale": "Tailscale VPN",
+    "system": "System Tools",
+    "setup": "Environment Setup"
+  },
   "commands": [
     {
       "name": "install-ignition",
+      "category": "ignition",
       "description": "Install Ignition Gateway",
       "script": "ignition-install.sh",
       "run": "curl -sL ${base_url}/ignition-install.sh | sudo bash"
     },
     {
-      "name": "install-tailscale",
-      "description": "Install Tailscale for remote access",
-      "script": "tailscale-install.sh",
-      "run": "curl -sL ${base_url}/tailscale-install.sh | bash"
-    },
-    {
-      "name": "full-setup",
-      "description": "Install Ignition + Tailscale together",
-      "script": "full-setup.sh",
-      "run": "curl -sL ${base_url}/full-setup.sh | bash"
-    },
-    {
-      "name": "status",
-      "description": "Check Ignition Gateway status",
-      "run": "/opt/ignition/ignition.sh status"
-    },
-    {
       "name": "start",
+      "category": "ignition",
       "description": "Start Ignition Gateway",
       "run": "/opt/ignition/ignition.sh start"
     },
     {
       "name": "stop",
+      "category": "ignition",
       "description": "Stop Ignition Gateway",
       "run": "/opt/ignition/ignition.sh stop"
     },
     {
+      "name": "restart",
+      "category": "ignition",
+      "description": "Restart Ignition Gateway",
+      "run": "/opt/ignition/ignition.sh restart"
+    },
+    {
+      "name": "status",
+      "category": "ignition",
+      "description": "Check Ignition Gateway status",
+      "run": "/opt/ignition/ignition.sh status"
+    },
+    {
+      "name": "logs",
+      "category": "ignition",
+      "description": "Tail Ignition logs",
+      "run": "tail -f /opt/ignition/logs/wrapper.log"
+    },
+    {
+      "name": "install-tailscale",
+      "category": "tailscale",
+      "description": "Install Tailscale",
+      "script": "tailscale-install.sh",
+      "run": "curl -sL ${base_url}/tailscale-install.sh | bash"
+    },
+    {
       "name": "tailscale-up",
+      "category": "tailscale",
       "description": "Connect to Tailnet",
       "run": "tailscale up"
     },
     {
       "name": "tailscale-status",
+      "category": "tailscale",
       "description": "Show Tailscale status",
       "run": "tailscale status"
+    },
+    {
+      "name": "tailscale-ip",
+      "category": "tailscale",
+      "description": "Show Tailscale IP",
+      "run": "tailscale ip -4"
+    },
+    {
+      "name": "full-setup",
+      "category": "setup",
+      "description": "Install Ignition + Tailscale together",
+      "script": "full-setup.sh",
+      "run": "curl -sL ${base_url}/full-setup.sh | bash"
+    },
+    {
+      "name": "sysinfo",
+      "category": "system",
+      "description": "Show system information",
+      "script": "scripts/sysinfo",
+      "run": "curl -sL ${base_url}/scripts/sysinfo | bash"
+    },
+    {
+      "name": "netinfo",
+      "category": "system",
+      "description": "Network diagnostics",
+      "script": "scripts/netinfo",
+      "run": "curl -sL ${base_url}/scripts/netinfo | bash"
+    },
+    {
+      "name": "docker-setup",
+      "category": "setup",
+      "description": "Install Docker",
+      "script": "scripts/docker-setup",
+      "run": "curl -sL ${base_url}/scripts/docker-setup | sudo bash"
+    },
+    {
+      "name": "java-setup",
+      "category": "setup",
+      "description": "Install Java (OpenJDK)",
+      "script": "scripts/java-setup",
+      "run": "curl -sL ${base_url}/scripts/java-setup | sudo bash"
+    },
+    {
+      "name": "python-setup",
+      "category": "setup",
+      "description": "Setup Python environment",
+      "script": "scripts/python-setup",
+      "run": "curl -sL ${base_url}/scripts/python-setup | bash"
+    },
+    {
+      "name": "loader",
+      "category": "system",
+      "description": "Command loader utility",
+      "script": "scripts/loader",
+      "run": "curl -sL ${base_url}/scripts/loader | bash -s --"
     }
   ]
 }

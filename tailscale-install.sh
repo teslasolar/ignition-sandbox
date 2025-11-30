@@ -1,16 +1,17 @@
 #!/bin/bash
-# Tailscale installer for WebVM (GitHub Pages sandbox)
-# Run inside WebVM: curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash
+# Tailscale installer for Linux
+# Run: curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash
 set -e
 
 echo '================================================'
-echo '🔗 Installing Tailscale for WebVM...'
+echo '🔗 Installing Tailscale...'
 echo '================================================'
 echo ''
 
-# Check if running in WebVM (Debian-based)
+# Check if Debian-based
 if [ ! -f /etc/debian_version ]; then
-    echo "⚠️  This script is designed for WebVM (Debian)"
+    echo "⚠️  This script is designed for Debian/Ubuntu"
+    echo "For other distros, visit: https://tailscale.com/download"
     exit 1
 fi
 
@@ -25,9 +26,7 @@ apt-get install -y tailscale
 
 echo ''
 echo '🚀 Starting Tailscale daemon...'
-# Start tailscaled in userspace networking mode (required for WebVM/WASM)
-# WebVM doesn't have real kernel networking, so we use userspace mode
-tailscaled --tun=userspace-networking --state=/var/lib/tailscale/tailscaled.state &
+tailscaled --state=/var/lib/tailscale/tailscaled.state &
 sleep 2
 
 echo ''
@@ -51,7 +50,4 @@ echo '   tailscale ip'
 echo ''
 echo '4. From any Tailscale peer, access Ignition:'
 echo '   curl http://<tailscale-ip>:8088/StatusPing'
-echo ''
-echo '💡 Tip: Use an auth key for non-interactive setup'
-echo '   Create at: https://login.tailscale.com/admin/settings/keys'
 echo ''

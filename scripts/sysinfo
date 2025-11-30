@@ -1,0 +1,47 @@
+#!/bin/bash
+# System info and diagnostics
+# curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sysinfo | bash
+
+echo "╔════════════════════════════════════════╗"
+echo "║         System Information             ║"
+echo "╚════════════════════════════════════════╝"
+echo ""
+
+echo "=== OS ==="
+cat /etc/os-release 2>/dev/null | grep -E "^(NAME|VERSION)=" || uname -a
+
+echo ""
+echo "=== Hardware ==="
+echo "CPU: $(nproc) cores"
+echo "RAM: $(free -h 2>/dev/null | awk '/^Mem:/{print $2}' || echo 'N/A')"
+echo "Disk: $(df -h / 2>/dev/null | awk 'NR==2{print $4 " free"}' || echo 'N/A')"
+
+echo ""
+echo "=== Network ==="
+hostname -I 2>/dev/null | awk '{print "IP: " $1}' || echo "IP: N/A"
+curl -s --connect-timeout 3 ifconfig.me 2>/dev/null && echo " (public)" || echo "Public IP: N/A"
+
+echo ""
+echo "=== Services ==="
+if [ -f /opt/ignition/ignition.sh ]; then
+    echo -n "Ignition: "
+    /opt/ignition/ignition.sh status 2>/dev/null | head -1 || echo "installed (status unknown)"
+else
+    echo "Ignition: not installed"
+fi
+
+if command -v tailscale &>/dev/null; then
+    echo -n "Tailscale: "
+    tailscale status 2>/dev/null | head -1 || echo "installed (not connected)"
+else
+    echo "Tailscale: not installed"
+fi
+
+echo ""
+echo "=== Tools ==="
+for cmd in java python3 node docker curl wget git; do
+    if command -v $cmd &>/dev/null; then
+        ver=$($cmd --version 2>&1 | head -1 | cut -c1-50)
+        echo "✓ $cmd: $ver"
+    fi
+done
