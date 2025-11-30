@@ -1,0 +1,12 @@
+id,name,type,cmd,desc
+status,Status,system,./sandbox-cli status,Show system status
+ping,Ping,test,./sandbox-cli ping,Test connectivity
+sync,Sync,test,./sandbox-cli sync,Check sync status
+commands,Commands,system,./sandbox-cli commands,List all commands
+watch,Watch,system,./sandbox-cli watch,Watch for changes
+mcp-list,MCP List,mcp,./sandbox-cli mcp list,List MCP tools
+ts-status,TS Status,tailscale,./sandbox-cli ts status,Tailscale status
+ts-up,TS Up,tailscale,./sandbox-cli ts up,Connect Tailscale
+plc-status,PLC Status,plc,./sandbox-cli plc status,Virtual PLC status
+plc-run,PLC Run,plc,./sandbox-cli plc run,Start PLC scan
+plc-stop,PLC Stop,plc,./sandbox-cli plc stop,Stop PLC

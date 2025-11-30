@@ -1,0 +1,5 @@
+id,name,file,lang,desc
+api,API Wrapper,api-wrapper.py,python,REST API client
+tailscale,Tailscale,tailscale_wrapper.py,python,VPN control
+mcp,MCP Server,mcp-server.json,config,MCP definition
+plc,PLC Bridge,plc-bridge.py,python,Virtual PLC interface
