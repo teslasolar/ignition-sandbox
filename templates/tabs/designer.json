@@ -1,0 +1,17 @@
+{"id":"designer","title":"Perspective Designer","type":"custom","sections":[
+{"type":"cards","items":[
+  {"title":"Visual Designer","href":"screens/designer/","description":"Drag-and-drop view designer"},
+  {"title":"Command Sandbox","href":"screens/sandbox/","description":"Interactive terminal"},
+  {"title":"All Screens","href":"screens/","description":"Browse all screens"}
+]},
+{"title":"Templates","type":"cards","items":[
+  {"title":"Tank Farm","href":"screens/templates/views/tank-farm.json","target":"_blank"},
+  {"title":"Overview","href":"screens/templates/views/overview.json","target":"_blank"},
+  {"title":"Manifest","href":"screens/templates/manifest.json","target":"_blank"}
+]},
+{"title":"Components","type":"commands","items":[
+  {"label":"Tank","code":"screens/templates/components/tank.json"},
+  {"label":"Valve","code":"screens/templates/components/valve.json"},
+  {"label":"Pump","code":"screens/templates/components/pump.json"}
+]}
+]}

@@ -1,472 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ignition Sandbox - Web Terminal</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0d1117;
-            color: #c9d1d9;
-            font-family: 'SF Mono', Consolas, 'Courier New', monospace;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .header {
-            background: #161b22;
-            padding: 8px 15px;
-            border-bottom: 1px solid #30363d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 { font-size: 14px; color: #58a6ff; }
-        .tabs { display: flex; gap: 5px; }
-        .tab {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #8b949e;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .tab:hover, .tab.active { background: #30363d; color: #c9d1d9; }
-        .terminal {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .line { margin-bottom: 2px; }
-        .prompt { color: #3fb950; }
-        .cmd { color: #c9d1d9; }
-        .output { color: #8b949e; white-space: pre-wrap; }
-        .error { color: #f85149; }
-        .success { color: #3fb950; }
-        .info { color: #58a6ff; }
-        .input-line {
-            display: flex;
-            align-items: center;
-            background: #161b22;
-            padding: 10px 15px;
-            border-top: 1px solid #30363d;
-        }
-        .input-prompt {
-            color: #3fb950;
-            margin-right: 8px;
-        }
-        #cmdInput {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #c9d1d9;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-        }
-        .sidebar {
-            position: fixed;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 250px;
-            background: #161b22;
-            border-left: 1px solid #30363d;
-            padding: 15px;
-            transform: translateX(100%);
-            transition: transform 0.2s;
-            overflow-y: auto;
-        }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar h3 { color: #7ee787; font-size: 12px; margin-bottom: 10px; }
-        .sidebar-btn {
-            display: block;
-            width: 100%;
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        .sidebar-btn:hover { background: #30363d; }
-        .sidebar-btn code { color: #7ee787; display: block; margin-top: 3px; }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Web Terminal - Ignition Sandbox</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:monospace;height:100vh;display:flex;flex-direction:column}
+.header{background:#161b22;padding:8px 15px;border-bottom:1px solid #30363d;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:14px;color:#58a6ff}
+.tabs{display:flex;gap:5px}
+.tab{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;text-decoration:none}
+.tab:hover,.tab.active{background:#30363d;color:#c9d1d9}
+.terminal{flex:1;padding:15px;overflow-y:auto;font-size:13px;line-height:1.5}
+.line{margin-bottom:2px}
+.prompt{color:#3fb950}
+.output{color:#8b949e;white-space:pre-wrap}
+.error{color:#f85149}
+.success{color:#3fb950}
+.info{color:#58a6ff}
+.input-line{display:flex;align-items:center;background:#161b22;padding:10px 15px;border-top:1px solid #30363d}
+.input-prompt{color:#3fb950;margin-right:8px}
+#cmdInput{flex:1;background:transparent;border:none;color:#c9d1d9;font-family:inherit;font-size:13px;outline:none}
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:220px;background:#161b22;border-left:1px solid #30363d;padding:12px;transform:translateX(100%);transition:transform 0.2s;overflow-y:auto}
+.sidebar.open{transform:translateX(0)}
+.sidebar h3{color:#7ee787;font-size:11px;margin-bottom:8px}
+.sidebar-btn{display:block;width:100%;background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:6px;margin-bottom:4px;border-radius:4px;text-align:left;cursor:pointer;font-size:10px}
+.sidebar-btn:hover{background:#30363d}
+.sidebar-btn code{color:#7ee787;display:block;margin-top:2px;font-size:10px}
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>Ignition Sandbox Terminal</h1>
-        <div class="tabs">
-            <button class="tab active" onclick="Shell.setMode('sandbox')">Sandbox</button>
-            <button class="tab" onclick="Shell.setMode('ignition')">Ignition</button>
-            <button class="tab" onclick="toggleSidebar()">Commands</button>
-            <a href="./" class="tab">VM</a>
-            <a href="../" class="tab">Back</a>
-        </div>
-    </div>
-
-    <div class="terminal" id="terminal"></div>
-
-    <div class="input-line">
-        <span class="input-prompt">$</span>
-        <input type="text" id="cmdInput" placeholder="Type a command..." autofocus>
-    </div>
-
-    <div class="sidebar" id="sidebar">
-        <h3>Quick Commands</h3>
-        <button class="sidebar-btn" onclick="Shell.run('help')">
-            Help
-            <code>help</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('sysinfo')">
-            System Info
-            <code>sysinfo</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('ls')">
-            List Files
-            <code>ls</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('env')">
-            Environment
-            <code>env</code>
-        </button>
-        <h3>Ignition</h3>
-        <button class="sidebar-btn" onclick="Shell.run('ignition status')">
-            Gateway Status
-            <code>ignition status</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('ignition start')">
-            Start Gateway
-            <code>ignition start</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('ignition install')">
-            Install Gateway
-            <code>ignition install</code>
-        </button>
-        <h3>Network</h3>
-        <button class="sidebar-btn" onclick="Shell.run('ifconfig')">
-            Network Config
-            <code>ifconfig</code>
-        </button>
-        <button class="sidebar-btn" onclick="Shell.run('ping google.com')">
-            Test Connection
-            <code>ping google.com</code>
-        </button>
-    </div>
-
-    <script>
-        const Shell = {
-            mode: 'sandbox',
-            history: [],
-            historyIndex: -1,
-            cwd: '/home/user',
-            env: {
-                USER: 'sandbox',
-                HOME: '/home/user',
-                PATH: '/usr/local/bin:/usr/bin:/bin',
-                SHELL: '/bin/sh',
-                IGNITION_HOME: '/opt/ignition'
-            },
-            fs: {
-                '/': { type: 'dir', children: ['home', 'opt', 'etc', 'usr', 'var', 'tmp'] },
-                '/home': { type: 'dir', children: ['user'] },
-                '/home/user': { type: 'dir', children: ['.bashrc', 'scripts'] },
-                '/home/user/.bashrc': { type: 'file', content: 'export PS1="$ "\nalias ll="ls -la"' },
-                '/home/user/scripts': { type: 'dir', children: ['install.sh'] },
-                '/home/user/scripts/install.sh': { type: 'file', content: '#!/bin/bash\necho "Installing Ignition..."' },
-                '/opt': { type: 'dir', children: ['ignition'] },
-                '/opt/ignition': { type: 'dir', children: ['ignition.sh', 'data'] },
-                '/opt/ignition/ignition.sh': { type: 'file', content: '#!/bin/bash\ncase "$1" in\n  start) echo "Starting...";;\n  stop) echo "Stopping...";;\nesac' },
-                '/etc': { type: 'dir', children: ['hosts', 'passwd'] },
-                '/etc/hosts': { type: 'file', content: '127.0.0.1 localhost\n::1 localhost' },
-                '/tmp': { type: 'dir', children: [] }
-            },
-            ignition: {
-                installed: false,
-                running: false,
-                version: '8.1.33'
-            },
-
-            commands: {
-                help: () => `Available commands:
-  help          Show this help
-  clear         Clear terminal
-  echo [text]   Print text
-  pwd           Print working directory
-  cd [dir]      Change directory
-  ls [dir]      List directory
-  cat [file]    Show file contents
-  mkdir [dir]   Create directory
-  touch [file]  Create file
-  env           Show environment
-  export K=V    Set environment variable
-  sysinfo       System information
-  ifconfig      Network interfaces
-  ping [host]   Ping host
-  curl [url]    Fetch URL
-  ignition      Ignition gateway commands
-  history       Command history
-  exit          Exit shell`,
-
-                clear: () => {
-                    document.getElementById('terminal').innerHTML = '';
-                    return null;
-                },
-
-                echo: (args) => args.join(' '),
-
-                pwd: () => Shell.cwd,
-
-                cd: (args) => {
-                    const target = args[0] || Shell.env.HOME;
-                    const newPath = Shell.resolvePath(target);
-                    if (Shell.fs[newPath]?.type === 'dir') {
-                        Shell.cwd = newPath;
-                        return null;
-                    }
-                    return { error: `cd: ${target}: No such directory` };
-                },
-
-                ls: (args) => {
-                    const path = Shell.resolvePath(args[0] || '.');
-                    const entry = Shell.fs[path];
-                    if (!entry) return { error: `ls: ${path}: No such file or directory` };
-                    if (entry.type === 'file') return path.split('/').pop();
-                    return entry.children.map(c => {
-                        const childPath = path === '/' ? '/' + c : path + '/' + c;
-                        const child = Shell.fs[childPath];
-                        return child?.type === 'dir' ? c + '/' : c;
-                    }).join('  ');
-                },
-
-                cat: (args) => {
-                    if (!args[0]) return { error: 'cat: missing operand' };
-                    const path = Shell.resolvePath(args[0]);
-                    const entry = Shell.fs[path];
-                    if (!entry) return { error: `cat: ${args[0]}: No such file` };
-                    if (entry.type === 'dir') return { error: `cat: ${args[0]}: Is a directory` };
-                    return entry.content;
-                },
-
-                mkdir: (args) => {
-                    if (!args[0]) return { error: 'mkdir: missing operand' };
-                    const path = Shell.resolvePath(args[0]);
-                    if (Shell.fs[path]) return { error: `mkdir: ${args[0]}: File exists` };
-                    Shell.fs[path] = { type: 'dir', children: [] };
-                    const parent = path.substring(0, path.lastIndexOf('/')) || '/';
-                    if (Shell.fs[parent]) Shell.fs[parent].children.push(args[0]);
-                    return null;
-                },
-
-                touch: (args) => {
-                    if (!args[0]) return { error: 'touch: missing operand' };
-                    const path = Shell.resolvePath(args[0]);
-                    if (!Shell.fs[path]) {
-                        Shell.fs[path] = { type: 'file', content: '' };
-                        const parent = path.substring(0, path.lastIndexOf('/')) || '/';
-                        const name = path.split('/').pop();
-                        if (Shell.fs[parent]) Shell.fs[parent].children.push(name);
-                    }
-                    return null;
-                },
-
-                env: () => Object.entries(Shell.env).map(([k,v]) => `${k}=${v}`).join('\n'),
-
-                export: (args) => {
-                    const match = args.join(' ').match(/^(\w+)=(.*)$/);
-                    if (match) {
-                        Shell.env[match[1]] = match[2];
-                        return null;
-                    }
-                    return { error: 'export: invalid syntax' };
-                },
-
-                sysinfo: () => `System Information
-------------------
-OS: Ignition Sandbox Linux
-Kernel: 5.15.0-sandbox
-Arch: x86_64 (emulated)
-Uptime: ${Math.floor((Date.now() - Shell.startTime) / 1000)}s
-Memory: 512 MB
-Browser: ${navigator.userAgent.split(' ').pop()}
-Platform: ${navigator.platform}`,
-
-                ifconfig: () => `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>
-    inet 10.0.2.15  netmask 255.255.255.0
-    inet6 fe80::1  prefixlen 64
-    ether 52:54:00:12:34:56
-
-lo: flags=73<UP,LOOPBACK,RUNNING>
-    inet 127.0.0.1  netmask 255.0.0.0
-    inet6 ::1  prefixlen 128`,
-
-                ping: (args) => {
-                    if (!args[0]) return { error: 'ping: missing host' };
-                    return `PING ${args[0]} (93.184.216.34): 56 data bytes
-64 bytes from 93.184.216.34: icmp_seq=0 ttl=56 time=12.3 ms
-64 bytes from 93.184.216.34: icmp_seq=1 ttl=56 time=11.8 ms
-64 bytes from 93.184.216.34: icmp_seq=2 ttl=56 time=12.1 ms
---- ${args[0]} ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss`;
-                },
-
-                curl: (args) => {
-                    if (!args[0]) return { error: 'curl: missing URL' };
-                    return { info: `Fetching ${args[0]}...\n(Simulated - use browser for real requests)` };
-                },
-
-                ignition: (args) => {
-                    const subcmd = args[0] || 'help';
-                    switch (subcmd) {
-                        case 'status':
-                            if (!Shell.ignition.installed) return { info: 'Ignition Gateway is not installed.\nRun: ignition install' };
-                            return Shell.ignition.running
-                                ? { success: `Ignition Gateway ${Shell.ignition.version} is RUNNING\nWeb UI: http://localhost:8088` }
-                                : { info: `Ignition Gateway ${Shell.ignition.version} is STOPPED\nRun: ignition start` };
-                        case 'start':
-                            if (!Shell.ignition.installed) return { error: 'Ignition not installed. Run: ignition install' };
-                            Shell.ignition.running = true;
-                            return { success: 'Ignition Gateway started.\nWeb UI: http://localhost:8088' };
-                        case 'stop':
-                            Shell.ignition.running = false;
-                            return { info: 'Ignition Gateway stopped.' };
-                        case 'install':
-                            return { info: `Installing Ignition Gateway ${Shell.ignition.version}...
-Downloading: ignition-linux-64.zip [##########] 100%
-Extracting files...
-Configuring gateway...
-Installation complete!
-
-Run 'ignition start' to start the gateway.`, success: true, callback: () => { Shell.ignition.installed = true; }};
-                        default:
-                            return `Ignition Gateway Control
-  ignition status   - Show gateway status
-  ignition start    - Start gateway
-  ignition stop     - Stop gateway
-  ignition install  - Install gateway`;
-                    }
-                },
-
-                history: () => Shell.history.slice(-20).map((c, i) => `${i+1}  ${c}`).join('\n'),
-
-                exit: () => {
-                    Shell.print('Goodbye!', 'info');
-                    setTimeout(() => location.href = '../', 1000);
-                    return null;
-                }
-            },
-
-            startTime: Date.now(),
-
-            resolvePath(path) {
-                if (!path || path === '.') return this.cwd;
-                if (path === '..') {
-                    const parts = this.cwd.split('/').filter(Boolean);
-                    parts.pop();
-                    return '/' + parts.join('/') || '/';
-                }
-                if (path.startsWith('/')) return path;
-                if (path.startsWith('~/')) return this.env.HOME + path.substring(1);
-                return this.cwd === '/' ? '/' + path : this.cwd + '/' + path;
-            },
-
-            print(text, type = '') {
-                const terminal = document.getElementById('terminal');
-                const div = document.createElement('div');
-                div.className = 'line ' + type;
-                div.textContent = text;
-                terminal.appendChild(div);
-                terminal.scrollTop = terminal.scrollHeight;
-            },
-
-            printCommand(cmd) {
-                const terminal = document.getElementById('terminal');
-                const div = document.createElement('div');
-                div.className = 'line';
-                div.innerHTML = `<span class="prompt">$ </span><span class="cmd">${this.escapeHtml(cmd)}</span>`;
-                terminal.appendChild(div);
-            },
-
-            escapeHtml(text) {
-                return text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-            },
-
-            run(input) {
-                const cmd = input.trim();
-                if (!cmd) return;
-
-                this.history.push(cmd);
-                this.historyIndex = this.history.length;
-                this.printCommand(cmd);
-
-                const [name, ...args] = cmd.split(/\s+/);
-                const handler = this.commands[name];
-
-                if (handler) {
-                    const result = handler(args);
-                    if (result === null) return;
-                    if (typeof result === 'object') {
-                        if (result.error) this.print(result.error, 'error');
-                        else if (result.success) this.print(typeof result.success === 'string' ? result.success : result.info, 'success');
-                        else if (result.info) this.print(result.info, 'info');
-                        if (result.callback) result.callback();
-                    } else {
-                        this.print(result, 'output');
-                    }
-                } else {
-                    this.print(`${name}: command not found`, 'error');
-                }
-            },
-
-            setMode(mode) {
-                this.mode = mode;
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                event.target.classList.add('active');
-                this.print(`Switched to ${mode} mode`, 'info');
-            },
-
-            init() {
-                const input = document.getElementById('cmdInput');
-
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        this.run(input.value);
-                        input.value = '';
-                    } else if (e.key === 'ArrowUp') {
-                        if (this.historyIndex > 0) {
-                            this.historyIndex--;
-                            input.value = this.history[this.historyIndex];
-                        }
-                        e.preventDefault();
-                    } else if (e.key === 'ArrowDown') {
-                        if (this.historyIndex < this.history.length - 1) {
-                            this.historyIndex++;
-                            input.value = this.history[this.historyIndex];
-                        } else {
-                            this.historyIndex = this.history.length;
-                            input.value = '';
-                        }
-                        e.preventDefault();
-                    }
-                });
-
-                this.print('Ignition Sandbox Terminal v1.0', 'info');
-                this.print('Type "help" for available commands\n', 'output');
-            }
-        };
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-
-        Shell.init();
-    </script>
+<div class="header"><h1>Terminal</h1><div class="tabs"><button class="tab active" onclick="Shell.setMode('sandbox')">Sandbox</button><button class="tab" onclick="Shell.setMode('ignition')">Ignition</button><button class="tab" onclick="toggleSidebar()">Cmds</button><a href="./" class="tab">VM</a><a href="../" class="tab">Back</a></div></div>
+<div class="terminal" id="terminal"></div>
+<div class="input-line"><span class="input-prompt">$</span><input type="text" id="cmdInput" placeholder="Type command..." autofocus></div>
+<div class="sidebar" id="sidebar">
+<h3>Quick</h3>
+<button class="sidebar-btn" onclick="Shell.run('help')">Help<code>help</code></button>
+<button class="sidebar-btn" onclick="Shell.run('sysinfo')">System<code>sysinfo</code></button>
+<button class="sidebar-btn" onclick="Shell.run('ls')">List<code>ls</code></button>
+<h3>Ignition</h3>
+<button class="sidebar-btn" onclick="Shell.run('ignition status')">Status<code>ignition status</code></button>
+<button class="sidebar-btn" onclick="Shell.run('ignition start')">Start<code>ignition start</code></button>
+<button class="sidebar-btn" onclick="Shell.run('ignition install')">Install<code>ignition install</code></button>
+<h3>Network</h3>
+<button class="sidebar-btn" onclick="Shell.run('ifconfig')">Config<code>ifconfig</code></button>
+<button class="sidebar-btn" onclick="Shell.run('ping google.com')">Ping<code>ping google.com</code></button>
+</div>
+<script>
+const Shell={mode:'sandbox',history:[],historyIndex:-1,cwd:'/home/user',startTime:Date.now(),
+env:{USER:'sandbox',HOME:'/home/user',PATH:'/usr/bin:/bin',IGNITION_HOME:'/opt/ignition'},
+fs:{'/': {type:'dir',children:['home','opt','etc','tmp']},'/home':{type:'dir',children:['user']},'/home/user':{type:'dir',children:['.bashrc','scripts']},'/home/user/.bashrc':{type:'file',content:'export PS1="$ "'},'/home/user/scripts':{type:'dir',children:['install.sh']},'/opt':{type:'dir',children:['ignition']},'/opt/ignition':{type:'dir',children:['ignition.sh']},'/etc':{type:'dir',children:['hosts']},'/etc/hosts':{type:'file',content:'127.0.0.1 localhost'},'/tmp':{type:'dir',children:[]}},
+ignition:{installed:false,running:false,version:'8.1.33'},
+commands:{
+help:()=>`Commands: help clear echo pwd cd ls cat mkdir touch env sysinfo ifconfig ping ignition history exit`,
+clear:()=>{document.getElementById('terminal').innerHTML='';return null},
+echo:(a)=>a.join(' '),
+pwd:()=>Shell.cwd,
+cd:(a)=>{const t=a[0]||Shell.env.HOME,p=Shell.resolvePath(t);if(Shell.fs[p]?.type==='dir'){Shell.cwd=p;return null}return{error:`cd: ${t}: No such directory`}},
+ls:(a)=>{const p=Shell.resolvePath(a[0]||'.'),e=Shell.fs[p];if(!e)return{error:`ls: not found`};if(e.type==='file')return p.split('/').pop();return e.children.map(c=>{const cp=p==='/'?'/'+c:p+'/'+c;return Shell.fs[cp]?.type==='dir'?c+'/':c}).join('  ')},
+cat:(a)=>{if(!a[0])return{error:'cat: missing file'};const p=Shell.resolvePath(a[0]),e=Shell.fs[p];if(!e)return{error:'cat: not found'};if(e.type==='dir')return{error:'cat: is directory'};return e.content},
+mkdir:(a)=>{if(!a[0])return{error:'mkdir: missing name'};const p=Shell.resolvePath(a[0]);if(Shell.fs[p])return{error:'mkdir: exists'};Shell.fs[p]={type:'dir',children:[]};return null},
+touch:(a)=>{if(!a[0])return{error:'touch: missing name'};const p=Shell.resolvePath(a[0]);if(!Shell.fs[p])Shell.fs[p]={type:'file',content:''};return null},
+env:()=>Object.entries(Shell.env).map(([k,v])=>`${k}=${v}`).join('\n'),
+sysinfo:()=>`OS: Ignition Sandbox\nKernel: 5.15.0\nArch: x86_64\nUptime: ${Math.floor((Date.now()-Shell.startTime)/1000)}s\nMemory: 512MB`,
+ifconfig:()=>`eth0: inet 10.0.2.15 netmask 255.255.255.0\nlo: inet 127.0.0.1`,
+ping:(a)=>a[0]?`PING ${a[0]}\n64 bytes: time=12ms\n64 bytes: time=11ms\n3 packets, 0% loss`:{error:'ping: missing host'},
+ignition:(a)=>{const s=a[0]||'help';if(s==='status')return Shell.ignition.installed?(Shell.ignition.running?{success:`Gateway ${Shell.ignition.version} RUNNING\nhttp://localhost:8088`}:{info:'Gateway STOPPED'}):{info:'Not installed. Run: ignition install'};if(s==='start'){if(!Shell.ignition.installed)return{error:'Not installed'};Shell.ignition.running=true;return{success:'Gateway started'}}if(s==='stop'){Shell.ignition.running=false;return{info:'Gateway stopped'}}if(s==='install'){Shell.ignition.installed=true;return{success:'Installing...\nDownload [##########] 100%\nInstalled! Run: ignition start'}}return'ignition [status|start|stop|install]'},
+history:()=>Shell.history.slice(-10).map((c,i)=>`${i+1} ${c}`).join('\n'),
+exit:()=>{Shell.print('Goodbye!','info');setTimeout(()=>location.href='../',1000);return null}
+},
+resolvePath(p){if(!p||p==='.')return this.cwd;if(p==='..')return'/'+this.cwd.split('/').filter(Boolean).slice(0,-1).join('/')||'/';if(p.startsWith('/'))return p;if(p.startsWith('~/'))return this.env.HOME+p.substring(1);return this.cwd==='/'?'/'+p:this.cwd+'/'+p},
+print(t,c=''){const term=document.getElementById('terminal'),d=document.createElement('div');d.className='line '+c;d.textContent=t;term.appendChild(d);term.scrollTop=term.scrollHeight},
+printCmd(c){const term=document.getElementById('terminal'),d=document.createElement('div');d.className='line';d.innerHTML=`<span class="prompt">$ </span>${c.replace(/[<>&]/g,x=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[x]))}`;term.appendChild(d)},
+run(input){const cmd=input.trim();if(!cmd)return;this.history.push(cmd);this.historyIndex=this.history.length;this.printCmd(cmd);const[name,...args]=cmd.split(/\s+/),h=this.commands[name];if(h){const r=h(args);if(r===null)return;if(typeof r==='object'){if(r.error)this.print(r.error,'error');else if(r.success)this.print(r.success,'success');else if(r.info)this.print(r.info,'info')}else this.print(r,'output')}else this.print(`${name}: not found`,'error')},
+setMode(m){this.mode=m;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');this.print(`Mode: ${m}`,'info')},
+init(){const input=document.getElementById('cmdInput');input.addEventListener('keydown',e=>{if(e.key==='Enter'){this.run(input.value);input.value=''}else if(e.key==='ArrowUp'&&this.historyIndex>0){this.historyIndex--;input.value=this.history[this.historyIndex];e.preventDefault()}else if(e.key==='ArrowDown'){if(this.historyIndex<this.history.length-1){this.historyIndex++;input.value=this.history[this.historyIndex]}else{this.historyIndex=this.history.length;input.value=''}e.preventDefault()}});this.print('Terminal v1.0 - Type "help"','info')}
+};
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+Shell.init();
+</script>
 </body>
 </html>

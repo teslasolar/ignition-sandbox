@@ -1,0 +1,18 @@
+{"name":"VM Sandbox","type":"module","parent":"/",
+"description":"Browser-based Linux environment powered by v86",
+"images":[
+  {"id":"buildroot","name":"Buildroot Linux","memory":256,"boot":"~5s","size":"~15MB","recommended":true},
+  {"id":"alpine","name":"Alpine Linux","memory":512,"boot":"~15s","size":"~50MB"},
+  {"id":"arch","name":"Arch Linux","memory":512,"boot":"~20s","size":"~60MB"}
+],
+"commands":[
+  {"label":"System Info","code":"uname -a"},
+  {"label":"Memory","code":"free -h"},
+  {"label":"Disk","code":"df -h"},
+  {"label":"Processes","code":"ps aux"},
+  {"label":"Network","code":"ifconfig"},
+  {"label":"Ignition Status","code":"ignition status"},
+  {"label":"Ignition Install","code":"ignition install"}
+],
+"features":["x86 emulation","Virtual filesystem","Ignition gateway simulation","Network simulation"],
+"children":["lib","boot"]}

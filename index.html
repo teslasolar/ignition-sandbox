@@ -1,411 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ignition Sandbox</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            padding: 40px 20px;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 { color: #58a6ff; margin-bottom: 10px; }
-        h2 { color: #7ee787; margin: 30px 0 15px; font-size: 18px; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
-        h3 { color: #f0f6fc; font-size: 14px; margin: 15px 0 10px; }
-        p { color: #8b949e; margin-bottom: 15px; }
-        a { color: #58a6ff; }
-
-        .cmd {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 12px 15px;
-            margin: 8px 0;
-            position: relative;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .cmd:hover { border-color: #58a6ff; }
-        .cmd code {
-            display: block;
-            color: #7ee787;
-            font-family: 'SF Mono', Consolas, monospace;
-            font-size: 13px;
-            word-break: break-all;
-        }
-        .cmd .label {
-            color: #c9d1d9;
-            font-size: 13px;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        .cmd .desc {
-            color: #8b949e;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-        .cmd button {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        .cmd button:hover { background: #30363d; }
-        .cmd button.copied { background: #238636; border-color: #238636; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin: 15px 0;
-        }
-        .card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-        }
-        .card h4 { color: #f0f6fc; font-size: 14px; margin-bottom: 6px; }
-        .card p { font-size: 13px; margin: 0; }
-        .card code { color: #7ee787; font-size: 12px; }
-
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-        .tab {
-            background: #21262d;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            padding: 6px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .tab:hover, .tab.active { background: #30363d; border-color: #58a6ff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .footer { margin-top: 40px; color: #8b949e; font-size: 13px; text-align: center; }
-    </style>
+<html><head><meta charset="UTF-8">
+<title>Konomi IgnAIte v1.0 | Browser Ignition OS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}
+body{background:#0d1117;color:#c9d1d9;overflow:hidden}
+.boot{position:fixed;inset:0;background:#0d1117;padding:20px;font-size:12px;z-index:9999;overflow-y:auto}
+.logo-boot{color:#f97316;font-size:9px;margin-bottom:15px;white-space:pre;line-height:1.1}
+.bline{margin:2px 0;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.bline.ok{color:#3fb950}
+.bline.warn{color:#f0883e}
+.bline.err{color:#f85149}
+.cur{animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.os{display:none;width:100vw;height:100vh}
+.os.active{display:grid;grid-template-rows:40px 1fr 24px}
+.tb{background:#161b22;border-bottom:2px solid #f97316;padding:8px 15px;display:flex;align-items:center;gap:15px}
+.logo{font-size:15px;font-weight:700;color:#f97316;text-shadow:0 0 8px rgba(249,115,22,.5)}
+.menu{display:flex;gap:6px}
+.mi{padding:5px 12px;background:rgba(249,115,22,.1);border:1px solid #f97316;border-radius:4px;cursor:pointer;font-size:11px;color:#c9d1d9;transition:all .2s}
+.mi:hover{background:rgba(249,115,22,.2);box-shadow:0 0 8px rgba(249,115,22,.3)}
+.mi.active{background:#f97316;color:#000}
+.desk{display:grid;grid-template-columns:220px 1fr 260px;gap:2px;background:#0d1117;padding:2px}
+.pan{background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:4px;overflow-y:auto}
+.pan::-webkit-scrollbar{width:4px}
+.pan::-webkit-scrollbar-thumb{background:#f97316;border-radius:2px}
+.pt{background:linear-gradient(135deg,#f97316,#ea580c);color:#000;padding:6px 10px;font-weight:700;font-size:10px}
+.pc{padding:8px;font-size:10px}
+.sb{background:#161b22;border-top:1px solid #30363d;padding:4px 15px;display:flex;justify-content:space-between;font-size:9px;color:#8b949e}
+.tree{list-style:none}
+.tree li{padding:3px 0 3px 14px;cursor:pointer;position:relative;font-size:10px;border-left:1px solid #30363d;margin-left:8px}
+.tree li:before{content:"📁";position:absolute;left:-2px;font-size:8px}
+.tree li.f:before{content:"📄"}
+.tree li.vm:before{content:"💻"}
+.tree li.tpl:before{content:"📋"}
+.tree li:hover{background:rgba(249,115,22,.1);color:#f97316}
+.tree>li{border-left:none;margin-left:0}
+.cv{background:#000;border-radius:4px;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.cv-inner{text-align:center}
+.cv h2{color:#f97316;margin-bottom:10px}
+.cv p{color:#8b949e;font-size:11px;margin-bottom:15px}
+.cv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px}
+.cv-card{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px;text-align:center;cursor:pointer;transition:all .2s}
+.cv-card:hover{border-color:#f97316;transform:translateY(-2px)}
+.cv-card.hl{border-color:#3fb950}
+.cv-card h4{color:#c9d1d9;font-size:12px;margin-bottom:5px}
+.cv-card p{color:#8b949e;font-size:9px;margin:0}
+.cv-card .icon{font-size:24px;margin-bottom:8px}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.stat-box{background:rgba(249,115,22,.08);border:1px solid #30363d;padding:8px;border-radius:4px;text-align:center}
+.stat-label{font-size:8px;color:#8b949e;text-transform:uppercase}
+.stat-val{font-size:14px;color:#f97316;font-weight:700}
+.cmd{background:#000;border:1px solid #30363d;border-radius:4px;padding:6px;margin:4px 0;cursor:pointer;font-size:9px}
+.cmd:hover{border-color:#f97316}
+.cmd .label{color:#f97316;margin-bottom:2px}
+.cmd code{color:#3fb950;font-size:9px}
+.term{background:#000;border:1px solid #30363d;border-radius:4px;padding:8px;height:150px;overflow-y:auto;font-size:9px;color:#3fb950}
+.term .ln{margin:2px 0}
+.term .pr{color:#f97316}
+.bp{width:100%;height:4px;background:#21262d;margin:10px 0;border-radius:2px;overflow:hidden}
+.bpf{height:100%;background:linear-gradient(90deg,#f97316,#3fb950);width:0;transition:width .3s}
+.btn{background:#f97316;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:700;margin:3px}
+.btn:hover{background:#ea580c}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Ignition Sandbox</h1>
-        <p>Command reference for Linux environments. Click any command to copy.</p>
+<div class="boot" id="boot">
+<pre class="logo-boot">
+ ██╗  ██╗ ██████╗ ███╗   ██╗ ██████╗ ███╗   ███╗██╗
+ ██║ ██╔╝██╔═══██╗████╗  ██║██╔═══██╗████╗ ████║██║
+ █████╔╝ ██║   ██║██╔██╗ ██║██║   ██║██╔████╔██║██║
+ ██╔═██╗ ██║   ██║██║╚██╗██║██║   ██║██║╚██╔╝██║██║
+ ██║  ██╗╚██████╔╝██║ ╚████║╚██████╔╝██║ ╚═╝ ██║██║
+ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝╚═╝
+    IgnAIte v1.0 | Browser-Based Ignition Sandbox
+</pre>
+<div id="bo"></div>
+<div class="bp"><div class="bpf" id="bb"></div></div>
+<div><span class="cur">█</span></div>
+</div>
 
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('ignition')">Ignition</button>
-            <button class="tab" onclick="showTab('tailscale')">Tailscale</button>
-            <button class="tab" onclick="showTab('system')">System</button>
-            <button class="tab" onclick="showTab('setup')">Setup</button>
-            <button class="tab" onclick="showTab('designer')">Designer</button>
-            <button class="tab" onclick="showTab('vm')" style="background:#238636;border-color:#238636;">VM Sandbox</button>
-        </div>
+<div class="os" id="os">
+<div class="tb">
+<div class="logo">🔥 KONOMI IgnAIte</div>
+<div class="menu">
+<div class="mi active" onclick="K.view('home')">🏠 Home</div>
+<div class="mi" onclick="K.view('vm')">💻 VM</div>
+<div class="mi" onclick="K.view('designer')">🎨 Designer</div>
+<div class="mi" onclick="K.view('cli')">⌨️ CLI</div>
+<div class="mi" onclick="K.view('templates')">📋 Templates</div>
+</div>
+<div style="margin-left:auto;color:#8b949e;font-size:10px">
+<span id="time"></span> | v1.0
+</div>
+</div>
 
-        <div id="ignition" class="tab-content active">
-            <h2>Ignition Gateway</h2>
+<div class="desk">
+<div class="pan">
+<div class="pt">📁 REPOSITORY</div>
+<div class="pc">
+<ul class="tree" id="tree"></ul>
+<div style="margin-top:10px">
+<button class="btn" onclick="K.action('refresh')">↻ Refresh</button>
+</div>
+</div>
+</div>
 
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Ignition</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
-                <button>Copy</button>
-            </div>
+<div class="pan">
+<div class="pt" id="cvTitle">🏠 KONOMI IgnAIte</div>
+<div class="cv" id="cv"></div>
+</div>
 
-            <h3>Control</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Start</div>
-                    <code>/opt/ignition/ignition.sh start</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Stop</div>
-                    <code>/opt/ignition/ignition.sh stop</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Restart</div>
-                    <code>/opt/ignition/ignition.sh restart</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Status</div>
-                    <code>/opt/ignition/ignition.sh status</code>
-                    <button>Copy</button>
-                </div>
-            </div>
+<div class="pan">
+<div class="pt">⚡ QUICK ACTIONS</div>
+<div class="pc">
+<div class="stat">
+<div class="stat-box"><div class="stat-label">Modules</div><div class="stat-val" id="mods">4</div></div>
+<div class="stat-box"><div class="stat-label">Templates</div><div class="stat-val" id="tpls">6</div></div>
+</div>
+<div id="cmds"></div>
+<div class="term" id="term">
+<div class="ln"><span class="pr">ignite$</span> system boot</div>
+<div class="ln">Konomi IgnAIte ready</div>
+</div>
+</div>
+</div>
+</div>
 
-            <h3>Access</h3>
-            <div class="card">
-                <h4>Web Interface</h4>
-                <p><code>http://localhost:8088</code></p>
-                <p>Login: <strong>admin</strong> / <strong>password</strong></p>
-            </div>
-        </div>
+<div class="sb">
+<div>Ignition Gateway • Perspective • v86 VM • GitHub Pages</div>
+<div>Repo: <span style="color:#f97316">teslasolar/ignition-sandbox</span></div>
+</div>
+</div>
 
-        <div id="tailscale" class="tab-content">
-            <h2>Tailscale VPN</h2>
+<script>
+const K={
+data:{},current:'home',
+async boot(){
+const lines=['Init Konomi IgnAIte...','Load index.json...','Mount /templates...','Init v86-lite VM...','Load Perspective...','Start gateway sim...','Connect GitHub Pages...','All systems ready.'];
+let i=0;const ou=document.getElementById('bo'),ba=document.getElementById('bb');
+const iv=setInterval(()=>{if(i<lines.length){const l=document.createElement('div');l.className='bline ok';l.textContent='[  OK  ] '+lines[i];ou.appendChild(l);ba.style.width=((i+1)/lines.length*100)+'%';i++}else{clearInterval(iv);setTimeout(()=>{document.getElementById('boot').style.display='none';document.getElementById('os').classList.add('active');this.init()},600)}},180)},
 
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Tailscale</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
-                <button>Copy</button>
-            </div>
+async init(){
+try{this.data.root=await this.load('index.json')}catch(e){this.data.root={name:'Konomi IgnAIte',children:['cli','screens','vm','templates']}}
+this.renderTree();this.view('home');this.clock();this.log('System initialized')},
 
-            <h3>Commands</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Connect</div>
-                    <code>tailscale up</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Status</div>
-                    <code>tailscale status</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Get IP</div>
-                    <code>tailscale ip -4</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Disconnect</div>
-                    <code>tailscale down</code>
-                    <button>Copy</button>
-                </div>
-            </div>
+async load(p){const r=await fetch(p);return r.ok?r.json():null},
 
-            <h3>With Auth Key</h3>
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Connect with auth key</div>
-                <code>tailscale up --authkey=tskey-YOUR-KEY</code>
-                <button>Copy</button>
-            </div>
-        </div>
+renderTree(){
+const tree=document.getElementById('tree');
+const items=[
+{name:'/',children:[
+{name:'cli/',cls:'',children:[{name:'commands/',cls:'f'},{name:'wrappers/',cls:'f'}]},
+{name:'screens/',cls:'',children:[{name:'designer/',cls:'f'},{name:'templates/',cls:'tpl'}]},
+{name:'vm/',cls:'vm',children:[{name:'lib/',cls:'f'},{name:'boot/',cls:'f'}]},
+{name:'templates/',cls:'tpl',children:[{name:'commands/',cls:'f'},{name:'tabs/',cls:'f'}]},
+{name:'index.json',cls:'f'},
+{name:'index.html',cls:'f'}
+]}];
+const render=(list,ul)=>{list.forEach(it=>{const li=document.createElement('li');li.className=it.cls||'';li.textContent=it.name;li.onclick=(e)=>{e.stopPropagation();this.select(it.name)};if(it.children){const sub=document.createElement('ul');sub.className='tree';render(it.children,sub);li.appendChild(sub)}ul.appendChild(li)})};
+tree.innerHTML='';render(items,tree)},
 
-        <div id="system" class="tab-content">
-            <h2>System Tools</h2>
+select(name){this.log('Selected: '+name);if(name.includes('vm'))this.view('vm');else if(name.includes('designer')||name.includes('screens'))this.view('designer');else if(name.includes('cli'))this.view('cli');else if(name.includes('templates'))this.view('templates')},
 
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">System Info</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sysinfo | bash</code>
-                <div class="desc">OS, hardware, services, installed tools</div>
-                <button>Copy</button>
-            </div>
+view(v){
+this.current=v;
+document.querySelectorAll('.mi').forEach(m=>m.classList.remove('active'));
+document.querySelector(`.mi[onclick*="${v}"]`)?.classList.add('active');
+const cv=document.getElementById('cv'),title=document.getElementById('cvTitle'),cmds=document.getElementById('cmds');
+const views={
+home:{title:'🏠 KONOMI IgnAIte',content:`<div class="cv-inner"><h2>🔥 Konomi IgnAIte</h2><p>Browser-based Ignition Gateway sandbox with custom OS</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">💻</div><h4>VM Sandbox</h4><p>Boot Linux in browser</p></div><div class="cv-card" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Designer</h4><p>Perspective views</p></div><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">⌨️</div><h4>CLI Tools</h4><p>Command framework</p></div><div class="cv-card" onclick="K.nav('screens/templates/')"><div class="icon">📋</div><h4>Templates</h4><p>JSON components</p></div><div class="cv-card" onclick="K.nav('screens/')"><div class="icon">📊</div><h4>Screens</h4><p>All screens</p></div><div class="cv-card" onclick="window.open('https://github.com/teslasolar/ignition-sandbox')"><div class="icon">🐙</div><h4>GitHub</h4><p>Source code</p></div></div>`,cmds:[{l:'Launch VM',c:'vm/'},{l:'Open Designer',c:'screens/designer/'}]},
+vm:{title:'💻 VM SANDBOX',content:`<div class="cv-inner"><h2>💻 Browser VM</h2><p>v86-lite x86 emulator - No external dependencies</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">🚀</div><h4>Launch VM</h4><p>Boot Linux now</p></div><div class="cv-card" onclick="K.nav('vm/terminal.html')"><div class="icon">>_</div><h4>Terminal</h4><p>Web terminal</p></div><div class="cv-card"><div class="icon">📦</div><h4>Alpine</h4><p>~50MB, ~15s boot</p></div></div>`,cmds:[{l:'ignition status',c:'ignition status'},{l:'ignition install',c:'ignition install'}]},
+designer:{title:'🎨 PERSPECTIVE DESIGNER',content:`<div class="cv-inner"><h2>🎨 Designer</h2><p>Visual Perspective view builder with JSON export</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Open Designer</h4><p>Drag & drop views</p></div><div class="cv-card" onclick="K.nav('screens/templates/views/tank-farm.json')"><div class="icon">🏭</div><h4>Tank Farm</h4><p>Example view</p></div><div class="cv-card" onclick="K.nav('screens/sandbox/')"><div class="icon">>_</div><h4>Sandbox</h4><p>Command runner</p></div></div>`,cmds:[{l:'Tank Component',c:'screens/templates/components/tank.json'},{l:'Valve Component',c:'screens/templates/components/valve.json'}]},
+cli:{title:'⌨️ CLI TOOLS',content:`<div class="cv-inner"><h2>⌨️ CLI Framework</h2><p>Command-line testing tools</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">📖</div><h4>Documentation</h4><p>CLI reference</p></div><div class="cv-card"><div class="icon">🔌</div><h4>API Wrapper</h4><p>HTTP client</p></div><div class="cv-card"><div class="icon">🔗</div><h4>MCP Tools</h4><p>MCP integration</p></div></div>`,cmds:[{l:'sandbox-cli ping',c:'./cli/sandbox-cli ping'},{l:'sandbox-cli sync',c:'./cli/sandbox-cli sync'}]},
+templates:{title:'📋 TEMPLATES',content:`<div class="cv-inner"><h2>📋 JSON Templates</h2><p>Perspective components, symbols, and views</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('screens/templates/')"><div class="icon">📁</div><h4>Browse All</h4><p>Template library</p></div><div class="cv-card" onclick="K.nav('templates/')"><div class="icon">⚙️</div><h4>Commands</h4><p>Command JSONs</p></div><div class="cv-card" onclick="K.nav('screens/templates/manifest.json')"><div class="icon">📜</div><h4>Manifest</h4><p>Full catalog</p></div></div>`,cmds:[{l:'View manifest',c:'templates/manifest.json'}]}
+};
+const vw=views[v]||views.home;
+title.textContent=vw.title;
+cv.innerHTML=vw.content;
+cmds.innerHTML=vw.cmds.map(c=>`<div class="cmd" onclick="K.copy('${c.c}')"><div class="label">${c.l}</div><code>${c.c}</code></div>`).join('')},
 
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Network Diagnostics</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/netinfo | bash</code>
-                <div class="desc">Interfaces, DNS, connectivity, open ports</div>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Command Loader</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/loader | bash -s -- list</code>
-                <div class="desc">List and run commands from manifest</div>
-                <button>Copy</button>
-            </div>
-        </div>
-
-        <div id="setup" class="tab-content">
-            <h2>Environment Setup</h2>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Full Setup (Ignition + Tailscale)</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Docker</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | sudo bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Java (OpenJDK 17)</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | sudo bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Setup Python Environment</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash</code>
-                <button>Copy</button>
-            </div>
-        </div>
-
-        <div id="vm" class="tab-content">
-            <h2>Browser VM Sandbox</h2>
-            <p>Run a real Linux VM directly in your browser. No installation required.</p>
-
-            <div class="grid">
-                <div class="card" style="border-color:#238636;">
-                    <h4><a href="vm/" style="color:#3fb950;">Launch VM Sandbox</a></h4>
-                    <p>Boot Alpine/Debian Linux in browser using v86 emulator</p>
-                </div>
-                <div class="card">
-                    <h4>How it Works</h4>
-                    <p>Uses v86 (JS x86 emulator) to run real Linux. State saves to browser storage.</p>
-                </div>
-            </div>
-
-            <h3>Available Images</h3>
-            <div class="grid">
-                <div class="card">
-                    <h4>Alpine Linux</h4>
-                    <p>~50MB, fast boot (~10s), minimal</p>
-                    <code>Recommended for quick testing</code>
-                </div>
-                <div class="card">
-                    <h4>Debian</h4>
-                    <p>~200MB, slower boot (~30s), full environment</p>
-                    <code>Better for Ignition install</code>
-                </div>
-                <div class="card">
-                    <h4>Buildroot</h4>
-                    <p>~20MB, fastest boot (~5s), ultra minimal</p>
-                    <code>For basic testing only</code>
-                </div>
-            </div>
-
-            <h3>Requirements</h3>
-            <div class="card">
-                <p>Modern browser with WebAssembly support (Chrome 90+, Firefox 85+, Safari 14+)</p>
-                <p>~500MB RAM available for browser tab</p>
-                <p>IndexedDB for persistent storage</p>
-            </div>
-        </div>
-
-        <div id="designer" class="tab-content">
-            <h2>Perspective Designer</h2>
-
-            <div class="grid">
-                <div class="card">
-                    <h4><a href="screens/designer/">Visual Designer</a></h4>
-                    <p>Drag-and-drop Perspective view designer with JSON export</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/sandbox/">Command Sandbox</a></h4>
-                    <p>Interactive terminal for loading templates</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/">All Screens</a></h4>
-                    <p>Browse all available screens and tools</p>
-                </div>
-            </div>
-
-            <h3>Templates</h3>
-            <div class="grid">
-                <div class="card">
-                    <h4><a href="screens/templates/views/tank-farm.json" target="_blank">Tank Farm</a></h4>
-                    <p>Industrial tank distribution view</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/templates/views/overview.json" target="_blank">Overview</a></h4>
-                    <p>Basic overview layout template</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/templates/manifest.json" target="_blank">Manifest</a></h4>
-                    <p>Full template catalog</p>
-                </div>
-            </div>
-
-            <h3>Components</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Tank Component</div>
-                    <code>screens/templates/components/tank.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Valve Component</div>
-                    <code>screens/templates/components/valve.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Pump Component</div>
-                    <code>screens/templates/components/pump.json</code>
-                    <button>Copy</button>
-                </div>
-            </div>
-
-            <h3>Symbols</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Hopper Feeder</div>
-                    <code>screens/templates/symbols/hopper.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Belt Conveyor</div>
-                    <code>screens/templates/symbols/belt.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Screw Conveyor</div>
-                    <code>screens/templates/symbols/screw.json</code>
-                    <button>Copy</button>
-                </div>
-            </div>
-        </div>
-
-        <h2>Resources</h2>
-        <div class="grid">
-            <div class="card" style="border-color:#238636;">
-                <h4><a href="vm/" style="color:#3fb950;">VM Sandbox</a></h4>
-                <p>Browser-based Linux VM</p>
-            </div>
-            <div class="card">
-                <h4><a href="screens/">Screens</a></h4>
-                <p>Designer and templates</p>
-            </div>
-            <div class="card">
-                <h4><a href="cli/">CLI Tools</a></h4>
-                <p>Python CLI and wrappers</p>
-            </div>
-            <div class="card">
-                <h4><a href="https://github.com/teslasolar/ignition-sandbox">GitHub</a></h4>
-                <p>Source code</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>All scripts fetch from this repo and run on Debian/Ubuntu Linux.</p>
-        </div>
-    </div>
-
-    <script>
-        function copyCode(el) {
-            const code = el.querySelector('code').textContent;
-            const btn = el.querySelector('button');
-            navigator.clipboard.writeText(code).then(() => {
-                btn.textContent = 'Copied!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = 'Copy';
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        }
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
-        }
-    </script>
+nav(url){this.log('Navigate: '+url);location.href=url},
+copy(txt){navigator.clipboard.writeText(txt);this.log('Copied: '+txt)},
+action(a){this.log('Action: '+a);if(a==='refresh')location.reload()},
+log(m){const t=document.getElementById('term'),ln=document.createElement('div');ln.className='ln';ln.innerHTML=`<span class="pr">ignite$</span> ${m}`;t.appendChild(ln);t.scrollTop=t.scrollHeight;if(t.children.length>30)t.removeChild(t.children[0])},
+clock(){setInterval(()=>{document.getElementById('time').textContent=new Date().toLocaleTimeString()},1000)}
+};
+K.boot();
+</script>
 </body>
 </html>

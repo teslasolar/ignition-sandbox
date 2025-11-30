@@ -1,0 +1,10 @@
+{"id":"tailscale","title":"Tailscale VPN","commands":[
+{"label":"Install Tailscale","code":"curl -fsSL https://tailscale.com/install.sh | sh"},
+{"label":"Start Tailscale","code":"sudo tailscale up"},
+{"label":"Check Status","code":"tailscale status"},
+{"label":"Get IP Address","code":"tailscale ip -4"},
+{"label":"Disconnect","code":"sudo tailscale down"},
+{"label":"Enable SSH","code":"sudo tailscale up --ssh"},
+{"label":"Share Exit Node","code":"sudo tailscale up --advertise-exit-node"},
+{"label":"Use Exit Node","code":"sudo tailscale up --exit-node=<node-ip>"}
+]}

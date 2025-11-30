@@ -1,0 +1,11 @@
+{"id":"vm","title":"Browser VM Sandbox","type":"custom","description":"Run Linux in browser. No install required.","sections":[
+{"type":"cards","items":[
+  {"title":"Launch VM","href":"vm/","description":"Boot Linux with v86 emulator","highlight":true},
+  {"title":"How it Works","description":"JS x86 emulator. State saves to browser."}
+]},
+{"title":"Images","type":"cards","items":[
+  {"title":"Alpine","description":"~50MB, ~10s boot","note":"Recommended"},
+  {"title":"Debian","description":"~200MB, ~30s boot","note":"Full environment"},
+  {"title":"Buildroot","description":"~20MB, ~5s boot","note":"Minimal"}
+]}
+]}

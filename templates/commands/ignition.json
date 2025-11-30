@@ -1,0 +1,11 @@
+{"id":"ignition","title":"Ignition Gateway","commands":[
+{"label":"Install Ignition","code":"curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash"},
+{"label":"Start Gateway","code":"sudo systemctl start ignition"},
+{"label":"Stop Gateway","code":"sudo systemctl stop ignition"},
+{"label":"Restart Gateway","code":"sudo systemctl restart ignition"},
+{"label":"Gateway Status","code":"sudo systemctl status ignition"},
+{"label":"View Logs","code":"tail -f /var/log/ignition/wrapper.log"},
+{"label":"Gateway Web UI","code":"http://localhost:8088","type":"link"},
+{"label":"Backup Gateway","code":"sudo /usr/local/bin/ignition/gwcmd --backup /tmp/gateway.gwbk"},
+{"label":"Restore Gateway","code":"sudo /usr/local/bin/ignition/gwcmd --restore /tmp/gateway.gwbk"}
+]}
