@@ -161,7 +161,7 @@
                 </div>
 
                 <h3>1. Copy this command:</h3>
-                <code id="installCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/claude/ignition-browser-sandbox-01NvmpKvr4EosK7GoU2msPkK/ignition-install.sh | sudo bash</code>
+                <code id="installCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
                 <button class="copy-btn" onclick="copyCommand()">📋 Copy Command</button>
 
                 <h3>2. Paste in terminal →</h3>
@@ -189,6 +189,30 @@
                     <p><strong>💡 Tip:</strong> Installation only needed once. Data persists in browser cache!</p>
                 </div>
 
+                <h2 style="margin-top: 25px; border-top: 1px solid #444; padding-top: 15px;">Remote Access (Tailscale)</h2>
+
+                <p>Connect to this sandbox from any device on your Tailnet:</p>
+
+                <h3>Full Setup (Ignition + Tailscale):</h3>
+                <code id="fullSetupCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash -s -- tskey-YOUR-KEY</code>
+                <button class="copy-btn" onclick="copyFullSetup()" style="background: #6b5b95;">📋 Copy Full Setup</button>
+
+                <h3>Or add Tailscale to existing:</h3>
+                <code id="tailscaleCmd">curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
+                <button class="copy-btn" onclick="copyTailscale()" style="background: #5b8c6b;">📋 Copy Tailscale Only</button>
+
+                <div class="status" style="margin-top: 15px; border-color: #6b5b95;">
+                    <p><strong>🔗 How it works:</strong></p>
+                    <p style="font-size: 12px;">1. Tailscale runs inside WebVM<br>
+                    2. Connects to your Tailnet<br>
+                    3. Access Ignition from any peer:<br>
+                    <code style="display: inline; padding: 2px 4px;">http://&lt;tailscale-ip&gt;:8088</code></p>
+                </div>
+
+                <p style="font-size: 11px; color: #888; margin-top: 10px;">
+                    Get auth key: <a href="https://login.tailscale.com/admin/settings/keys" target="_blank" style="color: #00bcf2;">Tailscale Admin</a>
+                </p>
+
                 <h3>Troubleshooting</h3>
                 <p>If download fails, you need to upload the Ignition installer to GitHub Releases first. See DEPLOY.md for details.</p>
             </div>
@@ -198,21 +222,34 @@
     </div>
 
     <script>
-        function copyCommand() {
-            const cmd = document.getElementById('installCmd').textContent;
+        function copyToClipboard(elementId, btn, originalText) {
+            const cmd = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(cmd).then(() => {
-                const btn = document.querySelector('.copy-btn');
                 btn.textContent = '✅ Copied!';
                 btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.textContent = '📋 Copy Command';
+                    btn.textContent = originalText;
                     btn.classList.remove('copied');
                 }, 2000);
             });
         }
 
+        function copyCommand() {
+            copyToClipboard('installCmd', document.querySelectorAll('.copy-btn')[0], '📋 Copy Command');
+        }
+
+        function copyFullSetup() {
+            copyToClipboard('fullSetupCmd', document.querySelectorAll('.copy-btn')[1], '📋 Copy Full Setup');
+        }
+
+        function copyTailscale() {
+            copyToClipboard('tailscaleCmd', document.querySelectorAll('.copy-btn')[2], '📋 Copy Tailscale Only');
+        }
+
         // Allow clicking code to copy
         document.getElementById('installCmd').addEventListener('click', copyCommand);
+        document.getElementById('fullSetupCmd').addEventListener('click', copyFullSetup);
+        document.getElementById('tailscaleCmd').addEventListener('click', copyTailscale);
     </script>
 </body>
 </html>
