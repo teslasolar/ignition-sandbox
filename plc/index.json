@@ -1,0 +1,5 @@
+{"name":"PLC","type":"directory",
+"description":"Virtual PLC with L5K compiler",
+"children":["compiler","runtime","programs"],
+"files":["gateway-bridge.js","index.html"],
+"features":["L5K compiler","Ladder logic CPU","I/O simulation","Gateway bridge"]}

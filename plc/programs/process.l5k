@@ -1,0 +1,115 @@
+; Konomi IgnAIte - Process Control L5K Program
+; Tank Level Control with Pump Sequencing
+; Compatible with Allen-Bradley Logix5000
+
+PROGRAM TankControl
+  DESCRIPTION "Automatic tank fill/drain with level control"
+
+ROUTINE MainRoutine
+  ; ===== SECTION 1: Mode Selection =====
+
+  ; Rung 0: Auto Mode Select
+  XIC AutoSelect XIO ManualSelect OTE AutoMode
+
+  ; Rung 1: Manual Mode Select
+  XIC ManualSelect XIO AutoSelect OTE ManualMode
+
+  ; ===== SECTION 2: Level Monitoring =====
+
+  ; Rung 2: Low Level Alarm (< 20%)
+  XIC LevelLow OTE LowAlarm
+
+  ; Rung 3: High Level Alarm (> 90%)
+  XIC LevelHigh OTE HighAlarm
+
+  ; Rung 4: Very High Level - Emergency Stop
+  XIC LevelVeryHigh OTU InletPump
+  XIC LevelVeryHigh OTE EmergencyStop
+
+  ; ===== SECTION 3: Automatic Control =====
+
+  ; Rung 5: Auto Fill - Start inlet when low
+  XIC AutoMode XIC LevelLow XIO LevelHigh OTE AutoFillCmd
+
+  ; Rung 6: Auto Drain - Start outlet when high
+  XIC AutoMode XIC LevelHigh XIO LevelLow OTE AutoDrainCmd
+
+  ; Rung 7: Inlet Pump Control (Auto)
+  XIC AutoFillCmd XIO EmergencyStop OTE InletPump
+
+  ; Rung 8: Outlet Valve Control (Auto)
+  XIC AutoDrainCmd XIO EmergencyStop OTE OutletValve
+
+  ; ===== SECTION 4: Manual Control =====
+
+  ; Rung 9: Manual Inlet Pump
+  XIC ManualMode XIC ManualFill XIO EmergencyStop OTE InletPump
+
+  ; Rung 10: Manual Outlet Valve
+  XIC ManualMode XIC ManualDrain XIO EmergencyStop OTE OutletValve
+
+  ; ===== SECTION 5: Status Indicators =====
+
+  ; Rung 11: System Running Indicator
+  XIC InletPump OTE FillingLamp
+  XIC OutletValve OTE DrainingLamp
+
+  ; Rung 12: Fault Indicator
+  XIC EmergencyStop OTE FaultLamp
+  XIC HighAlarm OTE FaultLamp
+
+END_ROUTINE
+
+ROUTINE TimerRoutine
+  ; Rung 0: Fill Time Monitor
+  XIC InletPump TON FillTimer 30000
+
+  ; Rung 1: Drain Time Monitor
+  XIC OutletValve TON DrainTimer 60000
+
+  ; Rung 2: Fill Timeout Fault
+  XIC FillTimer.DN OTU InletPump
+  XIC FillTimer.DN OTE FillTimeoutFault
+
+END_ROUTINE
+
+DATA
+  ; === DIGITAL INPUTS ===
+  AutoSelect     : BOOL := I:0/0   ; Auto mode selector
+  ManualSelect   : BOOL := I:0/1   ; Manual mode selector
+  ManualFill     : BOOL := I:0/2   ; Manual fill button
+  ManualDrain    : BOOL := I:0/3   ; Manual drain button
+  LevelLow       : BOOL := I:0/4   ; Low level switch (< 20%)
+  LevelHigh      : BOOL := I:0/5   ; High level switch (> 90%)
+  LevelVeryHigh  : BOOL := I:0/6   ; Very high level switch (> 95%)
+  EStopButton    : BOOL := I:0/7   ; Emergency stop button
+
+  ; === DIGITAL OUTPUTS ===
+  InletPump      : BOOL := O:0/0   ; Inlet pump contactor
+  OutletValve    : BOOL := O:0/1   ; Outlet valve solenoid
+  FillingLamp    : BOOL := O:0/2   ; Filling indicator
+  DrainingLamp   : BOOL := O:0/3   ; Draining indicator
+  FaultLamp      : BOOL := O:0/4   ; Fault indicator
+  AlarmHorn      : BOOL := O:0/5   ; Alarm horn
+
+  ; === INTERNAL BITS ===
+  AutoMode       : BOOL := B:0/0   ; Auto mode active
+  ManualMode     : BOOL := B:0/1   ; Manual mode active
+  AutoFillCmd    : BOOL := B:0/2   ; Auto fill command
+  AutoDrainCmd   : BOOL := B:0/3   ; Auto drain command
+  EmergencyStop  : BOOL := B:0/4   ; Emergency stop active
+  LowAlarm       : BOOL := B:0/5   ; Low level alarm
+  HighAlarm      : BOOL := B:0/6   ; High level alarm
+  FillTimeoutFault : BOOL := B:0/7 ; Fill timeout fault
+
+  ; === TIMERS ===
+  FillTimer      : TIMER          ; Fill operation timer
+  DrainTimer     : TIMER          ; Drain operation timer
+
+  ; === ANALOG INPUTS ===
+  LevelTransmitter : INT := AI:0  ; Level transmitter 4-20mA
+  FlowRate       : INT := AI:1    ; Flow rate transmitter
+
+END_DATA
+
+END_PROGRAM

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Programs | PLC</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}body{background:#0d1117;color:#c9d1d9;padding:20px}h1{color:#f97316;border-bottom:2px solid #f97316;padding-bottom:10px;margin-bottom:20px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}.c{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px;cursor:pointer;transition:border-color .2s}.c:hover{border-color:#f97316}.c h3{color:#f97316;font-size:14px;margin-bottom:8px}.c p{color:#8b949e;font-size:11px;margin-bottom:10px}.c .meta{font-size:10px;color:#8b949e}.code{background:#000;border:1px solid #30363d;border-radius:6px;padding:15px;margin-top:20px;max-height:400px;overflow:auto}.code pre{font-size:11px;color:#3fb950}.b{margin-top:20px}.b a{color:#f97316;text-decoration:none}.btn{background:#f97316;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:10px;margin-top:10px}</style>
+</head><body>
+<h1>📄 L5K Programs</h1>
+<div class="g">
+<div class="c" onclick="loadProgram('starter')">
+<h3>starter.l5k</h3>
+<p>Basic motor start/stop control</p>
+<div class="meta">~50 lines • Beginner</div>
+<button class="btn" onclick="event.stopPropagation();loadInPLC('starter')">Load in PLC →</button>
+</div>
+<div class="c" onclick="loadProgram('process')">
+<h3>process.l5k</h3>
+<p>Tank level control with pump sequencing</p>
+<div class="meta">~120 lines • Intermediate</div>
+<button class="btn" onclick="event.stopPropagation();loadInPLC('process')">Load in PLC →</button>
+</div>
+</div>
+<div class="code" id="code"><pre>Select a program to view source...</pre></div>
+<div class="b"><a href="../">← Back to PLC</a></div>
+<script>
+async function loadProgram(name) {
+  const res = await fetch(name + '.l5k');
+  const src = await res.text();
+  document.getElementById('code').innerHTML = '<pre>' + src
+    .replace(/;.*/g, m => '<span style="color:#8b949e">' + m + '</span>')
+    .replace(/\b(PROGRAM|ROUTINE|END_ROUTINE|END_PROGRAM|DATA|END_DATA)\b/g, '<span style="color:#f97316">$1</span>')
+    .replace(/\b(XIC|XIO|OTE|OTL|OTU|TON|TOF|CTU|CTD)\b/g, '<span style="color:#58a6ff">$1</span>')
+    .replace(/\b(BOOL|INT|TIMER|COUNTER)\b/g, '<span style="color:#d2a8ff">$1</span>')
+    + '</pre>';
+}
+function loadInPLC(name) {
+  window.location.href = '../?program=' + name;
+}
+</script>
+</body></html>

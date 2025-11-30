@@ -1,0 +1,48 @@
+; Konomi IgnAIte - Starter L5K Program
+; Basic Motor Control Example
+; Compatible with Allen-Bradley Logix5000
+
+PROGRAM MotorControl
+  DESCRIPTION "Simple start/stop motor control"
+
+ROUTINE MainRoutine
+  ; ===== Rung 0: Start Circuit with Seal-In =====
+  ; Start button OR running seal-in AND NOT stop button
+  XIC StartPB XIC MotorAux OTE MotorRun
+
+  ; ===== Rung 1: Stop Circuit =====
+  ; Stop button unlatches motor run
+  XIC StopPB OTU MotorRun
+
+  ; ===== Rung 2: Motor Contactor Output =====
+  ; Motor run enables contactor
+  XIC MotorRun OTE MotorContactor
+
+  ; ===== Rung 3: Running Indicator =====
+  ; Feedback from motor aux contact
+  XIC MotorAux OTE RunningLamp
+
+  ; ===== Rung 4: Fault Detection =====
+  ; Overload trips motor
+  XIC MotorOL OTU MotorRun
+  XIC MotorOL OTE FaultLamp
+
+END_ROUTINE
+
+DATA
+  ; Inputs - Slot 0 Digital Input Module
+  StartPB    : BOOL := I:0/0   ; Start pushbutton
+  StopPB     : BOOL := I:0/1   ; Stop pushbutton
+  MotorOL    : BOOL := I:0/2   ; Motor overload contact
+  MotorAux   : BOOL := I:0/3   ; Motor auxiliary contact
+
+  ; Outputs - Slot 2 Digital Output Module
+  MotorContactor : BOOL := O:0/0  ; Motor contactor coil
+  RunningLamp    : BOOL := O:0/1  ; Running indicator lamp
+  FaultLamp      : BOOL := O:0/2  ; Fault indicator lamp
+
+  ; Internal Bits
+  MotorRun   : BOOL := B:0/0   ; Motor run command
+END_DATA
+
+END_PROGRAM
