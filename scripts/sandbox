@@ -1,0 +1,58 @@
+#!/bin/bash
+# Sandbox CLI - runs inside WebVM
+# Fetch: curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sandbox | bash -s -- <command>
+
+BASE_URL="https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main"
+CMD="${1:-help}"
+
+case "$CMD" in
+    install|setup)
+        echo "Installing Ignition Gateway..."
+        curl -sL "$BASE_URL/ignition-install.sh" | sudo bash
+        ;;
+    tailscale|ts)
+        echo "Installing Tailscale..."
+        curl -sL "$BASE_URL/tailscale-install.sh" | bash
+        ;;
+    full)
+        echo "Full setup (Ignition + Tailscale)..."
+        curl -sL "$BASE_URL/full-setup.sh" | bash -s -- "$2"
+        ;;
+    start)
+        /opt/ignition/ignition.sh start
+        ;;
+    stop)
+        /opt/ignition/ignition.sh stop
+        ;;
+    status)
+        echo "=== Ignition ==="
+        /opt/ignition/ignition.sh status 2>/dev/null || echo "Not installed"
+        echo ""
+        echo "=== Tailscale ==="
+        tailscale status 2>/dev/null || echo "Not installed"
+        ;;
+    ip)
+        tailscale ip -4 2>/dev/null || echo "Tailscale not connected"
+        ;;
+    logs)
+        tail -f /opt/ignition/logs/wrapper.log 2>/dev/null || echo "No logs found"
+        ;;
+    help|*)
+        echo "Ignition Sandbox CLI"
+        echo ""
+        echo "Usage: sandbox <command>"
+        echo ""
+        echo "Commands:"
+        echo "  install    Install Ignition Gateway"
+        echo "  tailscale  Install Tailscale"
+        echo "  full       Full setup (Ignition + Tailscale)"
+        echo "  start      Start Ignition"
+        echo "  stop       Stop Ignition"
+        echo "  status     Show status"
+        echo "  ip         Show Tailscale IP"
+        echo "  logs       Tail Ignition logs"
+        echo ""
+        echo "Quick start:"
+        echo "  curl -sL $BASE_URL/scripts/sandbox | bash -s -- install"
+        ;;
+esac
