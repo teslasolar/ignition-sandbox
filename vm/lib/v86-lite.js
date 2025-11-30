@@ -426,6 +426,8 @@ class V86Lite {
 
         pwd: function() { return this.cwd; },
 
+        whoami: function() { return this.env.USER; },
+
         cd: function(args) {
             const target = args[0] || this.env.HOME;
             const path = this.resolvePath(target);
