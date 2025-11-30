@@ -108,6 +108,7 @@
             <button class="tab" onclick="showTab('system')">System</button>
             <button class="tab" onclick="showTab('setup')">Setup</button>
             <button class="tab" onclick="showTab('designer')">Designer</button>
+            <button class="tab" onclick="showTab('vm')" style="background:#238636;border-color:#238636;">VM Sandbox</button>
         </div>
 
         <div id="ignition" class="tab-content active">
@@ -245,6 +246,48 @@
             </div>
         </div>
 
+        <div id="vm" class="tab-content">
+            <h2>Browser VM Sandbox</h2>
+            <p>Run a real Linux VM directly in your browser. No installation required.</p>
+
+            <div class="grid">
+                <div class="card" style="border-color:#238636;">
+                    <h4><a href="vm/" style="color:#3fb950;">Launch VM Sandbox</a></h4>
+                    <p>Boot Alpine/Debian Linux in browser using v86 emulator</p>
+                </div>
+                <div class="card">
+                    <h4>How it Works</h4>
+                    <p>Uses v86 (JS x86 emulator) to run real Linux. State saves to browser storage.</p>
+                </div>
+            </div>
+
+            <h3>Available Images</h3>
+            <div class="grid">
+                <div class="card">
+                    <h4>Alpine Linux</h4>
+                    <p>~50MB, fast boot (~10s), minimal</p>
+                    <code>Recommended for quick testing</code>
+                </div>
+                <div class="card">
+                    <h4>Debian</h4>
+                    <p>~200MB, slower boot (~30s), full environment</p>
+                    <code>Better for Ignition install</code>
+                </div>
+                <div class="card">
+                    <h4>Buildroot</h4>
+                    <p>~20MB, fastest boot (~5s), ultra minimal</p>
+                    <code>For basic testing only</code>
+                </div>
+            </div>
+
+            <h3>Requirements</h3>
+            <div class="card">
+                <p>Modern browser with WebAssembly support (Chrome 90+, Firefox 85+, Safari 14+)</p>
+                <p>~500MB RAM available for browser tab</p>
+                <p>IndexedDB for persistent storage</p>
+            </div>
+        </div>
+
         <div id="designer" class="tab-content">
             <h2>Perspective Designer</h2>
 
@@ -320,17 +363,17 @@
 
         <h2>Resources</h2>
         <div class="grid">
-            <div class="card">
-                <h4><a href="commands/manifest.json">Command Manifest</a></h4>
-                <p>JSON file with all commands</p>
-            </div>
-            <div class="card">
-                <h4><a href="cli/">CLI Tools</a></h4>
-                <p>Python CLI and wrappers</p>
+            <div class="card" style="border-color:#238636;">
+                <h4><a href="vm/" style="color:#3fb950;">VM Sandbox</a></h4>
+                <p>Browser-based Linux VM</p>
             </div>
             <div class="card">
                 <h4><a href="screens/">Screens</a></h4>
                 <p>Designer and templates</p>
+            </div>
+            <div class="card">
+                <h4><a href="cli/">CLI Tools</a></h4>
+                <p>Python CLI and wrappers</p>
             </div>
             <div class="card">
                 <h4><a href="https://github.com/teslasolar/ignition-sandbox">GitHub</a></h4>
