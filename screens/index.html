@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ignition Sandbox - Screens</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 40px;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .back-link a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background: rgba(107,114,128,0.1);
+            border: 1px solid rgba(107,114,128,0.3);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .card:hover {
+            background: rgba(107,114,128,0.2);
+            transform: translateY(-5px);
+            border-color: rgba(107,114,128,0.5);
+        }
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .card-desc {
+            color: #9ca3af;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .card-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        .card-meta span {
+            background: rgba(107,114,128,0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            color: #9ca3af;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(107,114,128,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ignition Sandbox Screens</h1>
+        <p class="subtitle">Perspective JSON Templates and Design Tools</p>
+        <p class="back-link"><a href="../">&larr; Back to Main</a></p>
+
+        <div class="grid">
+            <a href="designer/" class="card">
+                <div class="card-icon">*</div>
+                <div class="card-title">Perspective Designer</div>
+                <div class="card-desc">
+                    Visual drag-and-drop designer for creating Perspective views.
+                    Export directly to JSON for use in Ignition Designer.
+                </div>
+                <div class="card-meta">
+                    <span>Drag & Drop</span>
+                    <span>JSON Export</span>
+                    <span>Pipes</span>
+                </div>
+            </a>
+
+            <a href="sandbox/" class="card">
+                <div class="card-icon">&gt;_</div>
+                <div class="card-title">Command Sandbox</div>
+                <div class="card-desc">
+                    Interactive command runner for testing and exploring
+                    the sandbox environment and loading templates.
+                </div>
+                <div class="card-meta">
+                    <span>Terminal</span>
+                    <span>Commands</span>
+                </div>
+            </a>
+
+            <a href="templates/" class="card">
+                <div class="card-icon">{}</div>
+                <div class="card-title">Template Library</div>
+                <div class="card-desc">
+                    Browse and download reusable Perspective JSON templates
+                    for components, symbols, and complete views.
+                </div>
+                <div class="card-meta">
+                    <span>Components</span>
+                    <span>Symbols</span>
+                    <span>Views</span>
+                </div>
+            </a>
+        </div>
+
+        <h2 class="section-title">Quick Links</h2>
+        <div class="grid">
+            <a href="templates/views/tank-farm.json" class="card" target="_blank">
+                <div class="card-title">Tank Farm View</div>
+                <div class="card-desc">Complete tank farm layout with distribution piping</div>
+                <div class="card-meta"><span>JSON</span><span>View</span></div>
+            </a>
+            <a href="templates/views/overview.json" class="card" target="_blank">
+                <div class="card-title">Overview Template</div>
+                <div class="card-desc">Basic overview screen layout template</div>
+                <div class="card-meta"><span>JSON</span><span>Layout</span></div>
+            </a>
+            <a href="templates/manifest.json" class="card" target="_blank">
+                <div class="card-title">Templates Manifest</div>
+                <div class="card-desc">Full catalog of available templates</div>
+                <div class="card-meta"><span>JSON</span><span>Catalog</span></div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

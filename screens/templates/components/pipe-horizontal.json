@@ -1,0 +1,28 @@
+{
+  "type": "ia.display.label",
+  "version": 0,
+  "props": {
+    "text": "",
+    "style": {
+      "backgroundColor": "#6b7280",
+      "borderRadius": "0px"
+    }
+  },
+  "meta": {
+    "name": "Pipe_Horizontal"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.15,
+    "height": 0.01
+  },
+  "custom": {
+    "pipeSpec": {
+      "material": "Carbon Steel",
+      "diameter": "4in",
+      "schedule": "40"
+    },
+    "flowDirection": "left-to-right"
+  }
+}

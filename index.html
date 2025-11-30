@@ -107,6 +107,7 @@
             <button class="tab" onclick="showTab('tailscale')">Tailscale</button>
             <button class="tab" onclick="showTab('system')">System</button>
             <button class="tab" onclick="showTab('setup')">Setup</button>
+            <button class="tab" onclick="showTab('designer')">Designer</button>
         </div>
 
         <div id="ignition" class="tab-content active">
@@ -244,6 +245,79 @@
             </div>
         </div>
 
+        <div id="designer" class="tab-content">
+            <h2>Perspective Designer</h2>
+
+            <div class="grid">
+                <div class="card">
+                    <h4><a href="screens/designer/">Visual Designer</a></h4>
+                    <p>Drag-and-drop Perspective view designer with JSON export</p>
+                </div>
+                <div class="card">
+                    <h4><a href="screens/sandbox/">Command Sandbox</a></h4>
+                    <p>Interactive terminal for loading templates</p>
+                </div>
+                <div class="card">
+                    <h4><a href="screens/">All Screens</a></h4>
+                    <p>Browse all available screens and tools</p>
+                </div>
+            </div>
+
+            <h3>Templates</h3>
+            <div class="grid">
+                <div class="card">
+                    <h4><a href="screens/templates/views/tank-farm.json" target="_blank">Tank Farm</a></h4>
+                    <p>Industrial tank distribution view</p>
+                </div>
+                <div class="card">
+                    <h4><a href="screens/templates/views/overview.json" target="_blank">Overview</a></h4>
+                    <p>Basic overview layout template</p>
+                </div>
+                <div class="card">
+                    <h4><a href="screens/templates/manifest.json" target="_blank">Manifest</a></h4>
+                    <p>Full template catalog</p>
+                </div>
+            </div>
+
+            <h3>Components</h3>
+            <div class="grid">
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Tank Component</div>
+                    <code>screens/templates/components/tank.json</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Valve Component</div>
+                    <code>screens/templates/components/valve.json</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Pump Component</div>
+                    <code>screens/templates/components/pump.json</code>
+                    <button>Copy</button>
+                </div>
+            </div>
+
+            <h3>Symbols</h3>
+            <div class="grid">
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Hopper Feeder</div>
+                    <code>screens/templates/symbols/hopper.json</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Belt Conveyor</div>
+                    <code>screens/templates/symbols/belt.json</code>
+                    <button>Copy</button>
+                </div>
+                <div class="cmd" onclick="copyCode(this)">
+                    <div class="label">Screw Conveyor</div>
+                    <code>screens/templates/symbols/screw.json</code>
+                    <button>Copy</button>
+                </div>
+            </div>
+        </div>
+
         <h2>Resources</h2>
         <div class="grid">
             <div class="card">
@@ -253,6 +327,10 @@
             <div class="card">
                 <h4><a href="cli/">CLI Tools</a></h4>
                 <p>Python CLI and wrappers</p>
+            </div>
+            <div class="card">
+                <h4><a href="screens/">Screens</a></h4>
+                <p>Designer and templates</p>
             </div>
             <div class="card">
                 <h4><a href="https://github.com/teslasolar/ignition-sandbox">GitHub</a></h4>
