@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Kernels | Konomi IgnAIte</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}body{background:#0d1117;color:#c9d1d9;padding:20px}.h{color:#f97316;border-bottom:2px solid #f97316;padding-bottom:10px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-bottom:20px}.c{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px;cursor:pointer;transition:all .2s}.c:hover{border-color:#f97316;transform:translateY(-2px)}.c h3{color:#f97316;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}.c p{color:#8b949e;font-size:11px;margin-bottom:10px}.c .meta{display:flex;gap:10px;font-size:10px;color:#8b949e}.c .meta span{background:#21262d;padding:2px 6px;border-radius:3px}.code{background:#000;border:1px solid #30363d;border-radius:6px;padding:15px;margin-top:20px;max-height:400px;overflow:auto}.code pre{font-size:11px;color:#3fb950;white-space:pre-wrap}.code .comment{color:#8b949e}.code .directive{color:#f97316}.code .string{color:#a5d6ff}.b{margin-top:20px}.b a{color:#f97316;text-decoration:none}.btn{background:#f97316;color:#000;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700}.btn:hover{background:#ea580c}</style>
+</head><body>
+<h1 class="h">⚙️ Custom Kernels <button class="btn" onclick="loadKernel('ignition')">Boot Ignition</button></h1>
+<div class="g" id="list"></div>
+<div class="code" id="code"><pre>Select a kernel to view source...</pre></div>
+<div class="b"><a href="../">← Back to IgnAIte</a></div>
+<script>
+const kernels=[
+{id:'minimal',name:'Minimal',icon:'📦',size:'512B',desc:'Bare boot sector - prints logo and halts'},
+{id:'ignition',name:'Ignition',icon:'🔥',size:'512B',desc:'Gateway focused kernel with status display'},
+{id:'full',name:'Full OS',icon:'🖥️',size:'512B',desc:'Complete shell with command interpreter'}
+];
+
+document.getElementById('list').innerHTML=kernels.map(k=>`
+<div class="c" onclick="showKernel('${k.id}')">
+<h3>${k.icon} ${k.name}</h3>
+<p>${k.desc}</p>
+<div class="meta"><span>${k.size}</span><span>x86 ASM</span><span>Real Mode</span></div>
+</div>`).join('');
+
+async function showKernel(id){
+const res=await fetch(id+'.asm');
+const src=await res.text();
+const highlighted=src
+.replace(/;.*/g,m=>`<span class="comment">${m}</span>`)
+.replace(/\[.*?\]/g,m=>`<span class="directive">${m}</span>`)
+.replace(/%define.*$/gm,m=>`<span class="directive">${m}</span>`)
+.replace(/'[^']*'/g,m=>`<span class="string">${m}</span>`);
+document.getElementById('code').innerHTML=`<pre>${highlighted}</pre>`;
+}
+
+function loadKernel(id){
+window.location.href='../vm/?kernel='+id;
+}
+</script>
+</body></html>

@@ -1,0 +1,8 @@
+{"name":"Custom Kernels","version":"1.0.0","type":"kernels",
+"description":"x86 assembly bootloaders for v86-lite",
+"kernels":[
+{"id":"minimal","file":"minimal.asm","size":"512B","desc":"Bare boot sector"},
+{"id":"ignition","file":"ignition.asm","size":"1KB","desc":"Ignition gateway kernel"},
+{"id":"full","file":"full.asm","size":"4KB","desc":"Full OS with shell"}
+],
+"loader":"kernel-loader.js"}
