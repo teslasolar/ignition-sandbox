@@ -1,0 +1,106 @@
+[
+  {
+    "type": "ia.container.coord",
+    "version": 0,
+    "props": {
+      "mode": "percent",
+      "aspectRatio": "16:9"
+    },
+    "meta": {"name": "root"},
+    "position": {},
+    "custom": {},
+    "children": [
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {
+          "text": "System Overview",
+          "style": {
+            "fontSize": "28px",
+            "fontWeight": "bold",
+            "color": "#1f2937",
+            "textAlign": "center",
+            "backgroundColor": "rgba(107,114,128,0.1)",
+            "borderBottom": "2px solid #6b7280",
+            "padding": "10px"
+          }
+        },
+        "meta": {"name": "Header"},
+        "position": {"x": 0, "y": 0, "width": 1, "height": 0.1}
+      },
+      {
+        "type": "ia.container.flex",
+        "version": 0,
+        "props": {
+          "direction": "row",
+          "justify": "space-around",
+          "align": "stretch",
+          "style": {
+            "padding": "20px",
+            "gap": "20px"
+          }
+        },
+        "meta": {"name": "MainContent"},
+        "position": {"x": 0, "y": 0.1, "width": 1, "height": 0.8},
+        "children": [
+          {
+            "type": "ia.container.coord",
+            "version": 0,
+            "props": {
+              "style": {
+                "backgroundColor": "rgba(107,114,128,0.05)",
+                "border": "1px solid rgba(107,114,128,0.2)",
+                "borderRadius": "8px"
+              }
+            },
+            "meta": {"name": "LeftPanel"},
+            "position": {}
+          },
+          {
+            "type": "ia.container.coord",
+            "version": 0,
+            "props": {
+              "style": {
+                "backgroundColor": "rgba(107,114,128,0.05)",
+                "border": "1px solid rgba(107,114,128,0.2)",
+                "borderRadius": "8px"
+              }
+            },
+            "meta": {"name": "CenterPanel"},
+            "position": {}
+          },
+          {
+            "type": "ia.container.coord",
+            "version": 0,
+            "props": {
+              "style": {
+                "backgroundColor": "rgba(107,114,128,0.05)",
+                "border": "1px solid rgba(107,114,128,0.2)",
+                "borderRadius": "8px"
+              }
+            },
+            "meta": {"name": "RightPanel"},
+            "position": {}
+          }
+        ]
+      },
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {
+          "text": "Last Updated: {now()}",
+          "style": {
+            "fontSize": "12px",
+            "color": "#6b7280",
+            "textAlign": "center",
+            "backgroundColor": "rgba(107,114,128,0.1)",
+            "borderTop": "1px solid #6b7280",
+            "padding": "5px"
+          }
+        },
+        "meta": {"name": "Footer"},
+        "position": {"x": 0, "y": 0.9, "width": 1, "height": 0.1}
+      }
+    ]
+  }
+]

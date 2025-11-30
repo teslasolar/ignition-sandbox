@@ -1,0 +1,36 @@
+{
+  "type": "ia.display.label",
+  "version": 0,
+  "props": {
+    "text": "P",
+    "style": {
+      "border": "3px solid #6b7280",
+      "borderRadius": "50%",
+      "backgroundColor": "rgba(107,114,128,0.1)",
+      "fontSize": "24px",
+      "fontWeight": "bold",
+      "color": "#6b7280",
+      "textAlign": "center",
+      "display": "flex",
+      "alignItems": "center",
+      "justifyContent": "center"
+    }
+  },
+  "meta": {
+    "name": "Pump_Template"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.06,
+    "height": 0.1
+  },
+  "custom": {
+    "tagPath": "",
+    "states": {
+      "running": { "borderColor": "#10b981", "color": "#10b981" },
+      "stopped": { "borderColor": "#6b7280", "color": "#6b7280" },
+      "fault": { "borderColor": "#ef4444", "color": "#ef4444", "blink": true }
+    }
+  }
+}

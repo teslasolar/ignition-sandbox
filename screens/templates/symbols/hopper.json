@@ -1,0 +1,32 @@
+{
+  "type": "ia.display.symbol",
+  "version": 0,
+  "props": {
+    "path": "symbols/feeders/hopper",
+    "style": {
+      "width": "100%",
+      "height": "100%"
+    }
+  },
+  "meta": {
+    "name": "Hopper_Feeder"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.08,
+    "height": 0.15
+  },
+  "custom": {
+    "svg": "<svg viewBox='0 0 100 150'><rect x='10' y='5' width='80' height='50' fill='#6b7280' stroke='#9ca3af' stroke-width='2'/><path d='M10,55 L30,120 L70,120 L90,55 Z' fill='#6b7280' stroke='#9ca3af' stroke-width='2'/><rect x='35' y='120' width='30' height='25' fill='#9ca3af' stroke='#6b7280'/><circle cx='50' cy='132' r='6' fill='none' stroke='#4b5563' stroke-width='2'/><line x1='46' y1='128' x2='54' y2='136' stroke='#4b5563' stroke-width='2'/></svg>",
+    "tagConfig": {
+      "levelTag": "",
+      "valveTag": "",
+      "statusTag": ""
+    },
+    "alarms": {
+      "highLevel": 90,
+      "lowLevel": 10
+    }
+  }
+}

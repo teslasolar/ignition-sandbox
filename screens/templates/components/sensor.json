@@ -1,0 +1,38 @@
+{
+  "type": "ia.display.label",
+  "version": 0,
+  "props": {
+    "text": "PT",
+    "style": {
+      "border": "1px solid #6b7280",
+      "borderRadius": "2px",
+      "backgroundColor": "rgba(107,114,128,0.1)",
+      "fontSize": "11px",
+      "fontWeight": "600",
+      "color": "#9ca3af",
+      "textAlign": "center",
+      "padding": "2px 4px"
+    }
+  },
+  "meta": {
+    "name": "Sensor_Template"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.03,
+    "height": 0.03
+  },
+  "custom": {
+    "tagPath": "",
+    "sensorTypes": {
+      "PT": "Pressure Transmitter",
+      "TT": "Temperature Transmitter",
+      "FT": "Flow Transmitter",
+      "LT": "Level Transmitter",
+      "AT": "Analytical Transmitter"
+    },
+    "units": "PSI",
+    "range": { "min": 0, "max": 100 }
+  }
+}

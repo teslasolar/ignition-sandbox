@@ -1,0 +1,33 @@
+{
+  "type": "ia.display.symbol",
+  "version": 0,
+  "props": {
+    "path": "symbols/feeders/screw",
+    "style": {
+      "width": "100%",
+      "height": "100%"
+    }
+  },
+  "meta": {
+    "name": "Screw_Conveyor"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.12,
+    "height": 0.06
+  },
+  "custom": {
+    "svg": "<svg viewBox='0 0 180 80'><rect x='10' y='25' width='160' height='30' fill='#6b7280' stroke='#9ca3af' stroke-width='2'/><path d='M20,22 Q50,10 80,22 Q110,34 140,22 Q170,10 165,22' stroke='#9ca3af' stroke-width='3' fill='none'/><path d='M20,58 Q50,70 80,58 Q110,46 140,58 Q170,70 165,58' stroke='#9ca3af' stroke-width='3' fill='none'/><circle cx='170' cy='40' r='15' fill='#9ca3af' stroke='#6b7280' stroke-width='2'/><text x='170' y='45' text-anchor='middle' font-size='12' fill='#4b5563'>M</text></svg>",
+    "tagConfig": {
+      "speedTag": "",
+      "runningTag": "",
+      "motorAmpTag": ""
+    },
+    "specs": {
+      "diameter": "9in",
+      "pitch": "9in",
+      "speed": "60 rpm"
+    }
+  }
+}

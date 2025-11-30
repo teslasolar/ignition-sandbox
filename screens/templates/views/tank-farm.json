@@ -1,0 +1,189 @@
+[
+  {
+    "type": "ia.container.coord",
+    "version": 0,
+    "props": {
+      "mode": "percent",
+      "aspectRatio": "16:9",
+      "pipes": [
+        {
+          "name": "main_header",
+          "appearance": "auto",
+          "flanges": true,
+          "lineVariant": "solid",
+          "start": "none",
+          "end": "none",
+          "stroke": "#1f2937",
+          "fill": "#1f2937",
+          "width": 18,
+          "origin": {
+            "x": 100,
+            "y": 400,
+            "connections": [{"x": 800, "y": 400}]
+          },
+          "visible": true
+        },
+        {
+          "name": "supply_line",
+          "appearance": "auto",
+          "flanges": true,
+          "start": "arrow",
+          "end": "none",
+          "stroke": "#7c3aed",
+          "fill": "#7c3aed",
+          "width": 15,
+          "origin": {
+            "x": 50,
+            "y": 400,
+            "connections": [{"x": 100, "y": 400}]
+          },
+          "visible": true
+        },
+        {
+          "name": "discharge_line",
+          "appearance": "auto",
+          "flanges": true,
+          "start": "none",
+          "end": "arrow",
+          "stroke": "#7c3aed",
+          "fill": "#7c3aed",
+          "width": 15,
+          "origin": {
+            "x": 800,
+            "y": 400,
+            "connections": [{"x": 850, "y": 400}]
+          },
+          "visible": true
+        },
+        {
+          "name": "tank1_line",
+          "flanges": true,
+          "stroke": "#059669",
+          "fill": "#059669",
+          "width": 12,
+          "origin": {
+            "x": 200,
+            "y": 400,
+            "connections": [{"x": 200, "y": 300}]
+          },
+          "visible": true
+        },
+        {
+          "name": "tank2_line",
+          "flanges": true,
+          "stroke": "#dc2626",
+          "fill": "#dc2626",
+          "width": 12,
+          "origin": {
+            "x": 350,
+            "y": 400,
+            "connections": [{"x": 350, "y": 300}]
+          },
+          "visible": true
+        },
+        {
+          "name": "tank3_line",
+          "flanges": true,
+          "stroke": "#2563eb",
+          "fill": "#2563eb",
+          "width": 12,
+          "origin": {
+            "x": 500,
+            "y": 400,
+            "connections": [{"x": 500, "y": 300}]
+          },
+          "visible": true
+        },
+        {
+          "name": "tank4_line",
+          "flanges": true,
+          "stroke": "#f59e0b",
+          "fill": "#f59e0b",
+          "width": 12,
+          "origin": {
+            "x": 650,
+            "y": 400,
+            "connections": [{"x": 650, "y": 300}]
+          },
+          "visible": true
+        }
+      ]
+    },
+    "meta": {"name": "root"},
+    "position": {},
+    "custom": {},
+    "children": [
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {
+          "text": "Industrial Tank Farm Distribution",
+          "style": {
+            "fontSize": "26px",
+            "fontWeight": "bold",
+            "color": "#1f2937",
+            "textAlign": "center"
+          }
+        },
+        "meta": {"name": "Title"},
+        "position": {"x": 0.25, "y": 0.05, "width": 0.5, "height": 0.08}
+      },
+      {
+        "type": "ia.display.tank",
+        "version": 0,
+        "props": {"level": 85, "fillColor": "#059669"},
+        "meta": {"name": "Tank1"},
+        "position": {"x": 0.15, "y": 0.2, "width": 0.1, "height": 0.3}
+      },
+      {
+        "type": "ia.display.tank",
+        "version": 0,
+        "props": {"level": 62, "fillColor": "#dc2626"},
+        "meta": {"name": "Tank2"},
+        "position": {"x": 0.30, "y": 0.2, "width": 0.1, "height": 0.3}
+      },
+      {
+        "type": "ia.display.tank",
+        "version": 0,
+        "props": {"level": 43, "fillColor": "#2563eb"},
+        "meta": {"name": "Tank3"},
+        "position": {"x": 0.45, "y": 0.2, "width": 0.1, "height": 0.3}
+      },
+      {
+        "type": "ia.display.tank",
+        "version": 0,
+        "props": {"level": 78, "fillColor": "#f59e0b"},
+        "meta": {"name": "Tank4"},
+        "position": {"x": 0.60, "y": 0.2, "width": 0.1, "height": 0.3}
+      },
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {"text": "T-001\n85%", "style": {"fontSize": "14px", "fontWeight": "bold", "textAlign": "center", "color": "#059669"}},
+        "meta": {"name": "Tank1Label"},
+        "position": {"x": 0.15, "y": 0.52, "width": 0.1, "height": 0.06}
+      },
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {"text": "T-002\n62%", "style": {"fontSize": "14px", "fontWeight": "bold", "textAlign": "center", "color": "#dc2626"}},
+        "meta": {"name": "Tank2Label"},
+        "position": {"x": 0.30, "y": 0.52, "width": 0.1, "height": 0.06}
+      },
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {"text": "T-003\n43%", "style": {"fontSize": "14px", "fontWeight": "bold", "textAlign": "center", "color": "#2563eb"}},
+        "meta": {"name": "Tank3Label"},
+        "position": {"x": 0.45, "y": 0.52, "width": 0.1, "height": 0.06}
+      },
+      {
+        "type": "ia.display.label",
+        "version": 0,
+        "props": {"text": "T-004\n78%", "style": {"fontSize": "14px", "fontWeight": "bold", "textAlign": "center", "color": "#f59e0b"}},
+        "meta": {"name": "Tank4Label"},
+        "position": {"x": 0.60, "y": 0.52, "width": 0.1, "height": 0.06}
+      }
+    ]
+  }
+]

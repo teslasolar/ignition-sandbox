@@ -1,0 +1,28 @@
+{
+  "type": "ia.display.valve",
+  "version": 0,
+  "props": {
+    "position": 0,
+    "fillColor": "#6b7280",
+    "strokeColor": "#9ca3af",
+    "strokeWidth": 2,
+    "orientation": "horizontal"
+  },
+  "meta": {
+    "name": "Valve_Template"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.05,
+    "height": 0.08
+  },
+  "custom": {
+    "tagPath": "",
+    "states": {
+      "open": { "color": "#10b981", "position": 100 },
+      "closed": { "color": "#ef4444", "position": 0 },
+      "fault": { "color": "#f59e0b", "blink": true }
+    }
+  }
+}

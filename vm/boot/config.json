@@ -1,0 +1,59 @@
+{
+  "name": "Ignition Sandbox VM",
+  "version": "1.0.0",
+  "description": "Browser-based Linux VM for running Ignition Gateway",
+  "images": {
+    "alpine": {
+      "name": "Alpine Linux 3.18",
+      "size": "50MB",
+      "memory": 512,
+      "features": ["apk", "busybox", "networking"],
+      "recommended": true,
+      "boot_time": "~10s"
+    },
+    "debian": {
+      "name": "Debian 11 (Bullseye)",
+      "size": "200MB",
+      "memory": 512,
+      "features": ["apt", "systemd", "java-support"],
+      "recommended": false,
+      "boot_time": "~30s"
+    },
+    "buildroot": {
+      "name": "Buildroot (Minimal)",
+      "size": "20MB",
+      "memory": 256,
+      "features": ["minimal", "fast-boot"],
+      "recommended": false,
+      "boot_time": "~5s"
+    },
+    "custom": {
+      "name": "Custom Ignition Image",
+      "size": "500MB",
+      "memory": 1024,
+      "features": ["java-17", "ignition-preinstalled", "tailscale"],
+      "recommended": false,
+      "boot_time": "~45s",
+      "notes": "Pre-configured with Ignition Gateway and dependencies"
+    }
+  },
+  "requirements": {
+    "browser": ["Chrome 90+", "Firefox 85+", "Safari 14+", "Edge 90+"],
+    "wasm": true,
+    "shared_array_buffer": true,
+    "local_storage": "50MB recommended"
+  },
+  "networking": {
+    "mode": "nat",
+    "ports": {
+      "8088": "Ignition Gateway HTTP",
+      "8043": "Ignition Gateway HTTPS",
+      "8060": "Gateway Network"
+    }
+  },
+  "storage": {
+    "persistent": true,
+    "backend": "indexeddb",
+    "max_size": "500MB"
+  }
+}

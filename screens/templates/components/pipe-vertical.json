@@ -1,0 +1,28 @@
+{
+  "type": "ia.display.label",
+  "version": 0,
+  "props": {
+    "text": "",
+    "style": {
+      "backgroundColor": "#6b7280",
+      "borderRadius": "0px"
+    }
+  },
+  "meta": {
+    "name": "Pipe_Vertical"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.01,
+    "height": 0.15
+  },
+  "custom": {
+    "pipeSpec": {
+      "material": "Carbon Steel",
+      "diameter": "4in",
+      "schedule": "40"
+    },
+    "flowDirection": "top-to-bottom"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "ia.display.tank",
+  "version": 0,
+  "props": {
+    "level": 50,
+    "fillColor": "#6b7280",
+    "backgroundColor": "rgba(107,114,128,0.1)",
+    "borderColor": "#6b7280",
+    "borderWidth": 2,
+    "orientation": "vertical",
+    "showLabel": true,
+    "labelFormat": "{:.1f}%"
+  },
+  "meta": {
+    "name": "Tank_Template"
+  },
+  "position": {
+    "x": 0.1,
+    "y": 0.1,
+    "width": 0.1,
+    "height": 0.2
+  },
+  "custom": {
+    "tagPath": "",
+    "alarmConfig": {
+      "high": 90,
+      "highHigh": 95,
+      "low": 10,
+      "lowLow": 5
+    }
+  }
+}

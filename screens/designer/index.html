@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Perspective Designer - Professional Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .root {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: rgba(31, 41, 55, 0.95);
+            border-right: 1px solid rgba(107, 114, 128, 0.3);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .toolbar {
+            height: 60px;
+            background: rgba(31, 41, 55, 0.9);
+            border-bottom: 1px solid rgba(107, 114, 128, 0.3);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, #374151, #4b5563);
+        }
+
+        .properties-panel {
+            width: 350px;
+            background: rgba(31, 41, 55, 0.95);
+            border-left: 1px solid rgba(107, 114, 128, 0.3);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .component {
+            position: absolute;
+            background: rgba(107, 114, 128, 0.1);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            border-radius: 4px;
+            cursor: move;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            user-select: none;
+            overflow: hidden;
+            min-width: 20px;
+            min-height: 20px;
+        }
+
+        .component.custom-shape {
+            border-color: rgba(156, 163, 175, 0.5);
+            background: rgba(156, 163, 175, 0.1);
+        }
+
+        .component:hover {
+            border-color: rgba(107, 114, 128, 0.6);
+            background: rgba(107, 114, 128, 0.2);
+            transform: translateZ(0);
+        }
+
+        .component.selected {
+            border-color: #6b7280;
+            box-shadow: 0 0 8px rgba(107, 114, 128, 0.5);
+            z-index: 1000;
+        }
+
+        .component.dragging {
+            opacity: 0.8;
+            transform: scale(1.05);
+            z-index: 1001;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 2px;
+            bottom: -4px;
+            right: -4px;
+            cursor: se-resize;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .component.selected .resize-handle {
+            opacity: 1;
+        }
+
+        .pipe-line {
+            position: absolute;
+            transition: all 0.2s;
+        }
+
+        .pipe-line:hover {
+            filter: brightness(1.2);
+        }
+
+        .button {
+            background: linear-gradient(45deg, #6b7280, #4b5563);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.4);
+        }
+
+        .button.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .button.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .button.secondary {
+            background: rgba(71, 85, 105, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .button.purple {
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+        }
+
+        .input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+            padding: 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #6b7280;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-bottom: 0.2rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        .category {
+            margin-bottom: 0.75rem;
+        }
+
+        .category-header {
+            background: rgba(107, 114, 128, 0.1);
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .category-header:hover {
+            background: rgba(107, 114, 128, 0.2);
+            border-color: rgba(107, 114, 128, 0.4);
+        }
+
+        .category-title {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .category-count {
+            background: rgba(107, 114, 128, 0.3);
+            padding: 0.1rem 0.4rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .category-content {
+            padding: 0.5rem 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+
+        .category-content.collapsed {
+            display: none;
+        }
+
+        .item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .item:active {
+            cursor: grabbing;
+        }
+
+        .item-name {
+            font-weight: 500;
+            margin-bottom: 0.1rem;
+            font-size: 0.75rem;
+        }
+
+        .item-type {
+            color: #4ecdc4;
+            font-size: 0.65rem;
+            opacity: 0.8;
+        }
+
+        .grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(107, 114, 128, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(107, 114, 128, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .shape-editor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .shape-editor-content {
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .shape-canvas {
+            width: 100%;
+            height: 400px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 1rem 0;
+            cursor: crosshair;
+        }
+
+        .tool-panel {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .custom-shape svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .feeder-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .feeder-template {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 0.5rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .feeder-template:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
+        .feeder-preview {
+            width: 80px;
+            height: 60px;
+            margin: 0 auto 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-bar {
+            height: 30px;
+            background: rgba(31, 41, 55, 0.9);
+            border-top: 1px solid rgba(107, 114, 128, 0.3);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            gap: 1rem;
+        }
+
+        .title {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            z-index: 10001;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, #6b7280, #4b5563);
+        }
+
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.75rem; }
+        .text-xs { font-size: 0.7rem; }
+        .p-2 { padding: 0.5rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .gap-2 { gap: 0.5rem; }
+
+        /* JSON Editor Improvements */
+        .json-editor {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(156, 163, 175, 0.3);
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.7rem;
+            color: #d1d5db;
+            white-space: pre-wrap;
+            overflow: auto;
+            max-height: 350px;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .json-editor:focus {
+            outline: none;
+            border-color: #6b7280;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="root" id="root">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="title">Enhanced Perspective Designer</div>
+            <input class="input mb-2" placeholder="Search components..." id="search" oninput="Designer.search(this.value)">
+            <div class="flex gap-2 mb-2">
+                <button class="button secondary" onclick="Designer.showTemplates()">Templates</button>
+                <button class="button purple" onclick="Designer.openShapeEditor()">Custom</button>
+            </div>
+            <div id="palette">
+                <!-- Component palette will be generated here -->
+            </div>
+        </div>
+
+        <!-- Main Area -->
+        <div class="main-area">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="button" id="gridBtn" onclick="Designer.toggleGrid()">Grid</button>
+                <button class="button" id="snapBtn" onclick="Designer.toggleSnap()">Snap</button>
+                <button class="button" onclick="Designer.zoom(0.1)">Zoom+</button>
+                <button class="button" onclick="Designer.zoom(-0.1)">Zoom-</button>
+                <button class="button secondary" onclick="Designer.resetZoom()">Reset</button>
+                <div style="border-left: 1px solid rgba(107,114,128,0.3); height: 30px; margin: 0 0.5rem;"></div>
+                <button class="button" onclick="Designer.togglePipeMode()" id="pipeBtn" title="Pipe Drawing Mode">Pipes</button>
+                <button class="button secondary" onclick="Designer.createTankFarm()" title="Create tank farm template">Tank Farm</button>
+                <button class="button secondary" onclick="Designer.clearAll()">Clear</button>
+                <button class="button purple" onclick="Designer.openShapeEditor()" title="Create custom shapes as Symbol components">Shape Editor</button>
+                <button class="button success" onclick="Designer.saveView()">Save</button>
+                <button class="button" onclick="Designer.loadView()">Load</button>
+                <button class="button" onclick="Designer.exportView()">Export</button>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-container">
+                <div class="canvas" id="canvas">
+                    <div class="grid" id="grid"></div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span>Components: <span id="count">0</span></span>
+                <span>Selected: <span id="selected">None</span></span>
+                <span>Zoom: <span id="zoom">100%</span></span>
+                <span>Pipes: <span id="pipeCount">0</span></span>
+                <span>Custom Shapes: <span id="customCount">0</span></span>
+                <span style="color: #10b981;" id="pipeStatus">Use Pipe Tool for P&ID diagrams</span>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="properties-panel">
+            <div class="title">Properties</div>
+            <div id="properties">
+                <div class="text-center text-sm p-2" style="color: #64748b;">
+                    Select a component to edit properties
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div style="color: #9ca3af; font-weight: 600; font-size: 1rem;">Perspective JSON Export</div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <button class="button success" onclick="Designer.copyJSON()" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Copy</button>
+                        <button class="button" onclick="Designer.downloadJSON()" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Download</button>
+                    </div>
+                </div>
+                <div class="json-editor" id="json" contenteditable="false">[
+  {
+    "type": "ia.container.coord",
+    "version": 0,
+    "props": {
+      "mode": "percent",
+      "aspectRatio": "16:9"
+    },
+    "meta": {
+      "name": "root"
+    },
+    "position": {},
+    "custom": {},
+    "children": []
+  }
+]</div>
+                <div class="copy-success" id="copySuccess">Copied!</div>
+                <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(156, 163, 175, 0.1); border-radius: 4px; font-size: 0.7rem; color: #9ca3af;">
+                    <strong>Usage:</strong> Copy this JSON and paste it into your Perspective Designer view resource in Ignition Designer.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shape Editor Modal -->
+    <div class="shape-editor" id="shapeEditor">
+        <div class="shape-editor-content">
+            <h3 style="color: #8b5cf6; margin-bottom: 1rem;">Custom Shape Editor</h3>
+
+            <div class="tool-panel">
+                <button class="button secondary" onclick="ShapeEditor.setTool('select')" id="selectTool">Select</button>
+                <button class="button secondary" onclick="ShapeEditor.setTool('rectangle')" id="rectangleTool">Rectangle</button>
+                <button class="button secondary" onclick="ShapeEditor.setTool('circle')" id="circleTool">Circle</button>
+                <button class="button secondary" onclick="ShapeEditor.setTool('line')" id="lineTool">Line</button>
+                <button class="button secondary" onclick="ShapeEditor.setTool('path')" id="pathTool">Path</button>
+                <button class="button danger" onclick="ShapeEditor.clear()">Clear</button>
+                <button class="button secondary" onclick="ShapeEditor.undo()">Undo</button>
+            </div>
+
+            <div class="mb-2">
+                <label class="label">Feeder Templates</label>
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.5rem;">
+                    Click a template to create a custom feeder shape, then save it as a Symbol component
+                </div>
+                <div style="font-size: 0.7rem; color: #9ca3af; margin-bottom: 0.5rem;">
+                    Use the <strong>Process</strong> and <strong>Equipment</strong> components in the palette, or the <strong>Pipe Tool</strong> in the toolbar to create P&ID diagrams
+                </div>
+                <div class="feeder-templates">
+                    <div class="feeder-template" onclick="ShapeEditor.loadTemplate('vibratory')">
+                        <div class="feeder-preview">
+                            <svg width="60" height="40" viewBox="0 0 60 40">
+                                <rect x="5" y="15" width="50" height="10" fill="#6b7280" stroke="#9ca3af" rx="2"/>
+                                <rect x="10" y="10" width="40" height="5" fill="#9ca3af" rx="1"/>
+                                <rect x="15" y="25" width="30" height="5" fill="#9ca3af" rx="1"/>
+                            </svg>
+                        </div>
+                        <div class="text-xs">Vibratory</div>
+                    </div>
+                    <div class="feeder-template" onclick="ShapeEditor.loadTemplate('belt')">
+                        <div class="feeder-preview">
+                            <svg width="60" height="40" viewBox="0 0 60 40">
+                                <rect x="5" y="15" width="50" height="8" fill="#6b7280" stroke="#9ca3af" rx="4"/>
+                                <circle cx="10" cy="19" r="3" fill="#9ca3af"/>
+                                <circle cx="50" cy="19" r="3" fill="#9ca3af"/>
+                            </svg>
+                        </div>
+                        <div class="text-xs">Belt</div>
+                    </div>
+                    <div class="feeder-template" onclick="ShapeEditor.loadTemplate('screw')">
+                        <div class="feeder-preview">
+                            <svg width="60" height="40" viewBox="0 0 60 40">
+                                <rect x="5" y="18" width="50" height="4" fill="#6b7280" stroke="#9ca3af"/>
+                                <path d="M10,16 Q20,12 30,16 Q40,20 50,16" stroke="#9ca3af" fill="none" stroke-width="2"/>
+                                <path d="M10,24 Q20,28 30,24 Q40,20 50,24" stroke="#9ca3af" fill="none" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="text-xs">Screw</div>
+                    </div>
+                    <div class="feeder-template" onclick="ShapeEditor.loadTemplate('hopper')">
+                        <div class="feeder-preview">
+                            <svg width="60" height="40" viewBox="0 0 60 40">
+                                <rect x="10" y="5" width="40" height="12" fill="#6b7280" stroke="#9ca3af"/>
+                                <path d="M10,17 L20,28 L40,28 L50,17 Z" fill="#6b7280" stroke="#9ca3af"/>
+                                <rect x="25" y="28" width="10" height="8" fill="#9ca3af"/>
+                                <circle cx="30" cy="32" r="2" fill="none" stroke="#4b5563"/>
+                                <line x1="28" y1="30" x2="32" y2="34" stroke="#4b5563"/>
+                            </svg>
+                        </div>
+                        <div class="text-xs">Hopper</div>
+                    </div>
+                </div>
+            </div>
+
+            <canvas class="shape-canvas" id="shapeCanvas" width="700" height="400"></canvas>
+
+            <div class="mb-2">
+                <label class="label">Shape Name</label>
+                <input class="input" id="shapeName" placeholder="Enter shape name...">
+            </div>
+
+            <div class="flex gap-2" style="justify-content: flex-end; margin-top: 1rem;">
+                <button class="button secondary" onclick="Designer.closeShapeEditor()">Cancel</button>
+                <button class="button success" onclick="ShapeEditor.saveShape()">Save Shape</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="designer.js"></script>
+</body>
+</html>

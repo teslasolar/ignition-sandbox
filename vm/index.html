@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ignition Sandbox VM</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: 'SF Mono', Consolas, monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #161b22;
+            padding: 10px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 16px;
+            color: #58a6ff;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:hover { background: #30363d; }
+        .btn.primary { background: #238636; border-color: #238636; }
+        .btn.primary:hover { background: #2ea043; }
+        .btn.danger { background: #da3633; border-color: #da3633; }
+        .status {
+            font-size: 12px;
+            color: #8b949e;
+        }
+        .status.running { color: #3fb950; }
+        .status.stopped { color: #f85149; }
+        .main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .terminal-container {
+            flex: 1;
+            background: #000;
+            position: relative;
+        }
+        #screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+        .sidebar {
+            width: 280px;
+            background: #161b22;
+            border-left: 1px solid #30363d;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            color: #7ee787;
+            font-size: 13px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #30363d;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        .info-row .label { color: #8b949e; }
+        .info-row .value { color: #c9d1d9; }
+        .quick-cmd {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .quick-cmd:hover { border-color: #58a6ff; }
+        .quick-cmd .cmd-name { color: #58a6ff; margin-bottom: 3px; }
+        .quick-cmd code { color: #7ee787; font-size: 10px; }
+        .boot-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .boot-overlay.hidden { display: none; }
+        .boot-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .boot-title {
+            font-size: 24px;
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+        .boot-subtitle {
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+        .boot-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 300px;
+        }
+        .boot-option {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .boot-option:hover { border-color: #58a6ff; }
+        .boot-option h4 { color: #c9d1d9; margin-bottom: 5px; }
+        .boot-option p { color: #8b949e; font-size: 12px; }
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: #21262d;
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar.active { display: block; }
+        .progress-fill {
+            height: 100%;
+            background: #58a6ff;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .boot-log {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #8b949e;
+            max-height: 100px;
+            overflow-y: auto;
+            text-align: left;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Ignition Sandbox VM</h1>
+        <div class="controls">
+            <span class="status" id="vmStatus">Stopped</span>
+            <button class="btn" id="restartBtn" onclick="VM.restart()">Restart</button>
+            <button class="btn danger" id="stopBtn" onclick="VM.stop()">Stop</button>
+            <button class="btn" onclick="VM.screenshot()">Screenshot</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="terminal-container">
+            <div id="screen"></div>
+            <div class="boot-overlay" id="bootOverlay">
+                <div class="boot-logo">*</div>
+                <div class="boot-title">Ignition Sandbox</div>
+                <div class="boot-subtitle">Browser-based Linux Environment</div>
+
+                <div class="boot-options" id="bootOptions">
+                    <div class="boot-option" onclick="VM.boot('alpine')">
+                        <h4>Alpine Linux (Minimal)</h4>
+                        <p>~50MB - Fast boot, basic tools</p>
+                    </div>
+                    <div class="boot-option" onclick="VM.boot('debian')">
+                        <h4>Debian (Full)</h4>
+                        <p>~200MB - Full environment, slower</p>
+                    </div>
+                    <div class="boot-option" onclick="VM.boot('buildroot')">
+                        <h4>Buildroot (Custom)</h4>
+                        <p>~20MB - Minimal, pre-configured</p>
+                    </div>
+                </div>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="boot-log" id="bootLog"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>System Info</h3>
+            <div class="info-row">
+                <span class="label">Memory</span>
+                <span class="value" id="infoMemory">512 MB</span>
+            </div>
+            <div class="info-row">
+                <span class="label">CPU</span>
+                <span class="value" id="infoCPU">x86 (emulated)</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Network</span>
+                <span class="value" id="infoNetwork">NAT</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Storage</span>
+                <span class="value" id="infoStorage">256 MB</span>
+            </div>
+
+            <h3>Quick Commands</h3>
+            <div class="quick-cmd" onclick="VM.sendCommand('cat /etc/os-release')">
+                <div class="cmd-name">OS Info</div>
+                <code>cat /etc/os-release</code>
+            </div>
+            <div class="quick-cmd" onclick="VM.sendCommand('free -h')">
+                <div class="cmd-name">Memory</div>
+                <code>free -h</code>
+            </div>
+            <div class="quick-cmd" onclick="VM.sendCommand('df -h')">
+                <div class="cmd-name">Disk Space</div>
+                <code>df -h</code>
+            </div>
+            <div class="quick-cmd" onclick="VM.sendCommand('ip addr')">
+                <div class="cmd-name">Network</div>
+                <code>ip addr</code>
+            </div>
+
+            <h3>Ignition</h3>
+            <div class="quick-cmd" onclick="VM.sendCommand('/opt/ignition/ignition.sh status')">
+                <div class="cmd-name">Gateway Status</div>
+                <code>ignition.sh status</code>
+            </div>
+            <div class="quick-cmd" onclick="VM.sendCommand('/opt/ignition/ignition.sh start')">
+                <div class="cmd-name">Start Gateway</div>
+                <code>ignition.sh start</code>
+            </div>
+            <div class="quick-cmd" onclick="VM.sendCommand('curl -sL install.sh | sh')">
+                <div class="cmd-name">Install Ignition</div>
+                <code>curl install.sh | sh</code>
+            </div>
+
+            <h3>About</h3>
+            <p style="font-size: 11px; color: #8b949e; line-height: 1.5;">
+                This sandbox runs a real Linux VM in your browser using v86 (JavaScript x86 emulator).
+                Changes are saved to browser storage.
+            </p>
+        </div>
+    </div>
+
+    <!-- v86 library -->
+    <script src="https://cdn.jsdelivr.net/gh/nicuvlad7/nicuvlad7.github.io/assets/lib/v86/libv86.js"></script>
+
+    <script>
+        const VM = {
+            emulator: null,
+            running: false,
+
+            // Image configurations
+            images: {
+                alpine: {
+                    name: 'Alpine Linux',
+                    bios: 'https://nicuvlad7.github.io/assets/lib/v86/seabios.bin',
+                    vgabios: 'https://nicuvlad7.github.io/assets/lib/v86/vgabios.bin',
+                    cdrom: 'https://nicuvlad7.github.io/assets/lib/v86/alpine.iso',
+                    memory: 512 * 1024 * 1024
+                },
+                debian: {
+                    name: 'Debian',
+                    bios: 'https://nicuvlad7.github.io/assets/lib/v86/seabios.bin',
+                    vgabios: 'https://nicuvlad7.github.io/assets/lib/v86/vgabios.bin',
+                    hda: {
+                        url: 'https://nicuvlad7.github.io/assets/lib/v86/debian.img',
+                        async: true
+                    },
+                    memory: 512 * 1024 * 1024
+                },
+                buildroot: {
+                    name: 'Buildroot',
+                    bios: 'https://nicuvlad7.github.io/assets/lib/v86/seabios.bin',
+                    vgabios: 'https://nicuvlad7.github.io/assets/lib/v86/vgabios.bin',
+                    bzimage: 'https://nicuvlad7.github.io/assets/lib/v86/buildroot-bzimage.bin',
+                    initrd: 'https://nicuvlad7.github.io/assets/lib/v86/buildroot-initramfs.bin',
+                    memory: 256 * 1024 * 1024
+                }
+            },
+
+            log(msg) {
+                const log = document.getElementById('bootLog');
+                log.innerHTML += msg + '<br>';
+                log.scrollTop = log.scrollHeight;
+            },
+
+            setProgress(pct) {
+                document.getElementById('progressFill').style.width = pct + '%';
+            },
+
+            async boot(imageType) {
+                const image = this.images[imageType];
+                if (!image) {
+                    alert('Unknown image type');
+                    return;
+                }
+
+                document.getElementById('bootOptions').style.display = 'none';
+                document.getElementById('progressBar').classList.add('active');
+
+                this.log('Initializing VM...');
+                this.setProgress(10);
+
+                try {
+                    this.log('Loading ' + image.name + '...');
+                    this.setProgress(30);
+
+                    const config = {
+                        wasm_path: 'https://nicuvlad7.github.io/assets/lib/v86/v86.wasm',
+                        memory_size: image.memory,
+                        vga_memory_size: 8 * 1024 * 1024,
+                        screen_container: document.getElementById('screen'),
+                        bios: { url: image.bios },
+                        vga_bios: { url: image.vgabios },
+                        autostart: true,
+                        disable_keyboard: false,
+                        disable_mouse: false
+                    };
+
+                    if (image.cdrom) {
+                        config.cdrom = { url: image.cdrom };
+                    }
+                    if (image.hda) {
+                        config.hda = image.hda;
+                    }
+                    if (image.bzimage) {
+                        config.bzimage = { url: image.bzimage };
+                        config.initrd = { url: image.initrd };
+                        config.cmdline = 'console=ttyS0';
+                    }
+
+                    this.log('Starting emulator...');
+                    this.setProgress(50);
+
+                    this.emulator = new V86Starter(config);
+
+                    this.emulator.add_listener('emulator-ready', () => {
+                        this.log('Emulator ready');
+                        this.setProgress(70);
+                    });
+
+                    this.emulator.add_listener('emulator-started', () => {
+                        this.log('VM started');
+                        this.setProgress(100);
+                        this.running = true;
+                        this.updateStatus();
+
+                        setTimeout(() => {
+                            document.getElementById('bootOverlay').classList.add('hidden');
+                        }, 1000);
+                    });
+
+                } catch (e) {
+                    this.log('Error: ' + e.message);
+                    console.error(e);
+                }
+            },
+
+            stop() {
+                if (this.emulator) {
+                    this.emulator.stop();
+                    this.running = false;
+                    this.updateStatus();
+                }
+            },
+
+            restart() {
+                if (this.emulator) {
+                    this.emulator.restart();
+                }
+            },
+
+            sendCommand(cmd) {
+                if (this.emulator && this.running) {
+                    // Send each character
+                    for (let char of cmd) {
+                        this.emulator.keyboard_send_text(char);
+                    }
+                    // Send enter
+                    this.emulator.keyboard_send_scancodes([0x1C, 0x9C]);
+                }
+            },
+
+            screenshot() {
+                if (this.emulator) {
+                    const canvas = document.querySelector('#screen canvas');
+                    if (canvas) {
+                        const link = document.createElement('a');
+                        link.download = 'ignition-sandbox-' + Date.now() + '.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    }
+                }
+            },
+
+            updateStatus() {
+                const status = document.getElementById('vmStatus');
+                if (this.running) {
+                    status.textContent = 'Running';
+                    status.className = 'status running';
+                } else {
+                    status.textContent = 'Stopped';
+                    status.className = 'status stopped';
+                }
+            }
+        };
+
+        // Check if v86 is available
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof V86Starter === 'undefined') {
+                VM.log('Warning: v86 library not loaded');
+                VM.log('Checking CDN availability...');
+            }
+        });
+    </script>
+</body>
+</html>

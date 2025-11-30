@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ignition Sandbox - Command Runner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #9ca3af;
+        }
+        .nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            background: rgba(107,114,128,0.2);
+            color: #9ca3af;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            border: 1px solid rgba(107,114,128,0.3);
+        }
+        .nav a:hover {
+            background: rgba(107,114,128,0.4);
+            color: #fff;
+        }
+        .terminal {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 400px;
+        }
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27ca40; }
+        .output {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #c9d1d9;
+        }
+        .prompt {
+            color: #58a6ff;
+        }
+        .command {
+            color: #f0883e;
+        }
+        .result {
+            color: #8b949e;
+        }
+        .success {
+            color: #3fb950;
+        }
+        .error {
+            color: #f85149;
+        }
+        .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .cmd-card {
+            background: rgba(107,114,128,0.1);
+            border: 1px solid rgba(107,114,128,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cmd-card:hover {
+            background: rgba(107,114,128,0.2);
+            transform: translateY(-2px);
+        }
+        .cmd-name {
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+        .cmd-desc {
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 8px;
+        }
+        .cmd-run {
+            font-family: monospace;
+            font-size: 11px;
+            color: #f0883e;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .input-area input {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .input-area button {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .input-area button:hover {
+            background: #2ea043;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ignition Sandbox</h1>
+        <nav class="nav">
+            <a href="../">Home</a>
+            <a href="../designer/">Designer</a>
+            <a href="../templates/">Templates</a>
+            <a href="../../">Main</a>
+        </nav>
+
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+                <span style="margin-left: 10px; color: #8b949e;">sandbox@ignition:~</span>
+            </div>
+            <div class="output" id="output">
+<span class="prompt">$</span> <span class="command">echo "Welcome to Ignition Sandbox"</span>
+<span class="success">Welcome to Ignition Sandbox</span>
+
+<span class="prompt">$</span> <span class="command">cat /etc/sandbox-info</span>
+<span class="result">Ignition Sandbox Environment
+Version: 1.0.0
+Platform: GitHub Pages
+Templates: Perspective JSON</span>
+
+<span class="prompt">$</span> <span class="command">_</span>
+            </div>
+            <div class="input-area">
+                <input type="text" id="cmdInput" placeholder="Enter command..." onkeypress="if(event.key==='Enter')runCommand()">
+                <button onclick="runCommand()">Run</button>
+            </div>
+        </div>
+
+        <div class="command-list" id="commandList">
+            <!-- Commands loaded dynamically -->
+        </div>
+    </div>
+
+    <script>
+        const commands = {
+            help: {
+                name: 'help',
+                description: 'Show available commands',
+                run: () => Object.keys(commands).join('  ')
+            },
+            clear: {
+                name: 'clear',
+                description: 'Clear terminal',
+                run: () => { document.getElementById('output').innerHTML = ''; return ''; }
+            },
+            date: {
+                name: 'date',
+                description: 'Show current date',
+                run: () => new Date().toString()
+            },
+            'load-template': {
+                name: 'load-template',
+                description: 'Load a Perspective template',
+                run: (args) => {
+                    if (!args) return 'Usage: load-template <name>\nAvailable: tank-farm, overview';
+                    return `Loading template: ${args}...\nTemplate loaded successfully. Check Designer.`;
+                }
+            },
+            'list-templates': {
+                name: 'list-templates',
+                description: 'List available templates',
+                run: () => 'Templates:\n  - tank-farm (Process View)\n  - overview (Layout)\n  - tank (Component)\n  - valve (Component)\n  - pump (Component)\n  - hopper (Symbol)\n  - belt (Symbol)\n  - screw (Symbol)'
+            },
+            sysinfo: {
+                name: 'sysinfo',
+                description: 'System information',
+                run: () => `Platform: Browser Sandbox\nUserAgent: ${navigator.userAgent.substring(0, 60)}...\nMemory: ${navigator.deviceMemory || 'N/A'} GB\nCores: ${navigator.hardwareConcurrency || 'N/A'}`
+            },
+            'open-designer': {
+                name: 'open-designer',
+                description: 'Open Perspective Designer',
+                run: () => { window.location.href = '../designer/'; return 'Opening Designer...'; }
+            }
+        };
+
+        function runCommand() {
+            const input = document.getElementById('cmdInput');
+            const output = document.getElementById('output');
+            const cmd = input.value.trim();
+
+            if (!cmd) return;
+
+            const [cmdName, ...args] = cmd.split(' ');
+            const argStr = args.join(' ');
+
+            let result;
+            if (commands[cmdName]) {
+                result = commands[cmdName].run(argStr);
+            } else {
+                result = `Command not found: ${cmdName}. Type 'help' for available commands.`;
+            }
+
+            output.innerHTML += `\n<span class="prompt">$</span> <span class="command">${cmd}</span>\n`;
+            if (result) {
+                output.innerHTML += `<span class="result">${result}</span>\n`;
+            }
+            output.innerHTML += `<span class="prompt">$</span> <span class="command">_</span>`;
+
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Build command cards
+        const list = document.getElementById('commandList');
+        Object.values(commands).forEach(cmd => {
+            const card = document.createElement('div');
+            card.className = 'cmd-card';
+            card.onclick = () => {
+                document.getElementById('cmdInput').value = cmd.name;
+                runCommand();
+            };
+            card.innerHTML = `
+                <div class="cmd-name">${cmd.name}</div>
+                <div class="cmd-desc">${cmd.description}</div>
+                <div class="cmd-run">${cmd.name}</div>
+            `;
+            list.appendChild(card);
+        });
+    </script>
+</body>
+</html>
