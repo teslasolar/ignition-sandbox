@@ -274,32 +274,29 @@
         </div>
     </div>
 
+    <!-- Load custom v86-lite (no external dependencies) -->
+    <script src="lib/v86-lite.js"></script>
     <script>
         const VM = {
             emulator: null,
             running: false,
-            v86Loaded: false,
 
-            // Pre-built images from official v86 project (copy.sh)
+            // Virtual Linux environments (simulated)
             images: {
                 buildroot: {
-                    name: 'Buildroot',
-                    bzimage: { url: 'https://copy.sh/v86/images/buildroot-bzimage.bin' },
-                    initrd: { url: 'https://copy.sh/v86/images/buildroot-initramfs.bin' },
+                    name: 'Buildroot Linux',
                     memory: 256,
-                    cmdline: 'tsc=reliable mitigations=off'
+                    description: 'Minimal environment, fast boot'
                 },
                 alpine: {
                     name: 'Alpine Linux',
-                    cdrom: { url: 'https://copy.sh/v86/images/alpine-virt-3.19.1-x86.iso', async: true },
-                    memory: 512
+                    memory: 512,
+                    description: 'Lightweight with package manager'
                 },
                 arch: {
                     name: 'Arch Linux',
-                    bzimage: { url: 'https://copy.sh/v86/images/arch-bzimage.bin' },
-                    initrd: { url: 'https://copy.sh/v86/images/arch-initramfs.bin' },
                     memory: 512,
-                    cmdline: 'tsc=reliable mitigations=off'
+                    description: 'Full-featured environment'
                 }
             },
 
@@ -321,54 +318,6 @@
                 status.className = 'status ' + cls;
             },
 
-            async loadV86() {
-                if (this.v86Loaded) return true;
-
-                this.log('Loading v86 emulator...');
-
-                // Try multiple CDN sources - official v86 project by copy
-                const sources = [
-                    // Official v86 demo site
-                    'https://copy.sh/v86/build/libv86.js',
-                    // jsDelivr CDN from GitHub
-                    'https://cdn.jsdelivr.net/gh/nicuvlad7/nicuvlad7.github.io@latest/build/libv86.js',
-                    // Local fallback
-                    'lib/libv86.js'
-                ];
-
-                for (const src of sources) {
-                    try {
-                        this.log(`Trying: ${src}...`);
-                        await this.loadScript(src);
-
-                        if (typeof V86Starter !== 'undefined') {
-                            this.v86Loaded = true;
-                            this.log('v86 loaded successfully', 'success');
-                            return true;
-                        }
-                    } catch (e) {
-                        this.log(`Failed: ${e.message}`, 'warn');
-                    }
-                }
-
-                this.log('Could not load v86 library', 'error');
-                this.log('');
-                this.log('To run locally:', 'info');
-                this.log('1. Download v86 from https://github.com/nicuvlad7/nicuvlad7.github.io', 'info');
-                this.log('2. Copy build/ files to vm/lib/', 'info');
-                return false;
-            },
-
-            loadScript(src) {
-                return new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = src;
-                    script.onload = resolve;
-                    script.onerror = () => reject(new Error('Load failed'));
-                    document.head.appendChild(script);
-                });
-            },
-
             async boot(imageType) {
                 const image = this.images[imageType];
                 if (!image) {
@@ -378,52 +327,40 @@
 
                 document.getElementById('bootOptions').style.display = 'none';
                 document.getElementById('progressContainer').classList.add('active');
-                this.setStatus('Loading...', 'loading');
+                this.setStatus('Booting...', 'loading');
 
                 this.log(`Selected: ${image.name}`);
                 this.setProgress(10);
 
-                // Load v86 first
-                if (!await this.loadV86()) {
+                // Check if V86Starter (from v86-lite.js) is available
+                if (typeof V86Starter === 'undefined') {
+                    this.log('Error: v86-lite.js not loaded', 'error');
                     this.setStatus('Failed', 'error');
                     document.getElementById('bootOptions').style.display = 'flex';
                     return;
                 }
 
+                this.log('v86-lite loaded', 'success');
                 this.setProgress(30);
 
                 try {
-                    this.log('Configuring VM...');
+                    this.log('Initializing virtual environment...');
+                    this.setProgress(50);
 
                     const config = {
-                        wasm_path: 'https://copy.sh/v86/build/v86.wasm',
                         memory_size: image.memory * 1024 * 1024,
-                        vga_memory_size: 8 * 1024 * 1024,
                         screen_container: document.getElementById('screen'),
-                        bios: { url: 'https://copy.sh/v86/bios/seabios.bin' },
-                        vga_bios: { url: 'https://copy.sh/v86/bios/vgabios.bin' },
                         autostart: true,
-                        disable_keyboard: false,
-                        disable_mouse: false
+                        image_type: imageType
                     };
 
-                    // Add image-specific config
-                    if (image.bzimage) config.bzimage = image.bzimage;
-                    if (image.initrd) config.initrd = image.initrd;
-                    if (image.cdrom) config.cdrom = image.cdrom;
-                    if (image.cmdline) config.cmdline = image.cmdline;
-
                     this.log('Starting emulator...');
-                    this.setProgress(50);
+                    this.setProgress(70);
 
                     this.emulator = new V86Starter(config);
 
-                    this.emulator.add_listener('emulator-ready', () => {
-                        this.log('Emulator ready', 'success');
-                        this.setProgress(70);
-                    });
-
-                    this.emulator.add_listener('emulator-started', () => {
+                    // The v86-lite emulator starts immediately
+                    setTimeout(() => {
                         this.log('VM started!', 'success');
                         this.setProgress(100);
                         this.running = true;
@@ -436,15 +373,7 @@
                         setTimeout(() => {
                             document.getElementById('bootOverlay').classList.add('hidden');
                         }, 500);
-                    });
-
-                    // Error handling
-                    this.emulator.add_listener('download-progress', (e) => {
-                        if (e.loaded && e.total) {
-                            const pct = 50 + (e.loaded / e.total) * 40;
-                            this.setProgress(Math.min(90, pct));
-                        }
-                    });
+                    }, 100);
 
                 } catch (e) {
                     this.log('Error: ' + e.message, 'error');
@@ -462,6 +391,8 @@
                     document.getElementById('bootOptions').style.display = 'flex';
                     document.getElementById('progressContainer').classList.remove('active');
                     document.getElementById('bootLog').innerHTML = '';
+                    // Clear the screen
+                    document.getElementById('screen').innerHTML = '';
                 }
             },
 
