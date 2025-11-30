@@ -1,62 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ignition Sandbox</title>
+<html><head><meta charset="UTF-8">
+<title>Konomi IgnAIte v1.0 | Browser Ignition OS</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font:16px/1.6 -apple-system,sans-serif;background:#0d1117;color:#c9d1d9;padding:40px 20px}
-.container{max-width:900px;margin:0 auto}
-h1{color:#58a6ff;margin-bottom:10px}
-h2{color:#7ee787;margin:30px 0 15px;font-size:18px;border-bottom:1px solid #30363d;padding-bottom:8px}
-h3{color:#f0f6fc;font-size:14px;margin:15px 0 10px}
-p{color:#8b949e;margin-bottom:15px}
-a{color:#58a6ff}
-.cmd{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px 15px;margin:8px 0;position:relative;cursor:pointer}
-.cmd:hover{border-color:#58a6ff}
-.cmd code{display:block;color:#7ee787;font-family:monospace;font-size:13px;word-break:break-all}
-.cmd .label{color:#c9d1d9;font-size:13px;margin-bottom:5px;font-weight:500}
-.cmd .desc{color:#8b949e;font-size:12px;margin-top:4px}
-.cmd button{position:absolute;top:50%;right:10px;transform:translateY(-50%);background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px}
-.cmd button:hover{background:#30363d}
-.cmd button.copied{background:#238636;border-color:#238636}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:15px 0}
-.card{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px}
-.card.highlight{border-color:#238636}
-.card h4{color:#f0f6fc;font-size:14px;margin-bottom:6px}
-.card h4 a.highlight{color:#3fb950}
-.card p{font-size:13px;margin:0}
-.card code{color:#7ee787;font-size:12px}
-.tabs{display:flex;gap:5px;margin-bottom:15px;flex-wrap:wrap}
-.tab{background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:13px}
-.tab:hover,.tab.active{background:#30363d;border-color:#58a6ff}
-.tab.highlight{background:#238636;border-color:#238636}
-.info-list{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px}
-.info-list p{margin:5px 0;font-size:13px}
-.loading{color:#8b949e;text-align:center;padding:40px}
-.footer{margin-top:40px;color:#8b949e;font-size:13px;text-align:center}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Consolas,monospace}
+body{background:#0d1117;color:#c9d1d9;overflow:hidden}
+.boot{position:fixed;inset:0;background:#0d1117;padding:20px;font-size:12px;z-index:9999;overflow-y:auto}
+.logo-boot{color:#f97316;font-size:9px;margin-bottom:15px;white-space:pre;line-height:1.1}
+.bline{margin:2px 0;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.bline.ok{color:#3fb950}
+.bline.warn{color:#f0883e}
+.bline.err{color:#f85149}
+.cur{animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.os{display:none;width:100vw;height:100vh}
+.os.active{display:grid;grid-template-rows:40px 1fr 24px}
+.tb{background:#161b22;border-bottom:2px solid #f97316;padding:8px 15px;display:flex;align-items:center;gap:15px}
+.logo{font-size:15px;font-weight:700;color:#f97316;text-shadow:0 0 8px rgba(249,115,22,.5)}
+.menu{display:flex;gap:6px}
+.mi{padding:5px 12px;background:rgba(249,115,22,.1);border:1px solid #f97316;border-radius:4px;cursor:pointer;font-size:11px;color:#c9d1d9;transition:all .2s}
+.mi:hover{background:rgba(249,115,22,.2);box-shadow:0 0 8px rgba(249,115,22,.3)}
+.mi.active{background:#f97316;color:#000}
+.desk{display:grid;grid-template-columns:220px 1fr 260px;gap:2px;background:#0d1117;padding:2px}
+.pan{background:rgba(22,27,34,.95);border:1px solid #30363d;border-radius:4px;overflow-y:auto}
+.pan::-webkit-scrollbar{width:4px}
+.pan::-webkit-scrollbar-thumb{background:#f97316;border-radius:2px}
+.pt{background:linear-gradient(135deg,#f97316,#ea580c);color:#000;padding:6px 10px;font-weight:700;font-size:10px}
+.pc{padding:8px;font-size:10px}
+.sb{background:#161b22;border-top:1px solid #30363d;padding:4px 15px;display:flex;justify-content:space-between;font-size:9px;color:#8b949e}
+.tree{list-style:none}
+.tree li{padding:3px 0 3px 14px;cursor:pointer;position:relative;font-size:10px;border-left:1px solid #30363d;margin-left:8px}
+.tree li:before{content:"📁";position:absolute;left:-2px;font-size:8px}
+.tree li.f:before{content:"📄"}
+.tree li.vm:before{content:"💻"}
+.tree li.tpl:before{content:"📋"}
+.tree li:hover{background:rgba(249,115,22,.1);color:#f97316}
+.tree>li{border-left:none;margin-left:0}
+.cv{background:#000;border-radius:4px;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.cv-inner{text-align:center}
+.cv h2{color:#f97316;margin-bottom:10px}
+.cv p{color:#8b949e;font-size:11px;margin-bottom:15px}
+.cv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px}
+.cv-card{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:15px;text-align:center;cursor:pointer;transition:all .2s}
+.cv-card:hover{border-color:#f97316;transform:translateY(-2px)}
+.cv-card.hl{border-color:#3fb950}
+.cv-card h4{color:#c9d1d9;font-size:12px;margin-bottom:5px}
+.cv-card p{color:#8b949e;font-size:9px;margin:0}
+.cv-card .icon{font-size:24px;margin-bottom:8px}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.stat-box{background:rgba(249,115,22,.08);border:1px solid #30363d;padding:8px;border-radius:4px;text-align:center}
+.stat-label{font-size:8px;color:#8b949e;text-transform:uppercase}
+.stat-val{font-size:14px;color:#f97316;font-weight:700}
+.cmd{background:#000;border:1px solid #30363d;border-radius:4px;padding:6px;margin:4px 0;cursor:pointer;font-size:9px}
+.cmd:hover{border-color:#f97316}
+.cmd .label{color:#f97316;margin-bottom:2px}
+.cmd code{color:#3fb950;font-size:9px}
+.term{background:#000;border:1px solid #30363d;border-radius:4px;padding:8px;height:150px;overflow-y:auto;font-size:9px;color:#3fb950}
+.term .ln{margin:2px 0}
+.term .pr{color:#f97316}
+.bp{width:100%;height:4px;background:#21262d;margin:10px 0;border-radius:2px;overflow:hidden}
+.bpf{height:100%;background:linear-gradient(90deg,#f97316,#3fb950);width:0;transition:width .3s}
+.btn{background:#f97316;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:700;margin:3px}
+.btn:hover{background:#ea580c}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>Ignition Sandbox</h1>
-<p>Command reference for Linux environments. Click any command to copy.</p>
-<div class="tabs" id="tabs"><div class="loading">Loading...</div></div>
-<div id="content"><div class="loading">Loading templates...</div></div>
-<h2>Resources</h2>
-<div class="grid" id="resources"><div class="loading">Loading...</div></div>
-<div class="footer"><p>All scripts run on Debian/Ubuntu Linux.</p></div>
+<div class="boot" id="boot">
+<pre class="logo-boot">
+ ██╗  ██╗ ██████╗ ███╗   ██╗ ██████╗ ███╗   ███╗██╗
+ ██║ ██╔╝██╔═══██╗████╗  ██║██╔═══██╗████╗ ████║██║
+ █████╔╝ ██║   ██║██╔██╗ ██║██║   ██║██╔████╔██║██║
+ ██╔═██╗ ██║   ██║██║╚██╗██║██║   ██║██║╚██╔╝██║██║
+ ██║  ██╗╚██████╔╝██║ ╚████║╚██████╔╝██║ ╚═╝ ██║██║
+ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝╚═╝
+    IgnAIte v1.0 | Browser-Based Ignition Sandbox
+</pre>
+<div id="bo"></div>
+<div class="bp"><div class="bpf" id="bb"></div></div>
+<div><span class="cur">█</span></div>
 </div>
+
+<div class="os" id="os">
+<div class="tb">
+<div class="logo">🔥 KONOMI IgnAIte</div>
+<div class="menu">
+<div class="mi active" onclick="K.view('home')">🏠 Home</div>
+<div class="mi" onclick="K.view('vm')">💻 VM</div>
+<div class="mi" onclick="K.view('designer')">🎨 Designer</div>
+<div class="mi" onclick="K.view('cli')">⌨️ CLI</div>
+<div class="mi" onclick="K.view('templates')">📋 Templates</div>
+</div>
+<div style="margin-left:auto;color:#8b949e;font-size:10px">
+<span id="time"></span> | v1.0
+</div>
+</div>
+
+<div class="desk">
+<div class="pan">
+<div class="pt">📁 REPOSITORY</div>
+<div class="pc">
+<ul class="tree" id="tree"></ul>
+<div style="margin-top:10px">
+<button class="btn" onclick="K.action('refresh')">↻ Refresh</button>
+</div>
+</div>
+</div>
+
+<div class="pan">
+<div class="pt" id="cvTitle">🏠 KONOMI IgnAIte</div>
+<div class="cv" id="cv"></div>
+</div>
+
+<div class="pan">
+<div class="pt">⚡ QUICK ACTIONS</div>
+<div class="pc">
+<div class="stat">
+<div class="stat-box"><div class="stat-label">Modules</div><div class="stat-val" id="mods">4</div></div>
+<div class="stat-box"><div class="stat-label">Templates</div><div class="stat-val" id="tpls">6</div></div>
+</div>
+<div id="cmds"></div>
+<div class="term" id="term">
+<div class="ln"><span class="pr">ignite$</span> system boot</div>
+<div class="ln">Konomi IgnAIte ready</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="sb">
+<div>Ignition Gateway • Perspective • v86 VM • GitHub Pages</div>
+<div>Repo: <span style="color:#f97316">teslasolar/ignition-sandbox</span></div>
+</div>
+</div>
+
 <script>
-const App={manifest:null,cache:{},
-async init(){try{this.manifest=await this.load('templates/manifest.json');this.renderTabs();this.renderResources();if(this.manifest.tabs.length)this.showTab(this.manifest.tabs[0].id)}catch(e){document.getElementById('content').innerHTML='<div class="loading">Failed to load</div>'}},
-async load(p){if(this.cache[p])return this.cache[p];const r=await fetch(p);if(!r.ok)throw new Error();return this.cache[p]=await r.json()},
-renderTabs(){document.getElementById('tabs').innerHTML=this.manifest.tabs.map(t=>`<button class="tab${t.highlight?' highlight':''}" onclick="App.showTab('${t.id}')" data-tab="${t.id}">${t.label}</button>`).join('')},
-renderResources(){document.getElementById('resources').innerHTML=this.manifest.resources.map(r=>`<div class="card${r.highlight?' highlight':''}"><h4><a href="${r.href}"${r.highlight?' class="highlight"':''}>${r.title}</a></h4><p>${r.description}</p></div>`).join('')},
-async showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelector(`[data-tab="${id}"]`)?.classList.add('active');const tab=this.manifest.tabs.find(t=>t.id===id);if(!tab)return;const c=document.getElementById('content');c.innerHTML='<div class="loading">Loading...</div>';try{const d=await this.load('templates/'+tab.src);c.innerHTML=this.render(d)}catch(e){c.innerHTML='<div class="loading">Failed</div>'}},
-render(d){let h=`<div><h2>${d.title}</h2>`;if(d.description)h+=`<p>${d.description}</p>`;if(d.commands)h+=d.commands.map(c=>`<div class="cmd" onclick="App.copy(this)"><div class="label">${c.label}</div><code>${c.code}</code>${c.description?`<div class="desc">${c.description}</div>`:''}<button>Copy</button></div>`).join('');if(d.sections)d.sections.forEach(s=>{if(s.title)h+=`<h3>${s.title}</h3>`;if(s.type==='cards')h+='<div class="grid">'+s.items.map(i=>`<div class="card${i.highlight?' highlight':''}"><h4>${i.href?`<a href="${i.href}"${i.target?' target="_blank"':''}${i.highlight?' class="highlight"':''}>${i.title}</a>`:i.title}</h4><p>${i.description||''}</p>${i.note?`<code>${i.note}</code>`:''}</div>`).join('')+'</div>';if(s.type==='commands')h+='<div class="grid">'+s.items.map(i=>`<div class="cmd" onclick="App.copy(this)"><div class="label">${i.label}</div><code>${i.code}</code><button>Copy</button></div>`).join('')+'</div>';if(s.type==='info')h+='<div class="info-list">'+s.content.map(l=>`<p>${l}</p>`).join('')+'</div>'});return h+'</div>'},
-copy(el){const code=el.querySelector('code').textContent,btn=el.querySelector('button');navigator.clipboard.writeText(code).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},2000)})}
-};App.init();
+const K={
+data:{},current:'home',
+async boot(){
+const lines=['Init Konomi IgnAIte...','Load index.json...','Mount /templates...','Init v86-lite VM...','Load Perspective...','Start gateway sim...','Connect GitHub Pages...','All systems ready.'];
+let i=0;const ou=document.getElementById('bo'),ba=document.getElementById('bb');
+const iv=setInterval(()=>{if(i<lines.length){const l=document.createElement('div');l.className='bline ok';l.textContent='[  OK  ] '+lines[i];ou.appendChild(l);ba.style.width=((i+1)/lines.length*100)+'%';i++}else{clearInterval(iv);setTimeout(()=>{document.getElementById('boot').style.display='none';document.getElementById('os').classList.add('active');this.init()},600)}},180)},
+
+async init(){
+try{this.data.root=await this.load('index.json')}catch(e){this.data.root={name:'Konomi IgnAIte',children:['cli','screens','vm','templates']}}
+this.renderTree();this.view('home');this.clock();this.log('System initialized')},
+
+async load(p){const r=await fetch(p);return r.ok?r.json():null},
+
+renderTree(){
+const tree=document.getElementById('tree');
+const items=[
+{name:'/',children:[
+{name:'cli/',cls:'',children:[{name:'commands/',cls:'f'},{name:'wrappers/',cls:'f'}]},
+{name:'screens/',cls:'',children:[{name:'designer/',cls:'f'},{name:'templates/',cls:'tpl'}]},
+{name:'vm/',cls:'vm',children:[{name:'lib/',cls:'f'},{name:'boot/',cls:'f'}]},
+{name:'templates/',cls:'tpl',children:[{name:'commands/',cls:'f'},{name:'tabs/',cls:'f'}]},
+{name:'index.json',cls:'f'},
+{name:'index.html',cls:'f'}
+]}];
+const render=(list,ul)=>{list.forEach(it=>{const li=document.createElement('li');li.className=it.cls||'';li.textContent=it.name;li.onclick=(e)=>{e.stopPropagation();this.select(it.name)};if(it.children){const sub=document.createElement('ul');sub.className='tree';render(it.children,sub);li.appendChild(sub)}ul.appendChild(li)})};
+tree.innerHTML='';render(items,tree)},
+
+select(name){this.log('Selected: '+name);if(name.includes('vm'))this.view('vm');else if(name.includes('designer')||name.includes('screens'))this.view('designer');else if(name.includes('cli'))this.view('cli');else if(name.includes('templates'))this.view('templates')},
+
+view(v){
+this.current=v;
+document.querySelectorAll('.mi').forEach(m=>m.classList.remove('active'));
+document.querySelector(`.mi[onclick*="${v}"]`)?.classList.add('active');
+const cv=document.getElementById('cv'),title=document.getElementById('cvTitle'),cmds=document.getElementById('cmds');
+const views={
+home:{title:'🏠 KONOMI IgnAIte',content:`<div class="cv-inner"><h2>🔥 Konomi IgnAIte</h2><p>Browser-based Ignition Gateway sandbox with custom OS</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">💻</div><h4>VM Sandbox</h4><p>Boot Linux in browser</p></div><div class="cv-card" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Designer</h4><p>Perspective views</p></div><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">⌨️</div><h4>CLI Tools</h4><p>Command framework</p></div><div class="cv-card" onclick="K.nav('screens/templates/')"><div class="icon">📋</div><h4>Templates</h4><p>JSON components</p></div><div class="cv-card" onclick="K.nav('screens/')"><div class="icon">📊</div><h4>Screens</h4><p>All screens</p></div><div class="cv-card" onclick="window.open('https://github.com/teslasolar/ignition-sandbox')"><div class="icon">🐙</div><h4>GitHub</h4><p>Source code</p></div></div>`,cmds:[{l:'Launch VM',c:'vm/'},{l:'Open Designer',c:'screens/designer/'}]},
+vm:{title:'💻 VM SANDBOX',content:`<div class="cv-inner"><h2>💻 Browser VM</h2><p>v86-lite x86 emulator - No external dependencies</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('vm/')"><div class="icon">🚀</div><h4>Launch VM</h4><p>Boot Linux now</p></div><div class="cv-card" onclick="K.nav('vm/terminal.html')"><div class="icon">>_</div><h4>Terminal</h4><p>Web terminal</p></div><div class="cv-card"><div class="icon">📦</div><h4>Alpine</h4><p>~50MB, ~15s boot</p></div></div>`,cmds:[{l:'ignition status',c:'ignition status'},{l:'ignition install',c:'ignition install'}]},
+designer:{title:'🎨 PERSPECTIVE DESIGNER',content:`<div class="cv-inner"><h2>🎨 Designer</h2><p>Visual Perspective view builder with JSON export</p></div><div class="cv-grid"><div class="cv-card hl" onclick="K.nav('screens/designer/')"><div class="icon">🎨</div><h4>Open Designer</h4><p>Drag & drop views</p></div><div class="cv-card" onclick="K.nav('screens/templates/views/tank-farm.json')"><div class="icon">🏭</div><h4>Tank Farm</h4><p>Example view</p></div><div class="cv-card" onclick="K.nav('screens/sandbox/')"><div class="icon">>_</div><h4>Sandbox</h4><p>Command runner</p></div></div>`,cmds:[{l:'Tank Component',c:'screens/templates/components/tank.json'},{l:'Valve Component',c:'screens/templates/components/valve.json'}]},
+cli:{title:'⌨️ CLI TOOLS',content:`<div class="cv-inner"><h2>⌨️ CLI Framework</h2><p>Command-line testing tools</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('cli/')"><div class="icon">📖</div><h4>Documentation</h4><p>CLI reference</p></div><div class="cv-card"><div class="icon">🔌</div><h4>API Wrapper</h4><p>HTTP client</p></div><div class="cv-card"><div class="icon">🔗</div><h4>MCP Tools</h4><p>MCP integration</p></div></div>`,cmds:[{l:'sandbox-cli ping',c:'./cli/sandbox-cli ping'},{l:'sandbox-cli sync',c:'./cli/sandbox-cli sync'}]},
+templates:{title:'📋 TEMPLATES',content:`<div class="cv-inner"><h2>📋 JSON Templates</h2><p>Perspective components, symbols, and views</p></div><div class="cv-grid"><div class="cv-card" onclick="K.nav('screens/templates/')"><div class="icon">📁</div><h4>Browse All</h4><p>Template library</p></div><div class="cv-card" onclick="K.nav('templates/')"><div class="icon">⚙️</div><h4>Commands</h4><p>Command JSONs</p></div><div class="cv-card" onclick="K.nav('screens/templates/manifest.json')"><div class="icon">📜</div><h4>Manifest</h4><p>Full catalog</p></div></div>`,cmds:[{l:'View manifest',c:'templates/manifest.json'}]}
+};
+const vw=views[v]||views.home;
+title.textContent=vw.title;
+cv.innerHTML=vw.content;
+cmds.innerHTML=vw.cmds.map(c=>`<div class="cmd" onclick="K.copy('${c.c}')"><div class="label">${c.l}</div><code>${c.c}</code></div>`).join('')},
+
+nav(url){this.log('Navigate: '+url);location.href=url},
+copy(txt){navigator.clipboard.writeText(txt);this.log('Copied: '+txt)},
+action(a){this.log('Action: '+a);if(a==='refresh')location.reload()},
+log(m){const t=document.getElementById('term'),ln=document.createElement('div');ln.className='ln';ln.innerHTML=`<span class="pr">ignite$</span> ${m}`;t.appendChild(ln);t.scrollTop=t.scrollHeight;if(t.children.length>30)t.removeChild(t.children[0])},
+clock(){setInterval(()=>{document.getElementById('time').textContent=new Date().toLocaleTimeString()},1000)}
+};
+K.boot();
 </script>
 </body>
 </html>

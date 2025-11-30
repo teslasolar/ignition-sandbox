@@ -1,0 +1,16 @@
+{"name":"Templates","type":"module","parent":"/",
+"description":"JSON templates for commands, tabs, and Perspective components",
+"structure":{
+  "commands":{"path":"commands/","description":"Command definitions by category"},
+  "tabs":{"path":"tabs/","description":"Tab content definitions"},
+  "perspective":{"path":"../screens/templates/","description":"Perspective view templates"}
+},
+"files":[
+  {"id":"ignition","path":"commands/ignition.json","type":"commands"},
+  {"id":"tailscale","path":"commands/tailscale.json","type":"commands"},
+  {"id":"system","path":"commands/system.json","type":"commands"},
+  {"id":"setup","path":"commands/setup.json","type":"commands"},
+  {"id":"designer","path":"tabs/designer.json","type":"tab"},
+  {"id":"vm","path":"tabs/vm.json","type":"tab"}
+],
+"children":["commands","tabs"]}

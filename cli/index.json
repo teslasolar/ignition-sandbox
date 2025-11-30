@@ -1,0 +1,15 @@
+{"name":"CLI Tools","type":"module","parent":"/",
+"description":"Command-line testing framework for Konomi IgnAIte",
+"items":[
+  {"id":"sandbox-cli","title":"sandbox-cli","description":"Main CLI entry point","tags":["Python","API"],"code":"./cli/sandbox-cli status"},
+  {"id":"api-wrapper","title":"API Wrapper","description":"HTTP client for endpoints","tags":["Python"],"code":"./cli/wrappers/api-wrapper.py"},
+  {"id":"mcp-tools","title":"MCP Tools","description":"MCP-compatible definitions","tags":["JSON","MCP"],"code":"./cli/sandbox-cli mcp list"},
+  {"id":"tailscale","title":"Tailscale Wrapper","description":"Tailscale CLI wrapper","tags":["Python"],"code":"./cli/sandbox-cli ts status"}
+],
+"commands":[
+  {"label":"Check status","code":"./cli/sandbox-cli ping"},
+  {"label":"Sync check","code":"./cli/sandbox-cli sync"},
+  {"label":"List commands","code":"./cli/sandbox-cli commands"},
+  {"label":"Watch sync","code":"./cli/sandbox-cli watch"}
+],
+"children":["commands","wrappers"]}

@@ -1,0 +1,13 @@
+{"name":"Screens","type":"module","parent":"/",
+"description":"Perspective JSON Templates & Design Tools",
+"items":[
+  {"id":"designer","title":"Perspective Designer","href":"designer/","icon":"cog","description":"Visual drag-and-drop view designer","tags":["Drag & Drop","JSON Export"]},
+  {"id":"sandbox","title":"Command Sandbox","href":"sandbox/","icon":"terminal","description":"Interactive command runner","tags":["Terminal","Commands"]},
+  {"id":"templates","title":"Template Library","href":"templates/","icon":"folder","description":"Reusable Perspective JSON templates","tags":["Components","Views"]}
+],
+"quickLinks":[
+  {"title":"Tank Farm","href":"templates/views/tank-farm.json","type":"view"},
+  {"title":"Overview","href":"templates/views/overview.json","type":"view"},
+  {"title":"Manifest","href":"templates/manifest.json","type":"catalog"}
+],
+"children":["designer","sandbox","templates"]}

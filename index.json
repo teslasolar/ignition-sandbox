@@ -1,0 +1,17 @@
+{"name":"Konomi IgnAIte","version":"1.0.0","type":"project",
+"description":"Browser-based Ignition sandbox with custom OS",
+"tabs":[
+  {"id":"ignition","label":"Ignition","src":"templates/commands/ignition.json"},
+  {"id":"tailscale","label":"Tailscale","src":"templates/commands/tailscale.json"},
+  {"id":"system","label":"System","src":"templates/commands/system.json"},
+  {"id":"setup","label":"Setup","src":"templates/commands/setup.json"},
+  {"id":"designer","label":"Designer","src":"templates/tabs/designer.json"},
+  {"id":"vm","label":"VM","src":"templates/tabs/vm.json","highlight":true}
+],
+"resources":[
+  {"id":"vm","title":"VM Sandbox","href":"vm/","icon":"terminal","highlight":true},
+  {"id":"screens","title":"Screens","href":"screens/","icon":"grid"},
+  {"id":"cli","title":"CLI Tools","href":"cli/","icon":"code"},
+  {"id":"templates","title":"Templates","href":"templates/","icon":"file"}
+],
+"children":["cli","screens","vm","templates"]}
