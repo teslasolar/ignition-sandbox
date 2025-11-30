@@ -1,0 +1,44 @@
+{
+  "id": "designer",
+  "title": "Perspective Designer",
+  "type": "custom",
+
+  "sections": [
+    {
+      "title": null,
+      "type": "cards",
+      "items": [
+        { "title": "Visual Designer", "href": "screens/designer/", "description": "Drag-and-drop Perspective view designer with JSON export" },
+        { "title": "Command Sandbox", "href": "screens/sandbox/", "description": "Interactive terminal for loading templates" },
+        { "title": "All Screens", "href": "screens/", "description": "Browse all available screens and tools" }
+      ]
+    },
+    {
+      "title": "Templates",
+      "type": "cards",
+      "items": [
+        { "title": "Tank Farm", "href": "screens/templates/views/tank-farm.json", "description": "Industrial tank distribution view", "target": "_blank" },
+        { "title": "Overview", "href": "screens/templates/views/overview.json", "description": "Basic overview layout template", "target": "_blank" },
+        { "title": "Manifest", "href": "screens/templates/manifest.json", "description": "Full template catalog", "target": "_blank" }
+      ]
+    },
+    {
+      "title": "Components",
+      "type": "commands",
+      "items": [
+        { "label": "Tank Component", "code": "screens/templates/components/tank.json" },
+        { "label": "Valve Component", "code": "screens/templates/components/valve.json" },
+        { "label": "Pump Component", "code": "screens/templates/components/pump.json" }
+      ]
+    },
+    {
+      "title": "Symbols",
+      "type": "commands",
+      "items": [
+        { "label": "Hopper Feeder", "code": "screens/templates/symbols/hopper.json" },
+        { "label": "Belt Conveyor", "code": "screens/templates/symbols/belt.json" },
+        { "label": "Screw Conveyor", "code": "screens/templates/symbols/screw.json" }
+      ]
+    }
+  ]
+}

@@ -76,9 +76,12 @@
             border-radius: 6px;
             padding: 15px;
         }
+        .card.highlight { border-color: #238636; }
         .card h4 { color: #f0f6fc; font-size: 14px; margin-bottom: 6px; }
+        .card h4 a.highlight { color: #3fb950; }
         .card p { font-size: 13px; margin: 0; }
         .card code { color: #7ee787; font-size: 12px; }
+        .card .note { color: #7ee787; font-size: 12px; display: block; margin-top: 4px; }
 
         .tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
         .tab {
@@ -91,9 +94,14 @@
             font-size: 13px;
         }
         .tab:hover, .tab.active { background: #30363d; border-color: #58a6ff; }
+        .tab.highlight { background: #238636; border-color: #238636; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        .info-list { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; }
+        .info-list p { margin: 5px 0; font-size: 13px; }
+
+        .loading { color: #8b949e; text-align: center; padding: 40px; }
         .footer { margin-top: 40px; color: #8b949e; font-size: 13px; text-align: center; }
     </style>
 </head>
@@ -102,283 +110,17 @@
         <h1>Ignition Sandbox</h1>
         <p>Command reference for Linux environments. Click any command to copy.</p>
 
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('ignition')">Ignition</button>
-            <button class="tab" onclick="showTab('tailscale')">Tailscale</button>
-            <button class="tab" onclick="showTab('system')">System</button>
-            <button class="tab" onclick="showTab('setup')">Setup</button>
-            <button class="tab" onclick="showTab('designer')">Designer</button>
-            <button class="tab" onclick="showTab('vm')" style="background:#238636;border-color:#238636;">VM Sandbox</button>
+        <div class="tabs" id="tabs">
+            <div class="loading">Loading...</div>
         </div>
 
-        <div id="ignition" class="tab-content active">
-            <h2>Ignition Gateway</h2>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Ignition</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/ignition-install.sh | sudo bash</code>
-                <button>Copy</button>
-            </div>
-
-            <h3>Control</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Start</div>
-                    <code>/opt/ignition/ignition.sh start</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Stop</div>
-                    <code>/opt/ignition/ignition.sh stop</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Restart</div>
-                    <code>/opt/ignition/ignition.sh restart</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Status</div>
-                    <code>/opt/ignition/ignition.sh status</code>
-                    <button>Copy</button>
-                </div>
-            </div>
-
-            <h3>Access</h3>
-            <div class="card">
-                <h4>Web Interface</h4>
-                <p><code>http://localhost:8088</code></p>
-                <p>Login: <strong>admin</strong> / <strong>password</strong></p>
-            </div>
-        </div>
-
-        <div id="tailscale" class="tab-content">
-            <h2>Tailscale VPN</h2>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Tailscale</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tailscale-install.sh | bash</code>
-                <button>Copy</button>
-            </div>
-
-            <h3>Commands</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Connect</div>
-                    <code>tailscale up</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Status</div>
-                    <code>tailscale status</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Get IP</div>
-                    <code>tailscale ip -4</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Disconnect</div>
-                    <code>tailscale down</code>
-                    <button>Copy</button>
-                </div>
-            </div>
-
-            <h3>With Auth Key</h3>
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Connect with auth key</div>
-                <code>tailscale up --authkey=tskey-YOUR-KEY</code>
-                <button>Copy</button>
-            </div>
-        </div>
-
-        <div id="system" class="tab-content">
-            <h2>System Tools</h2>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">System Info</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/sysinfo | bash</code>
-                <div class="desc">OS, hardware, services, installed tools</div>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Network Diagnostics</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/netinfo | bash</code>
-                <div class="desc">Interfaces, DNS, connectivity, open ports</div>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Command Loader</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/loader | bash -s -- list</code>
-                <div class="desc">List and run commands from manifest</div>
-                <button>Copy</button>
-            </div>
-        </div>
-
-        <div id="setup" class="tab-content">
-            <h2>Environment Setup</h2>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Full Setup (Ignition + Tailscale)</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/full-setup.sh | bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Docker</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/docker-setup | sudo bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Install Java (OpenJDK 17)</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/java-setup | sudo bash</code>
-                <button>Copy</button>
-            </div>
-
-            <div class="cmd" onclick="copyCode(this)">
-                <div class="label">Setup Python Environment</div>
-                <code>curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/python-setup | bash</code>
-                <button>Copy</button>
-            </div>
-        </div>
-
-        <div id="vm" class="tab-content">
-            <h2>Browser VM Sandbox</h2>
-            <p>Run a real Linux VM directly in your browser. No installation required.</p>
-
-            <div class="grid">
-                <div class="card" style="border-color:#238636;">
-                    <h4><a href="vm/" style="color:#3fb950;">Launch VM Sandbox</a></h4>
-                    <p>Boot Alpine/Debian Linux in browser using v86 emulator</p>
-                </div>
-                <div class="card">
-                    <h4>How it Works</h4>
-                    <p>Uses v86 (JS x86 emulator) to run real Linux. State saves to browser storage.</p>
-                </div>
-            </div>
-
-            <h3>Available Images</h3>
-            <div class="grid">
-                <div class="card">
-                    <h4>Alpine Linux</h4>
-                    <p>~50MB, fast boot (~10s), minimal</p>
-                    <code>Recommended for quick testing</code>
-                </div>
-                <div class="card">
-                    <h4>Debian</h4>
-                    <p>~200MB, slower boot (~30s), full environment</p>
-                    <code>Better for Ignition install</code>
-                </div>
-                <div class="card">
-                    <h4>Buildroot</h4>
-                    <p>~20MB, fastest boot (~5s), ultra minimal</p>
-                    <code>For basic testing only</code>
-                </div>
-            </div>
-
-            <h3>Requirements</h3>
-            <div class="card">
-                <p>Modern browser with WebAssembly support (Chrome 90+, Firefox 85+, Safari 14+)</p>
-                <p>~500MB RAM available for browser tab</p>
-                <p>IndexedDB for persistent storage</p>
-            </div>
-        </div>
-
-        <div id="designer" class="tab-content">
-            <h2>Perspective Designer</h2>
-
-            <div class="grid">
-                <div class="card">
-                    <h4><a href="screens/designer/">Visual Designer</a></h4>
-                    <p>Drag-and-drop Perspective view designer with JSON export</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/sandbox/">Command Sandbox</a></h4>
-                    <p>Interactive terminal for loading templates</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/">All Screens</a></h4>
-                    <p>Browse all available screens and tools</p>
-                </div>
-            </div>
-
-            <h3>Templates</h3>
-            <div class="grid">
-                <div class="card">
-                    <h4><a href="screens/templates/views/tank-farm.json" target="_blank">Tank Farm</a></h4>
-                    <p>Industrial tank distribution view</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/templates/views/overview.json" target="_blank">Overview</a></h4>
-                    <p>Basic overview layout template</p>
-                </div>
-                <div class="card">
-                    <h4><a href="screens/templates/manifest.json" target="_blank">Manifest</a></h4>
-                    <p>Full template catalog</p>
-                </div>
-            </div>
-
-            <h3>Components</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Tank Component</div>
-                    <code>screens/templates/components/tank.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Valve Component</div>
-                    <code>screens/templates/components/valve.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Pump Component</div>
-                    <code>screens/templates/components/pump.json</code>
-                    <button>Copy</button>
-                </div>
-            </div>
-
-            <h3>Symbols</h3>
-            <div class="grid">
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Hopper Feeder</div>
-                    <code>screens/templates/symbols/hopper.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Belt Conveyor</div>
-                    <code>screens/templates/symbols/belt.json</code>
-                    <button>Copy</button>
-                </div>
-                <div class="cmd" onclick="copyCode(this)">
-                    <div class="label">Screw Conveyor</div>
-                    <code>screens/templates/symbols/screw.json</code>
-                    <button>Copy</button>
-                </div>
-            </div>
+        <div id="content">
+            <div class="loading">Loading templates...</div>
         </div>
 
         <h2>Resources</h2>
-        <div class="grid">
-            <div class="card" style="border-color:#238636;">
-                <h4><a href="vm/" style="color:#3fb950;">VM Sandbox</a></h4>
-                <p>Browser-based Linux VM</p>
-            </div>
-            <div class="card">
-                <h4><a href="screens/">Screens</a></h4>
-                <p>Designer and templates</p>
-            </div>
-            <div class="card">
-                <h4><a href="cli/">CLI Tools</a></h4>
-                <p>Python CLI and wrappers</p>
-            </div>
-            <div class="card">
-                <h4><a href="https://github.com/teslasolar/ignition-sandbox">GitHub</a></h4>
-                <p>Source code</p>
-            </div>
+        <div class="grid" id="resources">
+            <div class="loading">Loading...</div>
         </div>
 
         <div class="footer">
@@ -387,25 +129,165 @@
     </div>
 
     <script>
-        function copyCode(el) {
-            const code = el.querySelector('code').textContent;
-            const btn = el.querySelector('button');
-            navigator.clipboard.writeText(code).then(() => {
-                btn.textContent = 'Copied!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = 'Copy';
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        }
+        const App = {
+            manifest: null,
+            cache: {},
 
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
-        }
+            async init() {
+                try {
+                    this.manifest = await this.loadJSON('templates/manifest.json');
+                    this.renderTabs();
+                    this.renderResources();
+                    // Load first tab
+                    if (this.manifest.tabs.length > 0) {
+                        this.showTab(this.manifest.tabs[0].id);
+                    }
+                } catch (e) {
+                    console.error('Failed to load manifest:', e);
+                    document.getElementById('content').innerHTML =
+                        '<div class="loading">Failed to load. Check console.</div>';
+                }
+            },
+
+            async loadJSON(path) {
+                if (this.cache[path]) return this.cache[path];
+                const res = await fetch(path);
+                if (!res.ok) throw new Error(`Failed to load ${path}`);
+                const data = await res.json();
+                this.cache[path] = data;
+                return data;
+            },
+
+            renderTabs() {
+                const container = document.getElementById('tabs');
+                container.innerHTML = this.manifest.tabs.map(tab =>
+                    `<button class="tab${tab.highlight ? ' highlight' : ''}"
+                             onclick="App.showTab('${tab.id}')"
+                             data-tab="${tab.id}">${tab.label}</button>`
+                ).join('');
+            },
+
+            renderResources() {
+                const container = document.getElementById('resources');
+                container.innerHTML = this.manifest.resources.map(r =>
+                    `<div class="card${r.highlight ? ' highlight' : ''}">
+                        <h4><a href="${r.href}"${r.highlight ? ' class="highlight"' : ''}>${r.title}</a></h4>
+                        <p>${r.description}</p>
+                    </div>`
+                ).join('');
+            },
+
+            async showTab(id) {
+                // Update tab active state
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector(`[data-tab="${id}"]`)?.classList.add('active');
+
+                const tab = this.manifest.tabs.find(t => t.id === id);
+                if (!tab) return;
+
+                const container = document.getElementById('content');
+                container.innerHTML = '<div class="loading">Loading...</div>';
+
+                try {
+                    const data = await this.loadJSON('templates/' + tab.src);
+                    container.innerHTML = this.renderTabContent(data);
+                } catch (e) {
+                    container.innerHTML = `<div class="loading">Failed to load tab: ${e.message}</div>`;
+                }
+            },
+
+            renderTabContent(data) {
+                let html = `<div class="tab-content active">`;
+                html += `<h2>${data.title}</h2>`;
+
+                if (data.description) {
+                    html += `<p>${data.description}</p>`;
+                }
+
+                // Command-type tabs (ignition, tailscale, system, setup)
+                if (data.commands) {
+                    html += this.renderCommands(data.commands);
+                }
+
+                // Custom tabs with sections (designer, vm)
+                if (data.sections) {
+                    html += this.renderSections(data.sections);
+                }
+
+                html += '</div>';
+                return html;
+            },
+
+            renderCommands(commands) {
+                return commands.map(cmd =>
+                    `<div class="cmd" onclick="App.copyCode(this)">
+                        <div class="label">${cmd.label}</div>
+                        <code>${cmd.code}</code>
+                        ${cmd.description ? `<div class="desc">${cmd.description}</div>` : ''}
+                        <button>Copy</button>
+                    </div>`
+                ).join('');
+            },
+
+            renderSections(sections) {
+                return sections.map(section => {
+                    let html = '';
+                    if (section.title) {
+                        html += `<h3>${section.title}</h3>`;
+                    }
+
+                    if (section.type === 'cards') {
+                        html += '<div class="grid">';
+                        html += section.items.map(item =>
+                            `<div class="card${item.highlight ? ' highlight' : ''}">
+                                <h4>${item.href ?
+                                    `<a href="${item.href}"${item.target ? ` target="${item.target}"` : ''}${item.highlight ? ' class="highlight"' : ''}>${item.title}</a>` :
+                                    item.title}</h4>
+                                <p>${item.description}</p>
+                                ${item.note ? `<code class="note">${item.note}</code>` : ''}
+                            </div>`
+                        ).join('');
+                        html += '</div>';
+                    }
+
+                    if (section.type === 'commands') {
+                        html += '<div class="grid">';
+                        html += section.items.map(item =>
+                            `<div class="cmd" onclick="App.copyCode(this)">
+                                <div class="label">${item.label}</div>
+                                <code>${item.code}</code>
+                                <button>Copy</button>
+                            </div>`
+                        ).join('');
+                        html += '</div>';
+                    }
+
+                    if (section.type === 'info') {
+                        html += '<div class="info-list">';
+                        html += section.content.map(line => `<p>${line}</p>`).join('');
+                        html += '</div>';
+                    }
+
+                    return html;
+                }).join('');
+            },
+
+            copyCode(el) {
+                const code = el.querySelector('code').textContent;
+                const btn = el.querySelector('button');
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            }
+        };
+
+        // Initialize on load
+        App.init();
     </script>
 </body>
 </html>
