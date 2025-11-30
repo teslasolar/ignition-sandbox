@@ -1,0 +1,24 @@
+#!/bin/bash
+# Install sandbox CLI into WebVM
+# Run: curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/scripts/install-cli | bash
+
+BASE_URL="https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main"
+
+echo "Installing Sandbox CLI..."
+
+# Download sandbox script to /usr/local/bin
+curl -sL "$BASE_URL/scripts/sandbox" -o /tmp/sandbox
+chmod +x /tmp/sandbox
+sudo mv /tmp/sandbox /usr/local/bin/sandbox
+
+# Download manifest
+mkdir -p ~/.sandbox
+curl -sL "$BASE_URL/commands/manifest.json" -o ~/.sandbox/manifest.json
+
+echo ""
+echo "✓ Installed! Run 'sandbox help' for commands"
+echo ""
+echo "Quick commands:"
+echo "  sandbox install   - Install Ignition"
+echo "  sandbox tailscale - Install Tailscale"
+echo "  sandbox status    - Check status"

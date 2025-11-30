@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "base_url": "https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main",
+  "commands": [
+    {
+      "name": "install-ignition",
+      "description": "Install Ignition Gateway",
+      "script": "ignition-install.sh",
+      "run": "curl -sL ${base_url}/ignition-install.sh | sudo bash"
+    },
+    {
+      "name": "install-tailscale",
+      "description": "Install Tailscale for remote access",
+      "script": "tailscale-install.sh",
+      "run": "curl -sL ${base_url}/tailscale-install.sh | bash"
+    },
+    {
+      "name": "full-setup",
+      "description": "Install Ignition + Tailscale together",
+      "script": "full-setup.sh",
+      "run": "curl -sL ${base_url}/full-setup.sh | bash"
+    },
+    {
+      "name": "status",
+      "description": "Check Ignition Gateway status",
+      "run": "/opt/ignition/ignition.sh status"
+    },
+    {
+      "name": "start",
+      "description": "Start Ignition Gateway",
+      "run": "/opt/ignition/ignition.sh start"
+    },
+    {
+      "name": "stop",
+      "description": "Stop Ignition Gateway",
+      "run": "/opt/ignition/ignition.sh stop"
+    },
+    {
+      "name": "tailscale-up",
+      "description": "Connect to Tailnet",
+      "run": "tailscale up"
+    },
+    {
+      "name": "tailscale-status",
+      "description": "Show Tailscale status",
+      "run": "tailscale status"
+    }
+  ]
+}
