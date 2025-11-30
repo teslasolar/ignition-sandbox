@@ -1,0 +1,6 @@
+id,name,category,width,height,svg
+belt,Belt Conveyor,feeder,0.15,0.05,<svg viewBox='0 0 200 60'><rect x='10' y='20' width='180' height='20' fill='#6b7280' rx='10'/><circle cx='25' cy='30' r='12' fill='#9ca3af'/><circle cx='175' cy='30' r='12' fill='#9ca3af'/></svg>
+screw,Screw Conveyor,feeder,0.12,0.06,<svg viewBox='0 0 160 80'><rect x='10' y='25' width='140' height='30' fill='#6b7280' rx='5'/><path d='M30 25 L30 55 M50 25 L50 55 M70 25 L70 55 M90 25 L90 55 M110 25 L110 55 M130 25 L130 55' stroke='#9ca3af' stroke-width='3'/></svg>
+hopper,Hopper,feeder,0.08,0.12,<svg viewBox='0 0 100 150'><path d='M10 10 L90 10 L70 140 L30 140 Z' fill='#6b7280' stroke='#9ca3af' stroke-width='2'/></svg>
+agitator,Agitator,mixer,0.06,0.1,<svg viewBox='0 0 80 120'><rect x='35' y='10' width='10' height='60' fill='#9ca3af'/><path d='M20 80 L60 80 M25 95 L55 95' stroke='#6b7280' stroke-width='4'/></svg>
+heat-ex,Heat Exchanger,thermal,0.1,0.08,<svg viewBox='0 0 120 100'><rect x='10' y='20' width='100' height='60' fill='none' stroke='#6b7280' stroke-width='2'/><path d='M20 35 H100 M20 50 H100 M20 65 H100' stroke='#f97316' stroke-width='2'/></svg>
