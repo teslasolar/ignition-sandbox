@@ -5,3 +5,6 @@ boot-minimal,Minimal Boot,512B,bootsector,kernels/boot-minimal.bin,critical,Bann
 boot-shell,Interactive Shell,512B,bootsector,kernels/boot-shell.bin,high,Keyboard input shell
 boot-gateway,Gateway Display,512B,bootsector,kernels/boot-gateway.bin,high,PLC/Gateway status
 ignaite-floppy,IgnAIte OS,1.44MB,fda,rootfs/ignaite.img,medium,FAT12 bootable floppy
+alpine-linux,Alpine Linux,46MB,cdrom,linux/alpine-virt-3.19.0-x86.iso,high,Alpine Linux Virtual Edition
+tinycore-linux,Tiny Core Linux,24MB,cdrom,linux/TinyCore-15.0.iso,medium,Minimal Linux distribution
+slitaz-linux,SliTaz Linux,55MB,cdrom,linux/slitaz-rolling.iso,medium,Lightweight rolling release Linux
