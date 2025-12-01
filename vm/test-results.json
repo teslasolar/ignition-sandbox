@@ -1,0 +1,119 @@
+{
+  "timestamp": "2025-12-01T08:29:05.566Z",
+  "base_url": "https://teslasolar.github.io/ignition-sandbox/vm",
+  "tests": [
+    {
+      "resource": "/index.html",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/index.html",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 14163,
+      "contentType": "text/html; charset=utf-8",
+      "error": null
+    },
+    {
+      "resource": "/lib/v86-loader.js",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/lib/v86-loader.js",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 2137,
+      "contentType": "application/javascript; charset=utf-8",
+      "error": null
+    },
+    {
+      "resource": "/images/seabios/seabios.bin",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/images/seabios/seabios.bin",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 127656,
+      "contentType": "application/octet-stream",
+      "error": null
+    },
+    {
+      "resource": "/images/seabios/vgabios.bin",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/images/seabios/vgabios.bin",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 36008,
+      "contentType": "application/octet-stream",
+      "error": null
+    },
+    {
+      "resource": "/images/linux/alpine-virt-3.19.0-x86.iso",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/images/linux/alpine-virt-3.19.0-x86.iso",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 46001883,
+      "contentType": "application/octet-stream",
+      "error": null
+    },
+    {
+      "resource": "/images/linux/TinyCore-15.0.iso",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/images/linux/TinyCore-15.0.iso",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 23919100,
+      "contentType": "application/octet-stream",
+      "error": null
+    },
+    {
+      "resource": "/images/linux/slitaz-rolling.iso",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/images/linux/slitaz-rolling.iso",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 54563850,
+      "contentType": "application/octet-stream",
+      "error": null
+    },
+    {
+      "resource": "https://copy.sh/v86/build/libv86.js",
+      "url": "https://copy.sh/v86/build/libv86.js",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 333943,
+      "contentType": "text/javascript",
+      "error": null
+    },
+    {
+      "resource": "https://copy.sh/v86/build/v86.wasm",
+      "url": "https://copy.sh/v86/build/v86.wasm",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 1423889,
+      "contentType": "application/wasm",
+      "error": null
+    },
+    {
+      "resource": "/index.html",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/index.html",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 14163,
+      "contentType": "text/html; charset=utf-8",
+      "error": null
+    },
+    {
+      "resource": "/debug.html",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/debug.html",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 4321,
+      "contentType": "text/html; charset=utf-8",
+      "error": null
+    },
+    {
+      "resource": "/test-local.html",
+      "url": "https://teslasolar.github.io/ignition-sandbox/vm/test-local.html",
+      "status": "passed",
+      "statusCode": 200,
+      "size": 4650,
+      "contentType": "text/html; charset=utf-8",
+      "error": null
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0
+  }
+}

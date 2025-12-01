@@ -8,7 +8,9 @@
       "Bash(git ls-tree:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(node test-api.js:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

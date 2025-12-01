@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>VM Health Check</title>
+<meta http-equiv="refresh" content="30">
+<style>
+body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+.status-card { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; margin: 10px 0; }
+.status-ok { color: #3fb950; }
+.status-error { color: #f85149; }
+.status-warning { color: #f0883e; }
+.metric { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #21262d; }
+.metric:last-child { border-bottom: none; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+.badge.ok { background: #238636; color: white; }
+.badge.error { background: #da3633; color: white; }
+.badge.warning { background: #9e6a03; color: white; }
+.json-output { background: #0d1117; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<h1>🔧 VM Health Check</h1>
+<p>Automated health monitoring for Ignition Sandbox VM</p>
+
+<div class="status-card">
+    <h2>System Status</h2>
+    <div class="metric">
+        <span>Overall Status</span>
+        <span id="overallStatus" class="badge">Checking...</span>
+    </div>
+    <div class="metric">
+        <span>Last Check</span>
+        <span id="lastCheck">-</span>
+    </div>
+    <div class="metric">
+        <span>Auto Refresh</span>
+        <span>Every 30 seconds</span>
+    </div>
+</div>
+
+<div class="status-card">
+    <h2>VM Components</h2>
+    <div class="metric">
+        <span>V86 Emulator</span>
+        <span id="v86Status" class="status-warning">Checking...</span>
+    </div>
+    <div class="metric">
+        <span>Main Page</span>
+        <span id="mainPageStatus" class="status-warning">Checking...</span>
+    </div>
+    <div class="metric">
+        <span>BIOS Files</span>
+        <span id="biosStatus" class="status-warning">Checking...</span>
+    </div>
+    <div class="metric">
+        <span>Linux ISOs</span>
+        <span id="isoStatus" class="status-warning">Checking...</span>
+    </div>
+    <div class="metric">
+        <span>CDN Resources</span>
+        <span id="cdnStatus" class="status-warning">Checking...</span>
+    </div>
+</div>
+
+<div class="status-card">
+    <h2>Resource Details</h2>
+    <div id="resourceDetails"></div>
+</div>
+
+<div class="status-card">
+    <h2>JSON Output</h2>
+    <button onclick="copyJSON()">Copy JSON</button>
+    <button onclick="downloadJSON()">Download JSON</button>
+    <pre class="json-output" id="jsonOutput"></pre>
+</div>
+
+<script>
+const BASE_URL = 'https://teslasolar.github.io/ignition-sandbox/vm';
+
+const healthCheck = {
+    timestamp: null,
+    status: 'checking',
+    components: {
+        v86: { status: 'unknown', loaded: false },
+        mainPage: { status: 'unknown', accessible: false },
+        bios: { status: 'unknown', files: {} },
+        isos: { status: 'unknown', files: {} },
+        cdn: { status: 'unknown', resources: {} }
+    },
+    summary: {
+        total: 0,
+        healthy: 0,
+        warnings: 0,
+        errors: 0
+    }
+};
+
+async function checkResource(url, timeout = 5000) {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+        const response = await fetch(url, {
+            method: 'HEAD',
+            signal: controller.signal,
+            mode: 'cors'
+        });
+
+        clearTimeout(timeoutId);
+
+        return {
+            ok: response.ok,
+            status: response.status,
+            size: response.headers.get('content-length'),
+            type: response.headers.get('content-type')
+        };
+    } catch (error) {
+        // For CORS errors, try a GET request
+        if (error.name === 'TypeError' && url.startsWith('https://')) {
+            try {
+                const response = await fetch(url);
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    size: 'unknown',
+                    type: 'unknown'
+                };
+            } catch {
+                return { ok: false, error: error.message };
+            }
+        }
+        return { ok: false, error: error.message };
+    }
+}
+
+async function performHealthCheck() {
+    healthCheck.timestamp = new Date().toISOString();
+    healthCheck.summary = { total: 0, healthy: 0, warnings: 0, errors: 0 };
+
+    // Check main page
+    const mainPage = await checkResource(BASE_URL + '/index.html');
+    healthCheck.components.mainPage.accessible = mainPage.ok;
+    healthCheck.components.mainPage.status = mainPage.ok ? 'healthy' : 'error';
+    updateStatus('mainPageStatus', mainPage.ok ? '✓ OK' : '✗ Error', mainPage.ok ? 'status-ok' : 'status-error');
+
+    // Check V86 loader
+    const v86Loader = await checkResource(BASE_URL + '/lib/v86-loader.js');
+    healthCheck.components.v86.loaded = v86Loader.ok;
+
+    // Check V86 CDN
+    const v86CDN = await checkResource('https://copy.sh/v86/build/libv86.js');
+    healthCheck.components.v86.status = (v86Loader.ok && v86CDN.ok) ? 'healthy' : 'error';
+    updateStatus('v86Status', (v86Loader.ok && v86CDN.ok) ? '✓ OK' : '✗ Error',
+                 (v86Loader.ok && v86CDN.ok) ? 'status-ok' : 'status-error');
+
+    // Check BIOS files
+    const biosFiles = [
+        { name: 'seabios.bin', path: '/images/seabios/seabios.bin' },
+        { name: 'vgabios.bin', path: '/images/seabios/vgabios.bin' }
+    ];
+
+    let biosOk = true;
+    for (const file of biosFiles) {
+        const result = await checkResource(BASE_URL + file.path);
+        healthCheck.components.bios.files[file.name] = result.ok;
+        if (!result.ok) biosOk = false;
+    }
+    healthCheck.components.bios.status = biosOk ? 'healthy' : 'error';
+    updateStatus('biosStatus', biosOk ? '✓ OK' : '✗ Error', biosOk ? 'status-ok' : 'status-error');
+
+    // Check Linux ISOs
+    const isoFiles = [
+        { name: 'Alpine Linux', path: '/images/linux/alpine-virt-3.19.0-x86.iso' },
+        { name: 'TinyCore', path: '/images/linux/TinyCore-15.0.iso' },
+        { name: 'SliTaz', path: '/images/linux/slitaz-rolling.iso' }
+    ];
+
+    let isoOk = true;
+    const details = document.getElementById('resourceDetails');
+    details.innerHTML = '';
+
+    for (const file of isoFiles) {
+        const result = await checkResource(BASE_URL + file.path);
+        healthCheck.components.isos.files[file.name] = result.ok;
+
+        const div = document.createElement('div');
+        div.className = 'metric';
+        div.innerHTML = `
+            <span>${file.name}</span>
+            <span class="${result.ok ? 'status-ok' : 'status-error'}">
+                ${result.ok ? `✓ ${(result.size/1024/1024).toFixed(1)} MB` : '✗ Not Found'}
+            </span>
+        `;
+        details.appendChild(div);
+
+        if (!result.ok) isoOk = false;
+    }
+    healthCheck.components.isos.status = isoOk ? 'healthy' : 'error';
+    updateStatus('isoStatus', isoOk ? '✓ OK' : '✗ Error', isoOk ? 'status-ok' : 'status-error');
+
+    // Check CDN resources
+    const cdnResources = [
+        { name: 'v86.js', url: 'https://copy.sh/v86/build/libv86.js' },
+        { name: 'v86.wasm', url: 'https://copy.sh/v86/build/v86.wasm' }
+    ];
+
+    let cdnOk = true;
+    for (const resource of cdnResources) {
+        const result = await checkResource(resource.url);
+        healthCheck.components.cdn.resources[resource.name] = result.ok;
+        if (!result.ok) cdnOk = false;
+    }
+    healthCheck.components.cdn.status = cdnOk ? 'healthy' : 'error';
+    updateStatus('cdnStatus', cdnOk ? '✓ OK' : '✗ Error', cdnOk ? 'status-ok' : 'status-error');
+
+    // Calculate overall status
+    const allComponents = [
+        healthCheck.components.mainPage.status,
+        healthCheck.components.v86.status,
+        healthCheck.components.bios.status,
+        healthCheck.components.isos.status,
+        healthCheck.components.cdn.status
+    ];
+
+    healthCheck.summary.total = allComponents.length;
+    healthCheck.summary.healthy = allComponents.filter(s => s === 'healthy').length;
+    healthCheck.summary.errors = allComponents.filter(s => s === 'error').length;
+
+    if (healthCheck.summary.errors === 0) {
+        healthCheck.status = 'healthy';
+        updateOverallStatus('ok', 'Healthy');
+    } else if (healthCheck.summary.errors < 3) {
+        healthCheck.status = 'degraded';
+        updateOverallStatus('warning', 'Degraded');
+    } else {
+        healthCheck.status = 'error';
+        updateOverallStatus('error', 'Error');
+    }
+
+    // Update last check time
+    document.getElementById('lastCheck').textContent = new Date().toLocaleTimeString();
+
+    // Update JSON output
+    document.getElementById('jsonOutput').textContent = JSON.stringify(healthCheck, null, 2);
+}
+
+function updateStatus(elementId, text, className) {
+    const element = document.getElementById(elementId);
+    element.textContent = text;
+    element.className = className;
+}
+
+function updateOverallStatus(badgeClass, text) {
+    const badge = document.getElementById('overallStatus');
+    badge.className = `badge ${badgeClass}`;
+    badge.textContent = text;
+}
+
+function copyJSON() {
+    const json = JSON.stringify(healthCheck, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+        alert('JSON copied to clipboard!');
+    });
+}
+
+function downloadJSON() {
+    const json = JSON.stringify(healthCheck, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vm-health-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Perform initial check
+performHealthCheck();
+
+// Auto-refresh every 30 seconds
+setInterval(performHealthCheck, 30000);
+
+// Also provide API endpoint simulation
+window.addEventListener('message', (event) => {
+    if (event.data === 'get-health') {
+        event.source.postMessage({
+            type: 'health-response',
+            data: healthCheck
+        }, event.origin);
+    }
+});
+</script>
+
+</body>
+</html>

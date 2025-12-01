@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ignition VM API Interface</title>
+<style>
+body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+.api-section { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; margin: 15px 0; }
+.endpoint { background: #21262d; padding: 10px; margin: 10px 0; border-radius: 4px; }
+.method { display: inline-block; padding: 2px 8px; border-radius: 3px; font-weight: bold; margin-right: 10px; }
+.method.get { background: #1f6feb; }
+.method.post { background: #238636; }
+.code { background: #0d1117; padding: 8px; border-radius: 4px; margin: 5px 0; overflow-x: auto; }
+.success { color: #3fb950; }
+.error { color: #f85149; }
+.warn { color: #f0883e; }
+#testResults { background: #0d1117; padding: 12px; border-radius: 4px; min-height: 100px; margin-top: 10px; }
+button { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+button:hover { background: #30363d; }
+</style>
+</head>
+<body>
+
+<h1>Ignition VM API Interface</h1>
+<p>Browser-based API for controlling and testing the VM emulator</p>
+
+<div class="api-section">
+    <h2>API Endpoints</h2>
+
+    <div class="endpoint">
+        <span class="method get">GET</span>
+        <strong>/api/status</strong> - Get VM status
+        <div class="code">
+// Example using fetch
+fetch('/api/status')
+    .then(res => res.json())
+    .then(data => console.log(data));
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <strong>/api/boot</strong> - Boot a VM
+        <div class="code">
+// Example: Boot Alpine Linux
+fetch('/api/boot', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ distro: 'alpine' })
+});
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <span class="method post">POST</span>
+        <strong>/api/command</strong> - Send command to VM
+        <div class="code">
+// Example: Send command
+fetch('/api/command', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cmd: 'uname -a' })
+});
+        </div>
+    </div>
+</div>
+
+<div class="api-section">
+    <h2>PostMessage API</h2>
+    <p>For cross-origin communication with embedded VM iframe</p>
+
+    <div class="code">
+// Send message to VM iframe
+const vmFrame = document.getElementById('vmFrame');
+vmFrame.contentWindow.postMessage({
+    type: 'vm-command',
+    action: 'boot',
+    params: { distro: 'alpine' }
+}, '*');
+
+// Listen for responses
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'vm-response') {
+        console.log('VM Response:', event.data);
+    }
+});
+    </div>
+</div>
+
+<div class="api-section">
+    <h2>Test Interface</h2>
+    <button onclick="testStatus()">Test Status</button>
+    <button onclick="testBoot('alpine')">Boot Alpine</button>
+    <button onclick="testBoot('tinycore')">Boot TinyCore</button>
+    <button onclick="testCommand('uname -a')">Send uname</button>
+    <button onclick="testCommand('ls /')">Send ls /</button>
+    <button onclick="runFullTest()">Run Full Test</button>
+
+    <div id="testResults"></div>
+</div>
+
+<!-- Hidden iframe for VM -->
+<iframe id="vmFrame" src="index.html" style="width: 100%; height: 600px; border: 1px solid #30363d; margin-top: 20px;"></iframe>
+
+<script>
+// VM API Client
+class VMAPIClient {
+    constructor() {
+        this.vmFrame = document.getElementById('vmFrame');
+        this.results = document.getElementById('testResults');
+        this.setupMessageListener();
+    }
+
+    setupMessageListener() {
+        window.addEventListener('message', (event) => {
+            // Handle VM responses
+            if (event.data && event.data.type === 'vm-response') {
+                this.log(`Response: ${JSON.stringify(event.data)}`, 'success');
+            }
+        });
+    }
+
+    log(msg, type = 'info') {
+        const time = new Date().toTimeString().split(' ')[0];
+        const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'warn';
+        this.results.innerHTML += `<div class="${className}">[${time}] ${msg}</div>`;
+        this.results.scrollTop = this.results.scrollHeight;
+    }
+
+    sendCommand(command) {
+        this.log(`Sending: ${JSON.stringify(command)}`);
+        this.vmFrame.contentWindow.postMessage(command, '*');
+    }
+
+    getStatus() {
+        this.sendCommand({
+            type: 'vm-command',
+            action: 'status'
+        });
+    }
+
+    boot(distro) {
+        this.sendCommand({
+            type: 'vm-command',
+            action: 'boot',
+            params: { distro: distro }
+        });
+    }
+
+    sendText(text) {
+        this.sendCommand({
+            type: 'vm-command',
+            action: 'type',
+            params: { text: text + '\n' }
+        });
+    }
+}
+
+const api = new VMAPIClient();
+
+// Test functions
+function testStatus() {
+    api.getStatus();
+}
+
+function testBoot(distro) {
+    api.boot(distro);
+}
+
+function testCommand(cmd) {
+    api.sendText(cmd);
+}
+
+async function runFullTest() {
+    api.log('Starting full API test...', 'info');
+
+    // Test status
+    api.log('1. Testing status endpoint...', 'info');
+    api.getStatus();
+
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Test boot
+    api.log('2. Testing boot Alpine...', 'info');
+    api.boot('alpine');
+
+    await new Promise(r => setTimeout(r, 5000));
+
+    // Test commands
+    api.log('3. Testing keyboard input...', 'info');
+    api.sendText('echo "Hello from API"');
+
+    await new Promise(r => setTimeout(r, 2000));
+
+    api.sendText('uname -a');
+
+    api.log('Full test complete!', 'success');
+}
+
+// Also inject message handler into VM frame once loaded
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        // Inject API handler into VM page
+        const script = `
+            // VM API Message Handler
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'vm-command') {
+                    const response = { type: 'vm-response', action: event.data.action };
+
+                    switch(event.data.action) {
+                        case 'status':
+                            response.data = {
+                                running: VM.running,
+                                emulator: !!VM.emulator,
+                                status: document.getElementById('vmStatus').textContent
+                            };
+                            break;
+
+                        case 'boot':
+                            const distro = event.data.params.distro;
+                            if (['alpine', 'tinycore', 'slitaz'].includes(distro)) {
+                                VM.bootLinux(distro);
+                                response.data = { booting: distro };
+                            } else {
+                                response.error = 'Invalid distro';
+                            }
+                            break;
+
+                        case 'type':
+                            if (VM.running && VM.emulator) {
+                                VM.type(event.data.params.text);
+                                response.data = { typed: event.data.params.text };
+                            } else {
+                                response.error = 'VM not running';
+                            }
+                            break;
+
+                        default:
+                            response.error = 'Unknown action';
+                    }
+
+                    event.source.postMessage(response, event.origin);
+                }
+            });
+            console.log('VM API handler installed');
+        `;
+
+        // Try to inject the script
+        try {
+            api.vmFrame.contentWindow.eval(script);
+            api.log('VM API handler injected', 'success');
+        } catch(e) {
+            api.log('Could not inject handler (cross-origin): ' + e.message, 'warn');
+        }
+    }, 2000);
+});
+</script>
+
+</body>
+</html>

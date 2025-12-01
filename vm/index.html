@@ -315,8 +315,92 @@ checkAutoboot(){
 }
 };
 
+// VM API Message Handler for cross-origin communication
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'vm-command') {
+    const response = { type: 'vm-response', action: event.data.action, timestamp: Date.now() };
+
+    try {
+      switch(event.data.action) {
+        case 'status':
+          response.data = {
+            running: VM.running,
+            emulator: !!VM.emulator,
+            v86Ready: VM.isV86Ready(),
+            status: document.getElementById('vmStatus').textContent,
+            memory: document.getElementById('infoMemory').textContent
+          };
+          break;
+
+        case 'boot':
+          const distro = event.data.params?.distro;
+          const bootType = event.data.params?.type || 'linux';
+
+          if (bootType === 'linux') {
+            if (['alpine', 'tinycore', 'slitaz'].includes(distro)) {
+              VM.bootLinux(distro);
+              response.data = { booting: distro, type: 'linux' };
+            } else {
+              response.error = 'Invalid Linux distro. Valid: alpine, tinycore, slitaz';
+            }
+          } else if (bootType === 'sector') {
+            if (['minimal', 'shell', 'gateway'].includes(distro)) {
+              VM.bootSector(distro);
+              response.data = { booting: distro, type: 'sector' };
+            } else {
+              response.error = 'Invalid boot sector. Valid: minimal, shell, gateway';
+            }
+          }
+          break;
+
+        case 'type':
+        case 'command':
+          const text = event.data.params?.text || event.data.params?.cmd;
+          if (VM.running && VM.emulator) {
+            VM.type(text);
+            response.data = { typed: text };
+          } else {
+            response.error = 'VM not running. Boot a VM first.';
+          }
+          break;
+
+        case 'stop':
+          VM.stop();
+          response.data = { stopped: true };
+          break;
+
+        case 'restart':
+          if (VM.running) {
+            VM.restart();
+            response.data = { restarted: true };
+          } else {
+            response.error = 'VM not running';
+          }
+          break;
+
+        case 'getLog':
+          const logEl = document.getElementById('bootLog');
+          response.data = { log: logEl ? logEl.innerText : '' };
+          break;
+
+        default:
+          response.error = `Unknown action: ${event.data.action}`;
+      }
+    } catch (error) {
+      response.error = error.message;
+    }
+
+    // Send response back
+    if (event.source && event.source.postMessage) {
+      event.source.postMessage(response, event.origin);
+    }
+  }
+});
+
 // Auto-boot from hash on load (with delay for v86 to load)
 window.addEventListener('load',()=>{
+  console.log('VM API ready for messages');
+
   // Wait a bit for v86 to load from CDN
   setTimeout(()=>{
     if(VM.isV86Ready()){
