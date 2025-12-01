@@ -1,25 +1,26 @@
 // V86 Loader - Loads v86 emulator from CDN with fallback to local v86-lite
 (function() {
-    // Pin to stable v86 version for consistency
-    const V86_VERSION = '0.1.0';
-
     // First check if V86Starter already exists (from v86-lite.js)
     if (typeof V86Starter !== 'undefined') {
         console.log('V86 emulator already loaded');
         return;
     }
 
-    // Try primary CDN (pinned version)
+    // Load directly from the official v86 CDN (most reliable)
     var script = document.createElement('script');
-    script.src = 'https://unpkg.com/v86@' + V86_VERSION + '/build/libv86.js';
-    script.onerror = function() {
-        console.warn('Primary v86 CDN failed, trying fallback CDN...');
+    script.src = 'https://copy.sh/v86/build/libv86.js';
+    script.crossOrigin = 'anonymous';
 
-        // Try secondary CDN
-        var cdnFallback = document.createElement('script');
-        cdnFallback.src = 'https://cdn.jsdelivr.net/npm/v86@' + V86_VERSION + '/build/libv86.js';
-        cdnFallback.onerror = function() {
-            console.warn('CDN sources failed, loading local v86-lite.js fallback...');
+    script.onerror = function() {
+        console.warn('Primary v86 CDN failed, trying GitHub CDN...');
+
+        // Try GitHub CDN as backup
+        var githubFallback = document.createElement('script');
+        githubFallback.src = 'https://raw.githack.com/copy/v86/master/build/libv86.js';
+        githubFallback.crossOrigin = 'anonymous';
+
+        githubFallback.onerror = function() {
+            console.warn('GitHub CDN failed, loading local v86-lite.js fallback...');
 
             // Load local v86-lite.js as final fallback
             var localFallback = document.createElement('script');
@@ -38,13 +39,13 @@
             };
             document.head.appendChild(localFallback);
         };
-        cdnFallback.onload = function() {
-            console.log('V86 loaded from backup CDN');
+        githubFallback.onload = function() {
+            console.log('V86 loaded from GitHub CDN');
         };
-        document.head.appendChild(cdnFallback);
+        document.head.appendChild(githubFallback);
     };
     script.onload = function() {
-        console.log('V86 emulator loaded from unpkg CDN');
+        console.log('V86 emulator loaded from copy.sh CDN');
     };
     document.head.appendChild(script);
 })();

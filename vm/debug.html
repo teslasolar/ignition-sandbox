@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VM Debug Test</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+        #screen { border: 2px solid #0f0; width: 720px; height: 400px; margin: 20px auto; }
+        #log { background: #111; padding: 10px; margin: 20px 0; height: 200px; overflow-y: auto; }
+        button { padding: 10px; margin: 5px; cursor: pointer; }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .info { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>V86 VM Debug Test</h1>
+    <div id="status">Loading v86...</div>
+    <div>
+        <button onclick="testBoot()">Test Boot Alpine</button>
+        <button onclick="testKeyboard()">Test Keyboard</button>
+        <button onclick="checkFiles()">Check Files</button>
+    </div>
+    <div id="screen"></div>
+    <div id="log"></div>
+
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
+    <script>
+        let emulator = null;
+
+        function log(msg, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toISOString().split('T')[1].split('.')[0];
+            logEl.innerHTML += `<div class="${type}">[${time}] ${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(msg);
+        }
+
+        window.addEventListener('load', () => {
+            if (typeof V86Starter !== 'undefined') {
+                log('✓ V86 loaded successfully', 'success');
+                document.getElementById('status').textContent = 'V86 Ready';
+            } else {
+                log('✗ V86 failed to load', 'error');
+                document.getElementById('status').textContent = 'V86 Failed';
+            }
+        });
+
+        async function checkFiles() {
+            const files = [
+                'images/seabios/seabios.bin',
+                'images/seabios/vgabios.bin',
+                'images/linux/alpine-virt-3.19.0-x86.iso'
+            ];
+
+            for (let file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const size = response.headers.get('content-length');
+                        log(`✓ ${file} (${size} bytes)`, 'success');
+                    } else {
+                        log(`✗ ${file} - ${response.status}`, 'error');
+                    }
+                } catch (e) {
+                    log(`✗ ${file} - ${e.message}`, 'error');
+                }
+            }
+        }
+
+        function testBoot() {
+            if (!V86Starter) {
+                log('V86 not loaded', 'error');
+                return;
+            }
+
+            log('Starting Alpine Linux boot test...');
+
+            try {
+                emulator = new V86Starter({
+                    wasm_path: 'https://copy.sh/v86/build/v86.wasm',
+                    memory_size: 512 * 1024 * 1024,
+                    vga_memory_size: 8 * 1024 * 1024,
+                    screen_container: document.getElementById('screen'),
+                    bios: { url: 'images/seabios/seabios.bin' },
+                    vga_bios: { url: 'images/seabios/vgabios.bin' },
+                    cdrom: { url: 'images/linux/alpine-virt-3.19.0-x86.iso' },
+                    autostart: true,
+                    disable_keyboard: false,
+                    disable_mouse: false
+                });
+
+                log('Emulator created, waiting for boot...');
+
+                emulator.add_listener('serial0-output-char', function(char) {
+                    // Log serial output to see boot progress
+                    process.stdout.write(String.fromCharCode(char));
+                });
+
+                emulator.add_listener('emulator-ready', function() {
+                    log('Emulator ready!', 'success');
+                });
+
+            } catch (e) {
+                log(`Boot failed: ${e.message}`, 'error');
+                console.error(e);
+            }
+        }
+
+        function testKeyboard() {
+            if (!emulator) {
+                log('Boot a VM first', 'error');
+                return;
+            }
+
+            const testText = 'uname -a\n';
+            log(`Sending: ${testText}`);
+            emulator.keyboard_send_text(testText);
+        }
+    </script>
+</body>
+</html>
