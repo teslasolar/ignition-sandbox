@@ -86,8 +86,25 @@ body{background:#0d1117;color:#c9d1d9;font-family:monospace;height:100vh;display
 <p style="font-size:10px;color:#8b949e;margin-top:10px">v86 x86 emulator in JS/WASM</p>
 </div>
 </div>
-<!-- V86 Loader with enhanced error handling -->
-<script src="lib/v86-loader-fixed.js"></script>
+<!-- Load V86 directly from CDN -->
+<script>
+console.log('[V86] Loading v86 emulator...');
+// Direct load from copy.sh CDN
+var v86Script = document.createElement('script');
+v86Script.src = 'https://copy.sh/v86/build/libv86.js';
+v86Script.onload = function() {
+    console.log('[V86] Loaded successfully');
+    if (typeof V86Starter !== 'undefined') {
+        console.log('[V86] V86Starter is available');
+        document.getElementById('bootLog').innerHTML = '<div class="success">✓ V86 emulator ready</div>';
+    }
+};
+v86Script.onerror = function() {
+    console.error('[V86] Failed to load');
+    document.getElementById('bootLog').innerHTML = '<div class="error">Failed to load V86 emulator</div>';
+};
+document.head.appendChild(v86Script);
+</script>
 <script>
 const VM={emulator:null,running:false,
 log(msg,type='info'){const l=document.getElementById('bootLog');l.innerHTML+=`<div class="${type}">${msg}</div>`;l.scrollTop=l.scrollHeight},

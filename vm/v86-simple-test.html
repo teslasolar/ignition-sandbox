@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>V86 Simple Test</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        #status { margin: 20px 0; padding: 15px; border: 1px solid #0f0; }
+    </style>
+</head>
+<body>
+    <h1>V86 Simple Load Test</h1>
+
+    <div id="status">
+        <p>Testing V86 loading...</p>
+        <div id="result"></div>
+    </div>
+
+    <button onclick="testV86()">Test V86</button>
+    <button onclick="createInstance()">Create Instance</button>
+    <button onclick="location.reload()">Refresh</button>
+
+    <!-- Direct script tag to v86 CDN -->
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
+
+    <script>
+        const result = document.getElementById('result');
+
+        // Check immediately
+        console.log('Immediate check - V86Starter:', typeof V86Starter);
+
+        // Check after DOM ready
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready - V86Starter:', typeof V86Starter);
+            checkV86();
+        });
+
+        // Check after window load
+        window.addEventListener('load', function() {
+            console.log('Window loaded - V86Starter:', typeof V86Starter);
+            checkV86();
+        });
+
+        // Also check with delay
+        setTimeout(function() {
+            console.log('After 2s - V86Starter:', typeof V86Starter);
+            checkV86();
+        }, 2000);
+
+        function checkV86() {
+            if (typeof V86Starter !== 'undefined') {
+                result.innerHTML = '<p class="success">✓ V86Starter is loaded! Type: ' + typeof V86Starter + '</p>';
+                console.log('✓ V86Starter is available');
+
+                // Check if it's a constructor
+                try {
+                    console.log('V86Starter.name:', V86Starter.name);
+                    console.log('V86Starter.prototype:', V86Starter.prototype);
+                } catch(e) {
+                    console.error('Error checking V86Starter:', e);
+                }
+            } else {
+                result.innerHTML = '<p class="error">✗ V86Starter is not defined</p>';
+                console.error('V86Starter is undefined');
+            }
+        }
+
+        function testV86() {
+            checkV86();
+
+            // Try alternate names
+            const alternates = ['V86', 'v86', 'V86Emulator', 'CPU'];
+            for (let name of alternates) {
+                if (typeof window[name] !== 'undefined') {
+                    result.innerHTML += '<p>Found: window.' + name + ' = ' + typeof window[name] + '</p>';
+                }
+            }
+        }
+
+        function createInstance() {
+            if (typeof V86Starter === 'function') {
+                try {
+                    const emulator = new V86Starter({
+                        memory_size: 32 * 1024 * 1024,
+                        screen_container: document.createElement('div'),
+                        autostart: false
+                    });
+                    result.innerHTML += '<p class="success">✓ Created V86 instance successfully!</p>';
+                    console.log('V86 instance:', emulator);
+
+                    // Clean up
+                    if (emulator.destroy) {
+                        emulator.destroy();
+                    }
+                } catch(e) {
+                    result.innerHTML += '<p class="error">✗ Failed to create instance: ' + e.message + '</p>';
+                    console.error('Failed to create V86 instance:', e);
+                }
+            } else {
+                result.innerHTML += '<p class="error">✗ V86Starter is not a function</p>';
+            }
+        }
+    </script>
+</body>
+</html>
