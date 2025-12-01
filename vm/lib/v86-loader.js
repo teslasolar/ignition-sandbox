@@ -1,33 +1,50 @@
-// V86 Loader - Loads v86 emulator from CDN with fallback
+// V86 Loader - Loads v86 emulator from CDN with fallback to local v86-lite
 (function() {
-    // Try primary CDN
+    // Pin to stable v86 version for consistency
+    const V86_VERSION = '0.1.0';
+
+    // First check if V86Starter already exists (from v86-lite.js)
+    if (typeof V86Starter !== 'undefined') {
+        console.log('V86 emulator already loaded');
+        return;
+    }
+
+    // Try primary CDN (pinned version)
     var script = document.createElement('script');
-    script.src = 'https://unpkg.com/v86@latest/build/libv86.js';
+    script.src = 'https://unpkg.com/v86@' + V86_VERSION + '/build/libv86.js';
     script.onerror = function() {
-        console.warn('Primary v86 CDN failed, trying fallback...');
-        // Fallback to another CDN
-        var fallback = document.createElement('script');
-        fallback.src = 'https://cdn.jsdelivr.net/npm/v86@latest/build/libv86.js';
-        fallback.onerror = function() {
-            console.error('All v86 CDN sources failed. Please check your internet connection.');
-            // Final fallback - use basic emulation
-            window.V86Starter = function(options) {
-                console.error('V86 emulator not available. Using placeholder.');
-                this.screen_container = options.screen_container;
-                if (this.screen_container) {
-                    this.screen_container.innerHTML = '<div style="color:#f00;padding:20px;">Error: V86 emulator failed to load. Please refresh the page or check your internet connection.</div>';
-                }
-                this.add_listener = function() {};
-                this.keyboard_send_text = function() {};
-                this.stop = function() {};
-                this.restart = function() {};
-                this.destroy = function() {};
+        console.warn('Primary v86 CDN failed, trying fallback CDN...');
+
+        // Try secondary CDN
+        var cdnFallback = document.createElement('script');
+        cdnFallback.src = 'https://cdn.jsdelivr.net/npm/v86@' + V86_VERSION + '/build/libv86.js';
+        cdnFallback.onerror = function() {
+            console.warn('CDN sources failed, loading local v86-lite.js fallback...');
+
+            // Load local v86-lite.js as final fallback
+            var localFallback = document.createElement('script');
+            localFallback.src = 'lib/v86-lite.js';
+            localFallback.onload = function() {
+                console.log('V86-lite fallback loaded successfully');
+                // v86-lite.js sets window.V86Starter = V86Lite
             };
+            localFallback.onerror = function() {
+                console.error('Failed to load v86-lite.js fallback');
+                // Show clear error to user
+                if (document.getElementById('bootLog')) {
+                    document.getElementById('bootLog').innerHTML =
+                        '<div class="error">Failed to load VM emulator. Please refresh the page.</div>';
+                }
+            };
+            document.head.appendChild(localFallback);
         };
-        document.head.appendChild(fallback);
+        cdnFallback.onload = function() {
+            console.log('V86 loaded from backup CDN');
+        };
+        document.head.appendChild(cdnFallback);
     };
     script.onload = function() {
-        console.log('V86 emulator loaded successfully');
+        console.log('V86 emulator loaded from unpkg CDN');
     };
     document.head.appendChild(script);
 })();

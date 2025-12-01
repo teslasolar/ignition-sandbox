@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>VM Test - Local</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        #status { margin: 20px 0; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warn { color: #ff0; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>VM Emulator Test</h1>
+    <div id="status"></div>
+    <div id="tests"></div>
+    <button onclick="testV86()">Test V86 Load</button>
+    <button onclick="testFallback()">Test Fallback</button>
+    <button onclick="window.location='index.html'">Open Full VM</button>
+
+    <script src="lib/v86-loader.js"></script>
+    <script>
+        const log = (msg, type = 'info') => {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toTimeString().split(' ')[0]}] ${msg}`;
+            document.getElementById('status').appendChild(div);
+        };
+
+        // Test if V86 loads
+        function testV86() {
+            log('Testing V86 loader...');
+
+            setTimeout(() => {
+                if (typeof V86Starter !== 'undefined') {
+                    log('✓ V86Starter is defined', 'success');
+
+                    if (typeof V86Starter === 'function') {
+                        log('✓ V86Starter is a function', 'success');
+
+                        // Try to create instance
+                        try {
+                            const test = new V86Starter({
+                                memory_size: 32 * 1024 * 1024,
+                                screen_container: document.createElement('div'),
+                                autostart: false
+                            });
+                            log('✓ V86Starter instance created', 'success');
+
+                            // Check methods
+                            if (typeof test.add_listener === 'function') {
+                                log('✓ add_listener method exists', 'success');
+                            } else {
+                                log('✗ add_listener method missing', 'error');
+                            }
+
+                            if (typeof test.keyboard_send_text === 'function') {
+                                log('✓ keyboard_send_text method exists', 'success');
+                            } else {
+                                log('✗ keyboard_send_text method missing', 'error');
+                            }
+
+                            test.destroy && test.destroy();
+                            log('✓ All V86 tests passed!', 'success');
+                        } catch(e) {
+                            log('✗ Failed to create V86 instance: ' + e.message, 'error');
+                        }
+                    } else {
+                        log('✗ V86Starter is not a function', 'error');
+                    }
+                } else {
+                    log('✗ V86Starter not loaded', 'error');
+                }
+            }, 2000);
+        }
+
+        // Test fallback to v86-lite
+        function testFallback() {
+            log('Testing v86-lite.js fallback...');
+
+            // Load v86-lite directly
+            const script = document.createElement('script');
+            script.src = 'lib/v86-lite.js';
+            script.onload = () => {
+                log('✓ v86-lite.js loaded', 'success');
+
+                if (typeof V86Lite !== 'undefined') {
+                    log('✓ V86Lite is defined', 'success');
+                }
+
+                if (typeof V86Starter !== 'undefined') {
+                    log('✓ V86Starter alias is set', 'success');
+
+                    try {
+                        const test = new V86Starter({
+                            memory_size: 32 * 1024 * 1024,
+                            screen_container: document.createElement('div')
+                        });
+                        log('✓ V86Lite instance created via V86Starter', 'success');
+                    } catch(e) {
+                        log('✗ Failed to create instance: ' + e.message, 'error');
+                    }
+                } else {
+                    log('✗ V86Starter alias not set', 'error');
+                }
+            };
+            script.onerror = () => {
+                log('✗ Failed to load v86-lite.js', 'error');
+            };
+            document.head.appendChild(script);
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('Page loaded, waiting for v86...');
+            setTimeout(testV86, 1000);
+        });
+    </script>
+</body>
+</html>

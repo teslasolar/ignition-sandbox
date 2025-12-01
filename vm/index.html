@@ -93,6 +93,12 @@ log(msg,type='info'){const l=document.getElementById('bootLog');l.innerHTML+=`<d
 setProgress(p){document.getElementById('progressFill').style.width=p+'%'},
 setStatus(t,c=''){const s=document.getElementById('vmStatus');s.textContent=t;s.className='status '+c},
 
+// Check if V86Starter is properly loaded and functional
+isV86Ready(){
+  return typeof V86Starter === 'function' &&
+         typeof V86Starter.prototype !== 'undefined';
+},
+
 // Boot Linux distributions using v86
 async bootLinux(distro){
   document.getElementById('bootOptions').style.display='none';
@@ -126,10 +132,10 @@ async bootLinux(distro){
   this.log(`Loading ${config.name}...`);this.setProgress(10);
 
   try{
-    if(typeof V86Starter==='undefined'){
+    if(!this.isV86Ready()){
       this.log('Waiting for v86 emulator to load...','warn');
       setTimeout(()=>{
-        if(typeof V86Starter!=='undefined'){
+        if(this.isV86Ready()){
           this.log('v86 loaded, retrying boot...','success');
           this.bootLinux(distro);
         }else{
@@ -143,7 +149,7 @@ async bootLinux(distro){
     this.log('Initializing v86 emulator...');this.setProgress(20);
 
     const options={
-      wasm_path:'https://unpkg.com/v86@latest/build/v86.wasm',
+      wasm_path:'https://unpkg.com/v86@0.1.0/build/v86.wasm',
       memory_size:config.memory,
       vga_memory_size:config.vga_memory,
       screen_container:document.getElementById('screen'),
@@ -207,10 +213,10 @@ async bootSector(profile){
   this.log(`Loading ${config.name}...`);this.setProgress(10);
 
   try{
-    if(typeof V86Starter==='undefined'){
+    if(!this.isV86Ready()){
       this.log('Waiting for v86 emulator to load...','warn');
       setTimeout(()=>{
-        if(typeof V86Starter!=='undefined'){
+        if(this.isV86Ready()){
           this.log('v86 loaded, retrying boot...','success');
           this.bootSector(profile);
         }else{
@@ -224,7 +230,7 @@ async bootSector(profile){
     this.log('Initializing boot sector...');this.setProgress(20);
 
     const options={
-      wasm_path:'https://unpkg.com/v86@latest/build/v86.wasm',
+      wasm_path:'https://unpkg.com/v86@0.1.0/build/v86.wasm',
       memory_size:config.mem*1024*1024,
       vga_memory_size:2*1024*1024,
       screen_container:document.getElementById('screen'),
@@ -310,13 +316,21 @@ checkAutoboot(){
 window.addEventListener('load',()=>{
   // Wait a bit for v86 to load from CDN
   setTimeout(()=>{
-    if(typeof V86Starter!=='undefined'){
+    if(VM.isV86Ready()){
       console.log('V86 loaded, checking autoboot...');
       VM.checkAutoboot();
     }else{
       console.log('Waiting for V86 to load...');
       // Try again in 2 seconds
-      setTimeout(()=>VM.checkAutoboot(),2000);
+      setTimeout(()=>{
+        if(VM.isV86Ready()){
+          console.log('V86 loaded on retry, checking autoboot...');
+          VM.checkAutoboot();
+        }else{
+          console.error('V86 failed to load after retries');
+          VM.log('Error: Unable to load VM emulator','error');
+        }
+      },2000);
     }
   },500);
 });
