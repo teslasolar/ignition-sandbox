@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>V86 Name Test</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        .found { color: #0f0; font-weight: bold; }
+        .notfound { color: #888; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>V86 Constructor Name Test</h1>
+    <p>Testing both V86 and V86Starter...</p>
+
+    <div id="results"></div>
+
+    <button onclick="testAll()">Test All Names</button>
+    <button onclick="tryCreate()">Try Create Instance</button>
+
+    <!-- Load v86 from CDN -->
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
+
+    <script>
+        const results = document.getElementById('results');
+
+        function log(msg, found = false) {
+            const div = document.createElement('div');
+            div.className = found ? 'found' : 'notfound';
+            div.textContent = msg;
+            results.appendChild(div);
+            console.log(msg);
+        }
+
+        function testAll() {
+            results.innerHTML = '';
+            log('Testing after script load...');
+
+            // Test common names
+            const names = ['V86', 'V86Starter', 'v86', 'V86Emulator', 'CPU', 'Emulator'];
+
+            for (let name of names) {
+                if (typeof window[name] !== 'undefined') {
+                    log(`✓ window.${name} = ${typeof window[name]}`, true);
+
+                    // Check if it's a constructor
+                    if (typeof window[name] === 'function') {
+                        try {
+                            log(`  - ${name}.name = ${window[name].name}`, true);
+                            log(`  - ${name}.prototype exists = ${!!window[name].prototype}`, true);
+                        } catch(e) {
+                            log(`  - Error checking ${name}: ${e.message}`);
+                        }
+                    }
+                } else {
+                    log(`✗ window.${name} = undefined`);
+                }
+            }
+
+            // Check all window properties for v86-related
+            log('\nScanning for v86-related properties...');
+            for (let prop in window) {
+                if (prop.toLowerCase().includes('v86') || prop.toLowerCase().includes('emulator')) {
+                    log(`Found: window.${prop} = ${typeof window[prop]}`, true);
+                }
+            }
+        }
+
+        function tryCreate() {
+            log('\nAttempting to create instances...');
+
+            // Try V86
+            if (typeof V86 === 'function') {
+                try {
+                    const em = new V86({
+                        memory_size: 32 * 1024 * 1024,
+                        screen_container: document.createElement('div'),
+                        autostart: false
+                    });
+                    log('✓ Created V86 instance successfully!', true);
+                    if (em.destroy) em.destroy();
+                } catch(e) {
+                    log(`Failed with V86: ${e.message}`);
+                }
+            }
+
+            // Try V86Starter
+            if (typeof V86Starter === 'function') {
+                try {
+                    const em = new V86Starter({
+                        memory_size: 32 * 1024 * 1024,
+                        screen_container: document.createElement('div'),
+                        autostart: false
+                    });
+                    log('✓ Created V86Starter instance successfully!', true);
+                    if (em.destroy) em.destroy();
+                } catch(e) {
+                    log(`Failed with V86Starter: ${e.message}`);
+                }
+            }
+        }
+
+        // Test on load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                log('=== Automatic test after page load ===');
+                testAll();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
