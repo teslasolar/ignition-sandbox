@@ -224,8 +224,23 @@ restart(){
   else{this.stop()}
 },
 
-type(t){if(this.emulator&&this.running&&this.mode==='simulation')this.emulator.keyboard_send_text(t)}
+type(t){if(this.emulator&&this.running&&this.mode==='simulation')this.emulator.keyboard_send_text(t)},
+
+// Check URL hash for auto-boot
+checkAutoboot(){
+  const hash=location.hash.slice(1);
+  if(hash){
+    const profiles=['minimal','shell','gateway','floppy','sandbox'];
+    if(profiles.includes(hash)){
+      if(hash==='sandbox')this.boot('sandbox');
+      else this.bootReal(hash);
+    }
+  }
+}
 };
+
+// Auto-boot from hash on load
+window.addEventListener('load',()=>VM.checkAutoboot());
 </script>
 </body>
 </html>
