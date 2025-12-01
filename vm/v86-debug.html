@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>V86 Emulator Debug</title>
+<style>
+body { background: #0d1117; color: #c9d1d9; font-family: monospace; padding: 20px; }
+.debug-section { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; margin: 15px 0; }
+.test-item { padding: 8px; margin: 5px 0; border-left: 3px solid #30363d; }
+.test-item.success { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
+.test-item.error { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
+.test-item.warning { border-color: #f0883e; background: rgba(240, 136, 62, 0.1); }
+.test-item.info { border-color: #58a6ff; background: rgba(88, 166, 255, 0.1); }
+button { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+button:hover { background: #30363d; }
+#console { background: #0d1117; padding: 10px; border-radius: 4px; height: 300px; overflow-y: auto; font-size: 12px; }
+.console-line { margin: 2px 0; }
+.console-error { color: #f85149; }
+.console-warn { color: #f0883e; }
+.console-info { color: #58a6ff; }
+.console-success { color: #3fb950; }
+code { background: #161b22; padding: 2px 5px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>🔧 V86 Emulator Debugger</h1>
+<p>Comprehensive debugging for v86 emulator loading issues</p>
+
+<div class="debug-section">
+    <h2>Quick Actions</h2>
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="testCDNs()">Test CDN Availability</button>
+    <button onclick="testV86Load()">Test V86 Loading</button>
+    <button onclick="tryManualLoad()">Try Manual Load</button>
+    <button onclick="clearConsole()">Clear Console</button>
+</div>
+
+<div class="debug-section">
+    <h2>Test Results</h2>
+    <div id="testResults"></div>
+</div>
+
+<div class="debug-section">
+    <h2>Console Output</h2>
+    <div id="console"></div>
+</div>
+
+<div class="debug-section">
+    <h2>Manual Testing</h2>
+    <p>Select a CDN source to test manually:</p>
+    <select id="cdnSelect">
+        <option value="https://copy.sh/v86/build/libv86.js">copy.sh (Official)</option>
+        <option value="https://cdn.jsdelivr.net/gh/copy/v86@master/build/libv86.js">jsDelivr</option>
+        <option value="https://unpkg.com/v86@latest/build/libv86.js">unpkg</option>
+        <option value="https://raw.githack.com/copy/v86/master/build/libv86.js">GitHack</option>
+        <option value="lib/v86-lite.js">Local v86-lite.js</option>
+    </select>
+    <button onclick="testSelectedCDN()">Test Selected</button>
+</div>
+
+<script>
+// Console logging
+const consoleEl = document.getElementById('console');
+const resultsEl = document.getElementById('testResults');
+
+function log(msg, type = 'info') {
+    const time = new Date().toTimeString().split(' ')[0];
+    const line = document.createElement('div');
+    line.className = `console-line console-${type}`;
+    line.innerHTML = `[${time}] ${msg}`;
+    consoleEl.appendChild(line);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+    console.log(msg);
+}
+
+function clearConsole() {
+    consoleEl.innerHTML = '';
+    resultsEl.innerHTML = '';
+}
+
+function addTestResult(name, status, details = '') {
+    const div = document.createElement('div');
+    div.className = `test-item ${status}`;
+    const icon = status === 'success' ? '✓' : status === 'error' ? '✗' : status === 'warning' ? '⚠' : 'ℹ';
+    div.innerHTML = `<strong>${icon} ${name}</strong>${details ? ': ' + details : ''}`;
+    resultsEl.appendChild(div);
+}
+
+// Test CDN availability
+async function testCDNs() {
+    log('Testing CDN availability...', 'info');
+    resultsEl.innerHTML = '';
+
+    const cdns = [
+        { name: 'copy.sh (Official)', url: 'https://copy.sh/v86/build/libv86.js' },
+        { name: 'copy.sh WASM', url: 'https://copy.sh/v86/build/v86.wasm' },
+        { name: 'jsDelivr', url: 'https://cdn.jsdelivr.net/gh/copy/v86@master/build/libv86.js' },
+        { name: 'unpkg', url: 'https://unpkg.com/v86@latest/build/libv86.js' },
+        { name: 'GitHack', url: 'https://raw.githack.com/copy/v86/master/build/libv86.js' }
+    ];
+
+    for (const cdn of cdns) {
+        try {
+            log(`Testing ${cdn.name}...`, 'info');
+            const startTime = Date.now();
+
+            const response = await fetch(cdn.url, {
+                method: 'HEAD',
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+
+            const time = Date.now() - startTime;
+
+            if (response.ok) {
+                const size = response.headers.get('content-length');
+                const type = response.headers.get('content-type');
+                addTestResult(cdn.name, 'success', `${time}ms, ${size ? (size/1024).toFixed(0) + 'KB' : 'size unknown'}`);
+                log(`✓ ${cdn.name} available (${time}ms)`, 'success');
+            } else {
+                addTestResult(cdn.name, 'error', `HTTP ${response.status}`);
+                log(`✗ ${cdn.name} returned ${response.status}`, 'error');
+            }
+        } catch (error) {
+            // Try with GET for CORS issues
+            try {
+                const response = await fetch(cdn.url);
+                if (response.ok) {
+                    addTestResult(cdn.name, 'warning', 'CORS restricted but accessible');
+                    log(`⚠ ${cdn.name} has CORS restrictions`, 'warn');
+                } else {
+                    addTestResult(cdn.name, 'error', error.message);
+                    log(`✗ ${cdn.name} failed: ${error.message}`, 'error');
+                }
+            } catch (e) {
+                addTestResult(cdn.name, 'error', e.message);
+                log(`✗ ${cdn.name} failed: ${e.message}`, 'error');
+            }
+        }
+    }
+}
+
+// Test V86 loading
+async function testV86Load() {
+    log('Testing V86 loading mechanism...', 'info');
+    resultsEl.innerHTML = '';
+
+    // Check current state
+    addTestResult('V86Starter defined', typeof V86Starter !== 'undefined' ? 'success' : 'error',
+                  typeof V86Starter);
+    log(`V86Starter type: ${typeof V86Starter}`, 'info');
+
+    if (typeof V86Starter === 'function') {
+        // Try to create instance
+        try {
+            const test = new V86Starter({
+                memory_size: 32 * 1024 * 1024,
+                screen_container: document.createElement('div'),
+                autostart: false
+            });
+
+            addTestResult('V86 instance creation', 'success', 'Instance created');
+            log('✓ V86 instance created successfully', 'success');
+
+            // Check methods
+            const methods = ['add_listener', 'keyboard_send_text', 'destroy', 'restart', 'stop'];
+            for (const method of methods) {
+                const exists = typeof test[method] === 'function';
+                addTestResult(`Method: ${method}`, exists ? 'success' : 'error');
+            }
+
+            if (test.destroy) test.destroy();
+        } catch (error) {
+            addTestResult('V86 instance creation', 'error', error.message);
+            log(`✗ Failed to create V86 instance: ${error.message}`, 'error');
+        }
+    } else {
+        addTestResult('V86 not loaded', 'error', 'V86Starter is not a function');
+        log('V86Starter not loaded or not functional', 'error');
+    }
+}
+
+// Try manual loading
+async function tryManualLoad() {
+    log('Attempting manual V86 load...', 'info');
+    resultsEl.innerHTML = '';
+
+    // Remove any existing V86
+    if (window.V86Starter) {
+        delete window.V86Starter;
+        log('Cleared existing V86Starter', 'info');
+    }
+
+    // Try loading from CDN
+    const script = document.createElement('script');
+    script.src = 'https://copy.sh/v86/build/libv86.js';
+
+    script.onload = () => {
+        log('Script tag loaded', 'info');
+        setTimeout(() => {
+            if (typeof V86Starter !== 'undefined') {
+                log('✓ V86Starter is now defined!', 'success');
+                addTestResult('Manual load', 'success', 'V86 loaded successfully');
+                testV86Load();
+            } else {
+                log('✗ V86Starter still undefined after load', 'error');
+                addTestResult('Manual load', 'error', 'Script loaded but V86Starter undefined');
+            }
+        }, 1000);
+    };
+
+    script.onerror = (e) => {
+        log(`✗ Script load error: ${e}`, 'error');
+        addTestResult('Manual load', 'error', 'Script failed to load');
+    };
+
+    document.head.appendChild(script);
+    log('Script tag added to document', 'info');
+}
+
+// Test selected CDN
+function testSelectedCDN() {
+    const url = document.getElementById('cdnSelect').value;
+    log(`Testing ${url}...`, 'info');
+
+    const script = document.createElement('script');
+    script.src = url;
+
+    script.onload = () => {
+        log(`✓ Loaded from ${url}`, 'success');
+        setTimeout(() => {
+            testV86Load();
+        }, 500);
+    };
+
+    script.onerror = () => {
+        log(`✗ Failed to load from ${url}`, 'error');
+    };
+
+    document.head.appendChild(script);
+}
+
+// Run all tests
+async function runAllTests() {
+    clearConsole();
+    log('Starting comprehensive V86 debug tests...', 'info');
+
+    await testCDNs();
+    await new Promise(r => setTimeout(r, 1000));
+
+    await testV86Load();
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Check browser compatibility
+    log('Checking browser compatibility...', 'info');
+    addTestResult('WebAssembly support', typeof WebAssembly !== 'undefined' ? 'success' : 'error');
+    addTestResult('ArrayBuffer support', typeof ArrayBuffer !== 'undefined' ? 'success' : 'error');
+    addTestResult('Uint8Array support', typeof Uint8Array !== 'undefined' ? 'success' : 'error');
+
+    // Check network
+    log('Checking network...', 'info');
+    addTestResult('Online status', navigator.onLine ? 'success' : 'error', navigator.onLine ? 'Connected' : 'Offline');
+
+    // Browser info
+    log(`Browser: ${navigator.userAgent}`, 'info');
+    log(`Platform: ${navigator.platform}`, 'info');
+
+    log('Debug tests complete!', 'success');
+}
+
+// Intercept console errors
+window.addEventListener('error', (e) => {
+    log(`Global error: ${e.message}`, 'error');
+});
+
+// Start with basic info
+window.addEventListener('load', () => {
+    log('V86 Debug page loaded', 'info');
+    log(`Current V86Starter status: ${typeof V86Starter}`, 'info');
+
+    if (typeof V86Starter === 'undefined') {
+        log('V86 not loaded. Click "Try Manual Load" to attempt loading.', 'warn');
+    } else {
+        log('V86 appears to be loaded. Click "Test V86 Loading" to verify.', 'success');
+    }
+});
+</script>
+
+</body>
+</html>

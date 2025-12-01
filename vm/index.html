@@ -86,7 +86,8 @@ body{background:#0d1117;color:#c9d1d9;font-family:monospace;height:100vh;display
 <p style="font-size:10px;color:#8b949e;margin-top:10px">v86 x86 emulator in JS/WASM</p>
 </div>
 </div>
-<script src="lib/v86-loader.js"></script>
+<!-- V86 Loader with enhanced error handling -->
+<script src="lib/v86-loader-fixed.js"></script>
 <script>
 const VM={emulator:null,running:false,
 log(msg,type='info'){const l=document.getElementById('bootLog');l.innerHTML+=`<div class="${type}">${msg}</div>`;l.scrollTop=l.scrollHeight},
