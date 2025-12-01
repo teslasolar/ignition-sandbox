@@ -10,9 +10,10 @@ Browser-based Ignition SCADA development environment with full VM capabilities a
 
 ### Browser VM (Recommended)
 1. Visit the [live sandbox](https://teslasolar.github.io/ignition-sandbox/)
-2. Choose "Ignition Sandbox" for instant boot
-3. Run `ignition install` in the terminal
-4. Access Gateway at http://localhost:8088
+2. Choose Alpine Linux for best compatibility (or any Linux distro)
+3. Wait for the OS to boot (Alpine boots in ~30 seconds)
+4. Run `ignition install` in the terminal
+5. Access Gateway at http://localhost:8088 within the VM
 
 ### Direct Linux Installation
 
@@ -30,7 +31,7 @@ curl -sL https://raw.githubusercontent.com/teslasolar/ignition-sandbox/main/tail
 - **v86 x86 Emulator** - Full x86 emulation in JavaScript/WebAssembly
 - **Multiple Linux Distros** - Alpine, Tiny Core, and SliTaz Linux ready to boot
 - **Real Boot Sectors** - Custom 512-byte boot sectors for minimal testing
-- **Instant Simulation** - JavaScript-based Linux environment for quick access
+- **No Installation Required** - Everything runs in your browser
 
 ### Ignition Integration
 - **Gateway Installation** - Full Ignition Gateway support in browser
