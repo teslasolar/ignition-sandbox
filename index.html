@@ -113,7 +113,7 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 
 <div class="os" id="os">
 <div class="tb">
-<div class="logo" onclick="K.view('home')">🔥 KONOMI IgnAIte</div>
+<div class="logo" onclick="K.view('home')">🔥 KONOMI IgnAIte <span id="headerCommit" style="font-size:8px;color:var(--text2);font-weight:normal"></span></div>
 <div class="menu" id="tabMenu"></div>
 <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
 <button onclick="K.togglePalette()" style="background:none;border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:9px">⌘K</button>
@@ -141,6 +141,7 @@ body{background:var(--bg);color:var(--text);overflow:hidden;transition:backgroun
 <div class="vm-widget">
 <h4>💻 Status <span id="vmStatus" style="color:var(--ok)">●</span></h4>
 <div class="vm-stat"><span>Version</span><span id="sysVersion">1.2.0</span></div>
+<div class="vm-stat"><span>Commit</span><span id="commitHash" style="font-family:monospace;font-size:8px">loading...</span></div>
 <div class="vm-stat"><span>Modules</span><span id="sysModules">0</span></div>
 <div class="vm-stat"><span>Uptime</span><span id="vmUptime">00:00</span></div>
 </div>
@@ -240,6 +241,7 @@ const K = {
       this.clock();
       this.initKeys();
       this.startMonitor();
+      this.fetchCommitInfo();
 
       document.getElementById('sbLeft').textContent =
         `${this.config?.name || 'IgnAIte'} v${this.config?.version || '1.0'} • Auto-loaded from config`;
@@ -541,6 +543,69 @@ const K = {
     setInterval(() => {
       document.getElementById('time').textContent = new Date().toLocaleTimeString();
     }, 1000);
+  },
+
+  async fetchCommitInfo() {
+    try {
+      // Try to fetch from GitHub API
+      const response = await fetch('https://api.github.com/repos/teslasolar/ignition-sandbox/commits/claude/ignition-browser-sandbox-01NvmpKvr4EosK7GoU2msPkK');
+      if (response.ok) {
+        const data = await response.json();
+        const shortHash = data.sha.substring(0, 7);
+        const date = new Date(data.commit.author.date);
+        const timeAgo = this.getTimeAgo(date);
+
+        // Update commit hash display
+        const commitEl = document.getElementById('commitHash');
+        if (commitEl) {
+          commitEl.innerHTML = `<a href="${data.html_url}" target="_blank" style="color:var(--accent);text-decoration:none">${shortHash}</a> <span style="color:var(--text2);font-size:7px">(${timeAgo})</span>`;
+          commitEl.title = `${data.commit.message}\nBy: ${data.commit.author.name}\n${date.toLocaleString()}`;
+        }
+
+        // Update header commit display
+        const headerCommit = document.getElementById('headerCommit');
+        if (headerCommit) {
+          headerCommit.innerHTML = `[${shortHash}]`;
+          headerCommit.title = `Latest commit: ${shortHash}\n${timeAgo}`;
+        }
+
+        // Also update status bar
+        const sbLeft = document.getElementById('sbLeft');
+        if (sbLeft && this.config) {
+          sbLeft.innerHTML = `${this.config.name || 'IgnAIte'} v${this.config.version || '1.0'} • <span style="color:var(--accent)">${shortHash}</span>`;
+        }
+      } else {
+        // Fallback to static version
+        document.getElementById('commitHash').textContent = 'offline';
+      }
+    } catch (e) {
+      // If API fails, use a fallback
+      const commitEl = document.getElementById('commitHash');
+      if (commitEl) {
+        commitEl.innerHTML = '<span style="color:var(--text2)">local</span>';
+      }
+      console.log('Could not fetch commit info:', e);
+    }
+  },
+
+  getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60
+    };
+
+    for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+      }
+    }
+    return 'just now';
   }
 };
 
