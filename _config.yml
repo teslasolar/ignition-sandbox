@@ -1,0 +1,10 @@
+# GitHub Pages Configuration
+title: Ignition Sandbox
+description: Browser-based Ignition Gateway development environment
+theme: null
+exclude:
+  - ignition-8.3.1-linux-64-installer.run
+  - '*.sh'
+  - '.git'
+  - '.github'
+  - 'README.md'
