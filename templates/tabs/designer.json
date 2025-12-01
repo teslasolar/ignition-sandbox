@@ -1,17 +1,12 @@
-{"id":"designer","title":"Perspective Designer","type":"custom","sections":[
-{"type":"cards","items":[
-  {"title":"Visual Designer","href":"screens/designer/","description":"Drag-and-drop view designer"},
-  {"title":"Command Sandbox","href":"screens/sandbox/","description":"Interactive terminal"},
-  {"title":"All Screens","href":"screens/","description":"Browse all screens"}
-]},
-{"title":"Templates","type":"cards","items":[
-  {"title":"Tank Farm","href":"screens/templates/views/tank-farm.json","target":"_blank"},
-  {"title":"Overview","href":"screens/templates/views/overview.json","target":"_blank"},
-  {"title":"Manifest","href":"screens/templates/manifest.json","target":"_blank"}
-]},
-{"title":"Components","type":"commands","items":[
-  {"label":"Tank","code":"screens/templates/components/tank.json"},
-  {"label":"Valve","code":"screens/templates/components/valve.json"},
-  {"label":"Pump","code":"screens/templates/components/pump.json"}
-]}
+{"id":"designer","title":"Perspective Designer","type":"tab",
+"description":"Screen design and component library",
+"commands":[
+  {"label":"Open Designer","code":"location.href='screens/designer/'","desc":"Drag-and-drop view designer"},
+  {"label":"Command Sandbox","code":"location.href='screens/sandbox/'","desc":"Interactive terminal"},
+  {"label":"Browse Screens","code":"location.href='screens/'","desc":"All screen templates"},
+  {"label":"Tank Farm View","code":"location.href='screens/templates/views/tank-farm.json'","desc":"Tank farm template"},
+  {"label":"Overview View","code":"location.href='screens/templates/views/overview.json'","desc":"System overview"},
+  {"label":"Tank Component","code":"fetch('screens/templates/components/tank.json').then(r=>r.json())","desc":"Reusable tank"},
+  {"label":"Valve Component","code":"fetch('screens/templates/components/valve.json').then(r=>r.json())","desc":"Reusable valve"},
+  {"label":"Pump Component","code":"fetch('screens/templates/components/pump.json').then(r=>r.json())","desc":"Reusable pump"}
 ]}
