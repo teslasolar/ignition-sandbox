@@ -1,0 +1,96 @@
+{
+  "id": "api",
+  "title": "Ignition VM API Interface",
+  "type": "api-documentation",
+  "components": {
+    "header": {
+      "title": "Ignition VM API Interface",
+      "subtitle": "Browser-based API for controlling and testing the VM emulator"
+    },
+    "sections": [
+      {
+        "title": "API Endpoints",
+        "type": "endpoints",
+        "items": [
+          {
+            "method": "GET",
+            "endpoint": "/api/status",
+            "description": "Get VM status",
+            "example": "fetch('/api/status').then(res => res.json()).then(data => console.log(data));"
+          },
+          {
+            "method": "POST",
+            "endpoint": "/api/boot",
+            "description": "Boot a VM",
+            "example": "fetch('/api/boot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ distro: 'alpine' }) });"
+          },
+          {
+            "method": "POST",
+            "endpoint": "/api/command",
+            "description": "Send command to VM",
+            "example": "fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cmd: 'uname -a' }) });"
+          }
+        ]
+      },
+      {
+        "title": "PostMessage API",
+        "type": "code",
+        "description": "For cross-origin communication with embedded VM iframe",
+        "example": "// Send message to VM iframe\nconst vmFrame = document.getElementById('vmFrame');\nvmFrame.contentWindow.postMessage({\n    type: 'vm-command',\n    action: 'boot',\n    params: { distro: 'alpine' }\n}, '*');\n\n// Listen for responses\nwindow.addEventListener('message', (event) => {\n    if (event.data.type === 'vm-response') {\n        console.log('VM Response:', event.data);\n    }\n});"
+      },
+      {
+        "title": "Test Interface",
+        "type": "controls",
+        "buttons": [
+          { "text": "Test Status", "action": "testStatus" },
+          { "text": "Boot Alpine", "action": "testBoot('alpine')" },
+          { "text": "Boot TinyCore", "action": "testBoot('tinycore')" },
+          { "text": "Send uname", "action": "testCommand('uname -a')" },
+          { "text": "Send ls /", "action": "testCommand('ls /')" },
+          { "text": "Run Full Test", "action": "runFullTest" }
+        ]
+      }
+    ],
+    "testResults": {
+      "title": "Test Results",
+      "type": "console",
+      "id": "testResults"
+    },
+    "vmFrame": {
+      "title": "VM Instance",
+      "type": "iframe",
+      "src": "?view=main",
+      "id": "vmFrame"
+    }
+  },
+  "commands": {
+    "status": {
+      "type": "vm-command",
+      "action": "status",
+      "response": ["running", "emulator", "v86Ready", "status", "memory"]
+    },
+    "boot": {
+      "type": "vm-command",
+      "action": "boot",
+      "params": {
+        "distro": ["alpine", "tinycore", "slitaz"],
+        "type": ["linux", "sector"]
+      }
+    },
+    "command": {
+      "type": "vm-command",
+      "action": "command",
+      "params": {
+        "cmd": "string"
+      }
+    },
+    "stop": {
+      "type": "vm-command",
+      "action": "stop"
+    },
+    "restart": {
+      "type": "vm-command",
+      "action": "restart"
+    }
+  }
+}

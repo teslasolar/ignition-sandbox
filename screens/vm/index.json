@@ -1,0 +1,60 @@
+{
+  "id": "vm",
+  "name": "Virtual Machine",
+  "description": "Browser-based x86 virtual machine emulator",
+  "type": "application",
+  "version": "1.0.0",
+  "author": "Konomi IgnAIte",
+  "entry": "main.json",
+  "views": [
+    {
+      "id": "main",
+      "name": "VM Emulator",
+      "description": "Main VM interface with Linux distributions",
+      "file": "main.json",
+      "default": true
+    },
+    {
+      "id": "monitor",
+      "name": "Error Monitor",
+      "description": "Real-time error monitoring and alarms",
+      "file": "monitor.json"
+    },
+    {
+      "id": "api",
+      "name": "API Interface",
+      "description": "PostMessage API for VM control",
+      "file": "api.json"
+    },
+    {
+      "id": "health",
+      "name": "Health Check",
+      "description": "System health monitoring",
+      "file": "health.json"
+    }
+  ],
+  "resources": {
+    "scripts": [
+      "../../vm/error-monitor.js"
+    ],
+    "images": [
+      "../../vm/images/seabios/seabios.bin",
+      "../../vm/images/seabios/vgabios.bin"
+    ],
+    "isos": [
+      "../../vm/images/linux/alpine-virt-3.19.0-x86.iso",
+      "../../vm/images/linux/TinyCore-15.0.iso",
+      "../../vm/images/linux/slitaz-rolling.iso"
+    ]
+  },
+  "dependencies": {
+    "v86": "https://copy.sh/v86/build/libv86.js",
+    "wasm": "https://copy.sh/v86/build/v86.wasm"
+  },
+  "navigation": [
+    { "view": "main", "label": "Emulator", "icon": "💻" },
+    { "view": "monitor", "label": "Monitor", "icon": "🔍" },
+    { "view": "api", "label": "API", "icon": "🔌" },
+    { "view": "health", "label": "Health", "icon": "🔧" }
+  ]
+}

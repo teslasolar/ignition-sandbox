@@ -1,0 +1,144 @@
+{
+  "id": "main",
+  "title": "Ignition Sandbox VM",
+  "type": "vm-emulator",
+  "components": {
+    "header": {
+      "title": "Ignition Sandbox VM",
+      "controls": [
+        { "id": "vmStatus", "type": "status", "text": "Ready" },
+        { "id": "restartBtn", "type": "button", "text": "Restart", "action": "VM.restart()", "disabled": true },
+        { "id": "stopBtn", "type": "button", "text": "Stop", "class": "danger", "action": "VM.stop()", "disabled": true },
+        { "id": "backBtn", "type": "button", "text": "Back", "action": "location.href='../'" }
+      ]
+    },
+    "bootOptions": {
+      "title": "Ignition Sandbox VM",
+      "subtitle": "Browser-based Linux Environment",
+      "sections": [
+        {
+          "label": "LINUX DISTRIBUTIONS (v86)",
+          "options": [
+            {
+              "id": "alpine",
+              "title": "Alpine Linux",
+              "tag": "Recommended",
+              "description": "46MB - Security-focused lightweight distribution. Fast boot, minimal resources.",
+              "action": "VM.bootLinux('alpine')"
+            },
+            {
+              "id": "tinycore",
+              "title": "Tiny Core Linux",
+              "description": "24MB - Ultra-minimal Linux. Perfect for testing and development.",
+              "action": "VM.bootLinux('tinycore')"
+            },
+            {
+              "id": "slitaz",
+              "title": "SliTaz Linux",
+              "description": "55MB - Full-featured lightweight rolling release distribution.",
+              "action": "VM.bootLinux('slitaz')"
+            }
+          ]
+        },
+        {
+          "label": "BOOT SECTORS (512 bytes)",
+          "options": [
+            {
+              "id": "minimal",
+              "title": "Minimal Boot",
+              "description": "Displays IgnAIte banner. Instant boot for testing.",
+              "action": "VM.bootSector('minimal')"
+            },
+            {
+              "id": "shell",
+              "title": "Interactive Shell",
+              "description": "Basic command-line interface with keyboard input.",
+              "action": "VM.bootSector('shell')"
+            },
+            {
+              "id": "gateway",
+              "title": "Gateway Display",
+              "description": "Shows PLC/Gateway status screen.",
+              "action": "VM.bootSector('gateway')"
+            }
+          ]
+        }
+      ]
+    },
+    "sidebar": {
+      "sections": [
+        {
+          "title": "System Info",
+          "type": "info",
+          "items": [
+            { "label": "Memory", "id": "infoMemory", "value": "512 MB" },
+            { "label": "CPU", "value": "x86 (emulated)" }
+          ]
+        },
+        {
+          "title": "Quick Commands",
+          "type": "commands",
+          "items": [
+            { "name": "System Info", "cmd": "uname -a\\n" },
+            { "name": "Memory", "cmd": "free -h\\n" },
+            { "name": "List Root", "cmd": "ls -la /\\n" },
+            { "name": "Disk", "cmd": "df -h\\n" },
+            { "name": "Processes", "cmd": "ps aux\\n" }
+          ]
+        },
+        {
+          "title": "Network",
+          "type": "commands",
+          "items": [
+            { "name": "IP Address", "cmd": "ifconfig\\n" },
+            { "name": "Ping Gateway", "cmd": "ping -c 3 10.0.2.2\\n" }
+          ]
+        },
+        {
+          "title": "Ignition",
+          "type": "commands",
+          "items": [
+            { "name": "Status", "cmd": "ignition status\\n" },
+            { "name": "Install", "cmd": "ignition install\\n" }
+          ]
+        }
+      ],
+      "footer": "v86 x86 emulator in JS/WASM"
+    }
+  },
+  "resources": {
+    "scripts": [
+      "https://copy.sh/v86/build/libv86.js"
+    ],
+    "distros": {
+      "alpine": {
+        "name": "Alpine Linux 3.19",
+        "cdrom": "images/linux/alpine-virt-3.19.0-x86.iso",
+        "memory": 536870912,
+        "vga_memory": 8388608
+      },
+      "tinycore": {
+        "name": "Tiny Core Linux 15.0",
+        "cdrom": "images/linux/TinyCore-15.0.iso",
+        "memory": 268435456,
+        "vga_memory": 8388608
+      },
+      "slitaz": {
+        "name": "SliTaz Linux",
+        "cdrom": "images/linux/slitaz-rolling.iso",
+        "memory": 536870912,
+        "vga_memory": 8388608
+      }
+    },
+    "bootSectors": {
+      "minimal": { "fda": "images/kernels/boot-minimal.bin", "name": "Minimal Boot", "mem": 16 },
+      "shell": { "fda": "images/kernels/boot-shell.bin", "name": "Interactive Shell", "mem": 32 },
+      "gateway": { "fda": "images/kernels/boot-gateway.bin", "name": "Gateway Display", "mem": 32 }
+    },
+    "bios": {
+      "seabios": "images/seabios/seabios.bin",
+      "vgabios": "images/seabios/vgabios.bin"
+    },
+    "wasm": "https://copy.sh/v86/build/v86.wasm"
+  }
+}

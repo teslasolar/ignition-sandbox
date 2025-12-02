@@ -1,0 +1,134 @@
+{
+  "id": "monitor",
+  "title": "VM Error Monitor Dashboard",
+  "type": "monitoring",
+  "layout": "dashboard",
+  "components": {
+    "header": {
+      "title": "🔍 VM Error Monitor Dashboard",
+      "subtitle": "Real-time error tracking and system health monitoring"
+    },
+    "controls": [
+      { "id": "healthCheckBtn", "text": "Run Health Check", "action": "runHealthCheck" },
+      { "id": "testAllBtn", "text": "Test All Systems", "action": "testAllSystems" },
+      { "id": "clearAlarmsBtn", "text": "Clear Alarms", "action": "clearAlarms" },
+      { "id": "exportLogBtn", "text": "Export Log", "action": "exportLog" },
+      { "id": "refreshBtn", "text": "Refresh", "action": "location.reload()" }
+    ],
+    "cards": [
+      {
+        "id": "systemStatus",
+        "title": "📊 System Status",
+        "type": "stats",
+        "metrics": [
+          { "id": "criticalCount", "label": "CRITICAL", "value": 0, "class": "critical" },
+          { "id": "warningCount", "label": "WARNING", "value": 0, "class": "warning" },
+          { "id": "infoCount", "label": "INFO", "value": 0, "class": "info" },
+          { "id": "totalErrors", "label": "TOTAL", "value": 0, "class": "ok" }
+        ]
+      },
+      {
+        "id": "systemTests",
+        "title": "🧪 System Tests",
+        "type": "tests",
+        "tests": [
+          { "name": "V86 Emulator", "check": "v86Status" },
+          { "name": "BIOS Files", "check": "biosStatus" },
+          { "name": "Linux ISOs", "check": "isoStatus" },
+          { "name": "CDN Status", "check": "cdnStatus" },
+          { "name": "WebAssembly", "check": "wasmStatus" }
+        ]
+      },
+      {
+        "id": "criticalAlarms",
+        "title": "🚨 Critical Alarms",
+        "type": "alarms",
+        "level": "critical",
+        "maxItems": 5
+      },
+      {
+        "id": "warningAlarms",
+        "title": "⚠️ Warnings",
+        "type": "alarms",
+        "level": "warning",
+        "maxItems": 5
+      },
+      {
+        "id": "infoAlarms",
+        "title": "ℹ️ Information",
+        "type": "alarms",
+        "level": "info",
+        "maxItems": 5
+      },
+      {
+        "id": "consoleLog",
+        "title": "📝 Console Output",
+        "type": "log",
+        "span": 2,
+        "maxLines": 100
+      }
+    ]
+  },
+  "alarmTags": {
+    "V86_LOAD_FAIL": {
+      "level": "CRITICAL",
+      "tag": "🚨 [V86_LOAD_FAIL]",
+      "message": "V86 emulator failed to load",
+      "recovery": "Refresh page or check internet connection"
+    },
+    "VM_CRASH": {
+      "level": "CRITICAL",
+      "tag": "🚨 [VM_CRASH]",
+      "message": "Virtual machine crashed",
+      "recovery": "Restart VM"
+    },
+    "MEMORY_ERROR": {
+      "level": "CRITICAL",
+      "tag": "🚨 [MEMORY_ERROR]",
+      "message": "Out of memory",
+      "recovery": "Reduce memory allocation or close other tabs"
+    },
+    "BIOS_MISSING": {
+      "level": "CRITICAL",
+      "tag": "🚨 [BIOS_MISSING]",
+      "message": "BIOS files not found",
+      "recovery": "Check BIOS file paths"
+    },
+    "CDN_SLOW": {
+      "level": "WARNING",
+      "tag": "⚠️ [CDN_SLOW]",
+      "message": "CDN response slow",
+      "recovery": "Using fallback CDN"
+    },
+    "ISO_NOT_FOUND": {
+      "level": "WARNING",
+      "tag": "⚠️ [ISO_NOT_FOUND]",
+      "message": "ISO file not accessible",
+      "recovery": "Check ISO file URL"
+    },
+    "KEYBOARD_ERROR": {
+      "level": "WARNING",
+      "tag": "⚠️ [KEYBOARD_ERROR]",
+      "message": "Keyboard input not working",
+      "recovery": "Click on VM screen to focus"
+    },
+    "NETWORK_ERROR": {
+      "level": "WARNING",
+      "tag": "⚠️ [NETWORK_ERROR]",
+      "message": "Network connectivity issue",
+      "recovery": "Check internet connection"
+    },
+    "V86_VERSION": {
+      "level": "INFO",
+      "tag": "ℹ️ [V86_VERSION]",
+      "message": "V86 version mismatch",
+      "recovery": "Update may be available"
+    },
+    "BROWSER_COMPAT": {
+      "level": "INFO",
+      "tag": "ℹ️ [BROWSER_COMPAT]",
+      "message": "Browser compatibility warning",
+      "recovery": "Use Chrome/Firefox for best results"
+    }
+  }
+}

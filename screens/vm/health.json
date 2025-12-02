@@ -1,0 +1,88 @@
+{
+  "id": "health",
+  "title": "VM Health Check",
+  "type": "health-monitor",
+  "autoRefresh": 30,
+  "components": {
+    "header": {
+      "title": "🔧 VM Health Check",
+      "subtitle": "Automated health monitoring for Ignition Sandbox VM"
+    },
+    "sections": [
+      {
+        "id": "systemStatus",
+        "title": "System Status",
+        "type": "status",
+        "items": [
+          { "label": "Overall Status", "id": "overallStatus", "badge": true },
+          { "label": "Last Check", "id": "lastCheck" },
+          { "label": "Auto Refresh", "value": "Every 30 seconds" }
+        ]
+      },
+      {
+        "id": "vmComponents",
+        "title": "VM Components",
+        "type": "checklist",
+        "checks": [
+          { "name": "V86 Emulator", "id": "v86Status", "endpoint": "check-v86" },
+          { "name": "Main Page", "id": "mainPageStatus", "endpoint": "/index.html" },
+          { "name": "BIOS Files", "id": "biosStatus", "endpoints": [
+            "/images/seabios/seabios.bin",
+            "/images/seabios/vgabios.bin"
+          ]},
+          { "name": "Linux ISOs", "id": "isoStatus", "endpoints": [
+            "/images/linux/alpine-virt-3.19.0-x86.iso",
+            "/images/linux/TinyCore-15.0.iso",
+            "/images/linux/slitaz-rolling.iso"
+          ]},
+          { "name": "CDN Resources", "id": "cdnStatus", "endpoints": [
+            "https://copy.sh/v86/build/libv86.js",
+            "https://copy.sh/v86/build/v86.wasm"
+          ]}
+        ]
+      },
+      {
+        "id": "resourceDetails",
+        "title": "Resource Details",
+        "type": "details",
+        "resources": [
+          { "name": "Alpine Linux", "path": "/images/linux/alpine-virt-3.19.0-x86.iso", "expectedSize": 48234496 },
+          { "name": "TinyCore", "path": "/images/linux/TinyCore-15.0.iso", "expectedSize": 25165824 },
+          { "name": "SliTaz", "path": "/images/linux/slitaz-rolling.iso", "expectedSize": 57571328 },
+          { "name": "SeaBIOS", "path": "/images/seabios/seabios.bin", "expectedSize": 131072 },
+          { "name": "VGA BIOS", "path": "/images/seabios/vgabios.bin", "expectedSize": 36352 }
+        ]
+      },
+      {
+        "id": "jsonOutput",
+        "title": "JSON Output",
+        "type": "json",
+        "buttons": [
+          { "text": "Copy JSON", "action": "copyJSON" },
+          { "text": "Download JSON", "action": "downloadJSON" }
+        ]
+      }
+    ]
+  },
+  "healthChecks": {
+    "v86": {
+      "check": "typeof V86Starter !== 'undefined' || typeof V86 !== 'undefined'",
+      "success": "✓ Ready",
+      "failure": "✗ Not loaded",
+      "alarm": "V86_LOAD_FAIL"
+    },
+    "webAssembly": {
+      "check": "typeof WebAssembly !== 'undefined'",
+      "success": "✓ Supported",
+      "failure": "✗ Not supported",
+      "alarm": "BROWSER_COMPAT"
+    },
+    "memory": {
+      "check": "navigator.deviceMemory",
+      "threshold": 4,
+      "success": "✓ Adequate",
+      "failure": "⚠ Limited",
+      "alarm": "MEMORY_ERROR"
+    }
+  }
+}
